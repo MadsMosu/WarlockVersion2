@@ -32,8 +32,7 @@ public class Animator {
     }
 
     public void render(GameData gameData) {
-        stateTime += gameData.getDelta();
-
+        
         //batch.setProjectionMatrix();
 //        batch.begin();
 //        batch.draw(getFrame(entity), entity.getX(), entity.getY());
@@ -46,10 +45,10 @@ public class Animator {
         int spriteWidth = 50;
         stateTime = 0;
 
-        chStandingRight = new TextureRegion(texture, 0, 0, spriteWidth, spriteHeight);
-        chStandingLeft = new TextureRegion(texture, 0, 0, spriteWidth, spriteHeight);
+        chStandingRight = new TextureRegion(texture, 700, 0, spriteWidth, spriteHeight);
+        chStandingLeft = new TextureRegion(texture, 300, 0, spriteWidth, spriteHeight);
         chStandingUp = new TextureRegion(texture, 0, 0, spriteWidth, spriteHeight);
-        chStandingDown = new TextureRegion(texture, 0, 0, spriteWidth, spriteHeight);
+        chStandingDown = new TextureRegion(texture, 1100, 0, spriteWidth, spriteHeight);
 
         Array<TextureRegion> frames = new Array<>();
 
@@ -57,28 +56,28 @@ public class Animator {
         for (int i = 0; i < 8; i++) {
             frames.add(new TextureRegion(texture, 700 + i * 50, 0, 50, 50));
         }
-        chRunningRight = new Animation(0.2f, frames);
+        chRunningRight = new Animation(0.18f, frames);
         frames.clear();
 
         //run left
         for (int i = 0; i < 8; i++) {
             frames.add(new TextureRegion(texture, 300 + i * 50, 0, 50, 50));
         }
-        chRunningLeft = new Animation(0.2f, frames);
+        chRunningLeft = new Animation(0.18f, frames);
         frames.clear();
 
         //run down
         for (int i = 0; i < 6; i++) {
             frames.add(new TextureRegion(texture, i * 50, 0, 50, 50));
         }
-        chRunningDown = new Animation(0.2f, frames);
+        chRunningDown = new Animation(0.18f, frames);
         frames.clear();
 
         //run up
         for (int i = 0; i < 6; i++) {
             frames.add(new TextureRegion(texture, 1100 + i * 50, 0, 50, 50));
         }
-        chRunningUp = new Animation(0.2f, frames);
+        chRunningUp = new Animation(0.18f, frames);
         frames.clear();
 
     }

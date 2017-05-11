@@ -39,6 +39,10 @@ public class SpellBook {
     public List<SpellType> getSpells() {
         return spells;
     }
+    
+    public void addToSpellBook(SpellType spell){
+        spells.add(spell);
+    }
 
     public void setSpells(List<SpellType> spells) {
         this.spells = spells;

@@ -39,9 +39,7 @@ public class SpellInfos {
 
     public void setChosenSpell(SpellType chosenSpell) {
         this.chosenSpell = chosenSpell;
-    }
-
-    
+    }   
     
     public SpellType hitByWhichSpell() {
         return getHitBy().get(SpellType.class);

@@ -13,6 +13,7 @@ import static States.CharacterState.IDLE;
 import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
+import data.SpellList;
 import data.componentdata.Expiration;
 import data.componentdata.Position;
 import data.componentdata.SpellInfos;
@@ -28,15 +29,16 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
 
     private SpellArchive archive;
     private World world;
+    SpellBook spellBook;
 
     @Override
     public void start(GameData gameData, World world) {
-        archive = new SpellArchive(world);
-
-        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
-            SpellBook spellBook = new SpellBook();
-        }
-
+//        archive = new SpellArchive(world);
+//
+//        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
+//            SpellBook spellBook = new SpellBook();
+//
+//    }
     }
 
     @Override
@@ -60,23 +62,21 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         }
     }
 
-    public void unlockSpell(World world, Entity owner, SpellType spellType) {
+    public void unlockSpell(Entity owner, SpellType spellType) {
         SpellBook sb = owner.get(SpellBook.class);
-        spellBook.addToSpellBook(world, owner, spellType);
+        sb.addToSpellBook(spellType);
     }
 
     public void useSpell(World world, SpellType spellType, float x, float y, Entity caster) {
         SpellBook sb = caster.get(SpellBook.class);
         for (SpellType spell : sb.getSpells()) {
-            if (spell.getSpellType().equals(spellType)) {
-                Entity se = spell.getSpellEntity();
-                //archive.getAnimator().getBatch().draw((TextureRegion) spellBook.getSpell(spellType).getAnimation().getKeyFrame(archive.getAnimator().getStateTime()), x, y);
+            if (spell.equals(spellType)) {
+                Entity se = new Entity();
                 se.setType(SPELL);
                 Position p = caster.get(Position.class);
                 se.add(new Position(p.getX(), p.getY()));
                 se.setRadians(caster.getRadians());
-                se.setMaxSpeed(spellBook.getSpell(spellType).getSpeed());
-                se.setAcceleration(spellBook.getSpell(spellType).getAcceleration());
+                se.setMaxSpeed(SpellList.getSpellSpeed(spellType));
                 return;
             }
         }

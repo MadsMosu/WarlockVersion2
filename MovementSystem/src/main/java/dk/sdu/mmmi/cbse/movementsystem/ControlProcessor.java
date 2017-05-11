@@ -47,7 +47,7 @@ public class ControlProcessor implements IEntityProcessingService {
             handleMoveClick(entity, gameData);
             handleTargetClick(entity, gameData);
             handleShoot(entity, gameData);
-
+            
             for (Entity spell : world.getEntities(EntityType.SPELL)) {
                 if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
                     Position sp = spell.get(Position.class);
