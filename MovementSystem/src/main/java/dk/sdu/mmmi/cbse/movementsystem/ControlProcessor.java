@@ -91,8 +91,7 @@ public class ControlProcessor implements IEntityProcessingService {
 
             if (startX == endX && startY == endY) {
                 e.setCharState(CharacterState.IDLE);
-            }
-            else {
+            } else {
                 angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX));
                 speed = 100;
                 distance = (float) Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
@@ -144,14 +143,11 @@ public class ControlProcessor implements IEntityProcessingService {
     private void setRunningState(Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.RUNNINGRIGHT);
-        }
-        else if (angle < 135 && angle > 45) {
+        } else if (angle < 135 && angle > 45) {
             e.setMoveState(MovementState.RUNNINGUP);
-        }
-        else if (angle > -135 && angle < -45) {
+        } else if (angle > -135 && angle < -45) {
             e.setMoveState(MovementState.RUNNINGDOWN);
-        }
-        else {
+        } else {
             e.setMoveState(MovementState.RUNNINGLEFT);
         }
     }
@@ -159,14 +155,11 @@ public class ControlProcessor implements IEntityProcessingService {
     private void setStandingState(Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.STANDINGRIGHT);
-        }
-        else if (angle < 135 && angle > 45) {
+        } else if (angle < 135 && angle > 45) {
             e.setMoveState(MovementState.STANDINGUP);
-        }
-        else if (angle > -135 && angle < -45) {
+        } else if (angle > -135 && angle < -45) {
             e.setMoveState(MovementState.STANDINGDOWN);
-        }
-        else {
+        } else {
             e.setMoveState(MovementState.STANDINGLEFT);
         }
     }
@@ -175,8 +168,7 @@ public class ControlProcessor implements IEntityProcessingService {
         if (gameData.getKeys().isPressed(NUM_1)) {
             e.get(SpellInfos.class).setChosenSpell(SpellType.FIREBALL);
 
-        }
-        else {
+        } else {
             return;
         }
         if (gameData.getKeys().isPressed(NUM_2)) {

@@ -16,6 +16,7 @@ import static data.EntityType.SPELL;
 import data.componentdata.Expiration;
 import data.componentdata.Position;
 import data.componentdata.SpellInfos;
+import data.componentdata.SpellBook;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IGamePluginService.class)
@@ -32,7 +33,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     public void start(GameData gameData, World world) {
         archive = new SpellArchive(world);
 
-        for (Entity entity : world.getEntities(PLAYER)) {
+        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             SpellBook spellBook = new SpellBook();
         }
 
@@ -41,7 +42,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     @Override
     public void process(GameData gameData, World world) {
 
-        for (Entity entity : world.getEntities(PLAYER)) {
+        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             SpellInfos s = entity.get(SpellInfos.class);
             Position p = entity.get(Position.class);
             if (entity.getCharState() == CASTING) {
@@ -60,11 +61,13 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     }
 
     public void unlockSpell(World world, Entity owner, SpellType spellType) {
+        SpellBook sb = owner.get(SpellBook.class);
         spellBook.addToSpellBook(world, owner, spellType);
     }
 
     public void useSpell(World world, SpellType spellType, float x, float y, Entity caster) {
-        for (Spell spell : spellBook.getSpellBook(world, caster)) {
+        SpellBook sb = caster.get(SpellBook.class);
+        for (SpellType spell : sb.getSpells()) {
             if (spell.getSpellType().equals(spellType)) {
                 Entity se = spell.getSpellEntity();
                 //archive.getAnimator().getBatch().draw((TextureRegion) spellBook.getSpell(spellType).getAnimation().getKeyFrame(archive.getAnimator().getStateTime()), x, y);
