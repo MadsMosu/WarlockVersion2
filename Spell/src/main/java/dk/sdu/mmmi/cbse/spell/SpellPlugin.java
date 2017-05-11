@@ -27,13 +27,14 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
 
     private SpellArchive archive;
     private World world;
+    SpellBook spellBook;
 
     @Override
     public void start(GameData gameData, World world) {
         archive = new SpellArchive(world);
 
         for (Entity entity : world.getEntities(PLAYER)) {
-            SpellBook spellBook = new SpellBook();
+            spellBook = new SpellBook();
         }
 
     }
