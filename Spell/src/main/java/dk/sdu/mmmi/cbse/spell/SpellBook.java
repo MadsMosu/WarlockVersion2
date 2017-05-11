@@ -5,6 +5,7 @@ import java.util.List;
 import data.Entity;
 import data.EntityType;
 import data.SpellType;
+import static data.SpellType.FIREBALL;
 import data.World;
 
 /**
@@ -39,6 +40,6 @@ public class SpellBook {
     }
 
     private void addDefaultSpells() {
-        spellBook.add((Spell) SpellArchive.getSpellArchive().get(SpellType.FIREBALL));
+        spellBook.add((Spell) SpellArchive.getSpellArchive().get(FIREBALL));
     }
 }

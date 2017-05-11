@@ -11,9 +11,8 @@ import java.io.Serializable;
  *
  * @author Aleksander
  */
-public class Position implements Serializable{
+public class Position implements Serializable {
 
-    
     private float x;
     private float y;
 
@@ -27,11 +26,11 @@ public class Position implements Serializable{
         this.y = y;
     }
 
-    public void setPosition(float x, float y){
+    public void setPosition(float x, float y) {
         this.x = x;
         this.y = y;
     }
-    
+
     public float getX() {
         return x;
     }
@@ -48,27 +47,22 @@ public class Position implements Serializable{
         this.y = y;
     }
 
-        @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (obj == null)
-        {
+        if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass())
-        {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        Position other = (Position)obj;
-        if (x != other.getX() || y != other.getY())
-        {
+        Position other = (Position) obj;
+        if (x != other.getX() || y != other.getY()) {
             return false;
         }
         return true;
     }
-    
+
 }

@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
@@ -63,6 +64,10 @@ public class GameEngine implements ApplicationListener {
     private SpriteBatch spriteBatch;
     private Animator animator;
     private HUD hud;
+    
+    private MapProperties prop;
+    private int mapHeight;
+    private int mapWidth;
 
     @Override
     public void create() {
@@ -93,6 +98,16 @@ public class GameEngine implements ApplicationListener {
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
+        
+        prop = map.getProperties();
+        mapHeight = prop.get("height", Integer.class)* prop.get("tileheight", Integer.class);
+        mapWidth = prop.get("width", Integer.class) * prop.get("tilewidth", Integer.class);;
+        System.out.println(mapHeight + "  " + mapWidth);
+ 
+        gameData.setDisplayWidth(Gdx.graphics.getWidth());
+        gameData.setDisplayHeight(Gdx.graphics.getHeight());
+        //camera.setToOrtho(false, gameData.getMapWidth(), gameData.getMapHeight());
+        camera.position.set(mapWidth/2, 0, 0);
 
         for (int i = 2; i < mapLayers.getCount(); i++) {
             mapLayers.get(i).setVisible(false);
