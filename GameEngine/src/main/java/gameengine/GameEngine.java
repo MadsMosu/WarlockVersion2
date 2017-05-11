@@ -12,7 +12,6 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -151,13 +150,14 @@ public class GameEngine implements ApplicationListener {
         renderer.setView(camera);
         renderer.render();
         camera.updateAndMove();
-        animator.render(gameData);
+        animator.updateStateTime(gameData.getDelta());
         update();
         draw();
     }
 
     private void draw() {
 
+        
         for (Entity e : world.getEntities(PLAYER)) {
             Position p = e.get(Position.class);
             Image image = e.get(Image.class);
@@ -166,7 +166,7 @@ public class GameEngine implements ApplicationListener {
                 
 
                 if (!image.isRepeat()) {
-                    animator.updateStateTime(gameData.getDelta());
+                    
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
                     spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
@@ -181,10 +181,7 @@ public class GameEngine implements ApplicationListener {
             Image image = e.get(Image.class);
             if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
 
-                
-
                 if (!image.isRepeat()) {
-                    animator.updateStateTime(gameData.getDelta());
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
                     spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
@@ -203,7 +200,6 @@ public class GameEngine implements ApplicationListener {
                 animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class));
 
                 if (!image.isRepeat()) {
-                    animator.updateStateTime(gameData.getDelta());
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
                     spriteBatch.draw(animator.getSpellTexture(), p.getX(), p.getY());
