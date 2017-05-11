@@ -1,6 +1,5 @@
 package dk.sdu.mmmi.cbse.spell;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import data.Entity;
 import data.GameData;
 import data.World;
@@ -8,9 +7,12 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
 import services.IGamePluginService;
-import data.EntityType;
 import data.SpellType;
-import States.CharacterState;
+import static States.CharacterState.CASTING;
+import static States.CharacterState.IDLE;
+import static data.EntityType.ENEMY;
+import static data.EntityType.PLAYER;
+import static data.EntityType.SPELL;
 import data.componentdata.Expiration;
 import data.componentdata.Position;
 import data.componentdata.SpellInfos;
@@ -23,7 +25,6 @@ import data.componentdata.SpellInfos;
 
 public class SpellPlugin implements IGamePluginService, IEntityProcessingService {
 
-    private SpellBook spellBook;
     private SpellArchive archive;
     private World world;
 
@@ -31,22 +32,24 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     public void start(GameData gameData, World world) {
         archive = new SpellArchive(world);
 
-        spellBook = new SpellBook();
+        for (Entity entity : world.getEntities(PLAYER)) {
+            SpellBook spellBook = new SpellBook();
+        }
 
     }
 
     @Override
     public void process(GameData gameData, World world) {
-        
-        for (Entity entity : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
+
+        for (Entity entity : world.getEntities(PLAYER)) {
             SpellInfos s = entity.get(SpellInfos.class);
             Position p = entity.get(Position.class);
-            if (entity.getCharState() == CharacterState.CASTING) {
+            if (entity.getCharState() == CASTING) {
                 useSpell(world, s.getChosenSpell(), p.getX(), p.getY(), entity);
-                entity.setCharState(CharacterState.IDLE);
+                entity.setCharState(IDLE);
             }
         }
-        for (Entity spell : world.getEntities(EntityType.SPELL)) {
+        for (Entity spell : world.getEntities(SPELL)) {
             float dt = gameData.getDelta();
             Expiration e = spell.get(Expiration.class);
             e.reduceExpiration(dt);
@@ -55,7 +58,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             }
         }
     }
-    
+
     public void unlockSpell(World world, Entity owner, SpellType spellType) {
         spellBook.addToSpellBook(world, owner, spellType);
     }
@@ -65,7 +68,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             if (spell.getSpellType().equals(spellType)) {
                 Entity se = spell.getSpellEntity();
                 //archive.getAnimator().getBatch().draw((TextureRegion) spellBook.getSpell(spellType).getAnimation().getKeyFrame(archive.getAnimator().getStateTime()), x, y);
-                se.setType(EntityType.SPELL);
+                se.setType(SPELL);
                 Position p = caster.get(Position.class);
                 se.add(new Position(p.getX(), p.getY()));
                 se.setRadians(caster.getRadians());
@@ -78,7 +81,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
 
     @Override
     public void stop() {
-        for (Entity spell : world.getEntities(EntityType.SPELL)) {
+        for (Entity spell : world.getEntities(SPELL)) {
             world.removeEntity(spell);
         }
     }
