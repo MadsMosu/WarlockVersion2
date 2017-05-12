@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-OpenIDE-Module-Install: dk/sdu/mmmi/cbse/enemy/Installer.class
-OpenIDE-Module-Localizing-Bundle: dk/sdu/mmmi/cbse/enemy/Bundle.properties
+OpenIDE-Module-Install: enemy/Installer.class
+OpenIDE-Module-Localizing-Bundle: enemy/Bundle.properties
 

@@ -11,6 +11,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayers;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import data.Entity;
@@ -168,6 +170,13 @@ public class GameEngine implements ApplicationListener {
         animator.updateStateTime(gameData.getDelta());
         update();
         draw();
+        
+        spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
+        //Matrix4 normalProjection = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(),  Gdx.graphics.getHeight());
+        //hud.getStage().getBatch().setProjectionMatrix(hud.getStage().getCamera().combined);
+        //spriteBatch.setProjectionMatrix(normalProjection);
+        hud.getStage().act(gameData.getDelta());
+        hud.getStage().draw();
     }
 
     private void draw() {
@@ -223,9 +232,7 @@ public class GameEngine implements ApplicationListener {
             }
         }
 
-        spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
-        hud.getStage().act(gameData.getDelta());
-        hud.getStage().draw();
+        
     }
 
     private void mapShrink(int layerCount) {

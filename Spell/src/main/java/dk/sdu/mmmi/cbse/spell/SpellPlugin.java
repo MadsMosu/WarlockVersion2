@@ -27,18 +27,15 @@ import data.componentdata.SpellBook;
 
 public class SpellPlugin implements IGamePluginService, IEntityProcessingService {
 
-    private SpellArchive archive;
     private World world;
-    SpellBook spellBook;
 
     @Override
     public void start(GameData gameData, World world) {
-//        archive = new SpellArchive(world);
-//
-//        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
-//            SpellBook spellBook = new SpellBook();
-//
-//    }
+
+        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
+            SpellBook sb = entity.get(SpellBook.class);
+            sb.addToSpellBook(SpellType.FIREBALL);
+        }
     }
 
     @Override
@@ -47,8 +44,8 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             SpellInfos s = entity.get(SpellInfos.class);
             Position p = entity.get(Position.class);
-            if (entity.getCharState() == CASTING) {
-                useSpell(world, s.getChosenSpell(), p.getX(), p.getY(), entity);
+            if (entity.getCharState() == CASTING && s.getChosenSpell() != null) {
+                useSpell(s.getChosenSpell(), p.getX(), p.getY(), entity);
                 entity.setCharState(IDLE);
             }
         }
@@ -67,7 +64,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         sb.addToSpellBook(spellType);
     }
 
-    public void useSpell(World world, SpellType spellType, float x, float y, Entity caster) {
+    public void useSpell(SpellType spellType, float x, float y, Entity caster) {
         SpellBook sb = caster.get(SpellBook.class);
         for (SpellType spell : sb.getSpells()) {
             if (spell.equals(spellType)) {

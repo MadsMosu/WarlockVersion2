@@ -1,4 +1,4 @@
-package player;
+package ai;
 
 import States.CharacterState;
 import data.Entity;
@@ -20,11 +20,8 @@ import data.componentdata.Position;
     ,
     @ServiceProvider(service = IGamePluginService.class)
 })
-/**
- *
- * @author jcs
- */
-public class PlayerPlugin implements IEntityProcessingService, IGamePluginService {
+
+public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
     private Entity player;
     public static final String CHARACTER_IMAGE_PATH = "assets/Characters.png";
@@ -33,29 +30,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     @Override
     public void start(GameData gameData, World world) {
-        CHARACTER_FINAL_IMAGE_PATH = PlayerPlugin.class.getResource(CHARACTER_IMAGE_PATH).getPath().replace("file:", "");
-        ImageManager.createImage(CHARACTER_FINAL_IMAGE_PATH, false);
-        this.world = world;
-        player = new Entity();
-        player.setType(PLAYER);
-
-        player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
-
-        Position pos = new Position(0.0f, 0.0f);
-        player.add(pos);
-
-        player.setMaxSpeed(2);
-        player.setAcceleration(2);
-        player.setDeacceleration(1);
-
-        player.setRadians(3.1415f / 2);
-
-        Body body = new Body(50, 32, Geometry.RECTANGLE);
-        player.add(body);
-
-        player.setMoveState(MovementState.STANDINGRIGHT);
-        player.setCharState(CharacterState.IDLE);
-        world.addEntity(player);
+        
 
     }
 
@@ -66,8 +41,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     @Override
     public void stop() {
-        // Remove entities
-        world.removeEntity(player);
+ 
     }
 
 }

@@ -1,4 +1,4 @@
-package dk.sdu.mmmi.cbse.enemy;
+package enemy;
 
 import States.CharacterState;
 import data.Entity;
@@ -11,11 +11,14 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.MovementState;
 import data.ImageManager;
+import data.componentdata.Body;
+import data.componentdata.Position;
 import java.util.ArrayList;
 import java.util.List;
 
 @ServiceProviders(value = {
-    @ServiceProvider(service = IEntityProcessingService.class),
+    @ServiceProvider(service = IEntityProcessingService.class)
+    ,
     @ServiceProvider(service = IGamePluginService.class)
 })
 /**
@@ -30,49 +33,51 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public static String CHARACTER_FINAL_IMAGE_PATH = "";
     private World world;
     private List<Entity> enemies;
-            
+
     @Override
     public void start(GameData gameData, World world) {
-//        // Add entities to the world
-//        CHARACTER_FINAL_IMAGE_PATH = EnemyPlugin.class.getResource(CHARACTER_IMAGE_PATH).getPath().replace("file:", "");
-//        ImageManager.createImage(CHARACTER_FINAL_IMAGE_PATH, false);
-//        this.world = world;
-//        enemies = new ArrayList();
-//        Entity enemy = new Entity();
-//        enemy.setType(PLAYER);
-//
-//	enemy.setView(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
-//        enemy.setPosition(0.0f, 0.0f);
-//
-//        enemy.setMaxSpeed(2);
-//        enemy.setAcceleration(2);
-//        enemy.setDeacceleration(1);
-//
-//        enemy.setRadians(3.1415f / 2);
-//        enemy.setRotationSpeed(3);
-//        world.addEntity(enemy);
-//        
-//        enemy.setMoveState(MovementState.STANDINGRIGHT);
-//        enemy.setCharState(CharacterState.IDLE);
+        CHARACTER_FINAL_IMAGE_PATH = EnemyPlugin.class.getResource(CHARACTER_IMAGE_PATH).getPath().replace("file:", "");
+        ImageManager.createImage(CHARACTER_FINAL_IMAGE_PATH, false);
+        this.world = world;
+        enemies = new ArrayList();
+
         
+        enemies.add(makeEnemy());
+
     }
 
     @Override
     public void process(GameData gameData, World world) {
-        // TODO: Implement entity processor
-
-
-
-
 
     }
 
-    
+    private Entity makeEnemy() {
+        Entity enemy = new Entity();
+        enemy.setType(PLAYER);
+
+        enemy.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
+        Position pos = new Position(0.0f, 0.0f);
+        enemy.add(pos);
+
+        enemy.setMaxSpeed(2);
+        enemy.setAcceleration(2);
+        enemy.setDeacceleration(1);
+
+        enemy.setRadians(3.1415f / 2);
+
+        Body body = new Body(50, 32, Body.Geometry.RECTANGLE);
+        enemy.add(body);
+
+        enemy.setMoveState(MovementState.STANDINGRIGHT);
+        enemy.setCharState(CharacterState.IDLE);
+        world.addEntity(enemy);
+        return enemy;
+    }
 
     @Override
     public void stop() {
         // Remove entities
-        for(Entity enemy : enemies){
+        for (Entity enemy : enemies) {
             world.removeEntity(enemy);
         }
     }

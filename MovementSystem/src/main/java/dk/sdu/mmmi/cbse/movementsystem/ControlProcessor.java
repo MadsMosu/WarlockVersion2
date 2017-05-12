@@ -12,6 +12,7 @@ import data.EntityType;
 import data.GameData;
 import static data.GameKeys.*;
 import data.SpellType;
+import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.Body;
 import data.componentdata.Position;
@@ -136,7 +137,6 @@ public class ControlProcessor implements IEntityProcessingService {
             e.setCharState(CharacterState.CASTING);
             //System.out.println("Shooting: + " + spell.getChosenSpell());
             //}
-
         }
     }
 
@@ -166,7 +166,8 @@ public class ControlProcessor implements IEntityProcessingService {
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
-            e.get(SpellInfos.class).setChosenSpell(SpellType.FIREBALL);
+            SpellInfos si = e.get(SpellInfos.class);
+            si.setChosenSpell(FIREBALL);
 
         } else {
             return;
