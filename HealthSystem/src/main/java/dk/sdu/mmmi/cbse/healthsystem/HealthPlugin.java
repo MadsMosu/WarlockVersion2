@@ -5,7 +5,6 @@
  */
 package dk.sdu.mmmi.cbse.healthsystem;
 
-import States.CharacterState;
 import data.Entity;
 import data.EntityType;
 import static data.EntityType.*;
@@ -13,8 +12,6 @@ import data.GameData;
 import data.SpellType;
 import data.World;
 import data.SpellList;
-import data.componentdata.Damage;
-import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
