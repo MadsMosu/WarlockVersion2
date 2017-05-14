@@ -32,7 +32,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     @Override
     public void start(GameData gameData, World world) {
 
-        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
+        for (Entity entity : world.getEntities(PLAYER)) {
             SpellBook sb = entity.get(SpellBook.class);
             sb.addToSpellBook(SpellType.FIREBALL);
         }
@@ -42,7 +42,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     public void process(GameData gameData, World world) {
 
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
-            SpellInfos s = entity.get(SpellInfos.class);
+            SpellBook s = entity.get(SpellBook.class);
             Position p = entity.get(Position.class);
             if (entity.getCharState() == CASTING && s.getChosenSpell() != null) {
                 useSpell(s.getChosenSpell(), p.getX(), p.getY(), entity);

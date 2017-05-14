@@ -70,6 +70,8 @@
         <module>Player</module>
         <module>Common</module>
         <module>AI</module>
+		<module>ModuleBuilder</module>
+        <module>SilentUpdate</module>
     </modules>
 
     <properties>

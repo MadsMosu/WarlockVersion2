@@ -16,6 +16,7 @@ import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.Body;
 import data.componentdata.Position;
+import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
 import org.openide.util.lookup.ServiceProvider;
 import services.IEntityProcessingService;
@@ -48,10 +49,11 @@ public class ControlProcessor implements IEntityProcessingService {
             handleMoveClick(entity, gameData);
             handleTargetClick(entity, gameData);
             handleShoot(entity, gameData);
-            
+
             for (Entity spell : world.getEntities(EntityType.SPELL)) {
+                Position sp = spell.get(Position.class);
                 if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
-                    Position sp = spell.get(Position.class);
+
                     sStartX = sp.getX();
                     sStartY = sp.getY();
                     sEndX = gameData.getMousePositionX();
@@ -65,15 +67,10 @@ public class ControlProcessor implements IEntityProcessingService {
                     sp.setY(sStartY);
                     spellIsMoving = true;
 
-                    if (spellIsMoving) {
-                        sp.setX(sp.getX() + sDirectionX * spell.getMaxSpeed() * gameData.getDelta());
-                        sp.setY(sp.getY() + sDirectionY * spell.getMaxSpeed() * gameData.getDelta());
-                        if ((float) Math.sqrt(Math.pow(sp.getX() - sStartX, 2) + Math.pow(sp.getY() - sStartY, 2)) >= sDistance) {
-                            sp.setX(sEndX);
-                            sp.setY(sEndY);
-                            spellIsMoving = false;
-                        }
-                    }
+                }
+                if (spellIsMoving) {
+                    sp.setX(sp.getX() + sDirectionX * spell.getMaxSpeed() * gameData.getDelta());
+                    sp.setY(sp.getY() + sDirectionY * spell.getMaxSpeed() * gameData.getDelta());
                 }
             }
         }
@@ -166,8 +163,8 @@ public class ControlProcessor implements IEntityProcessingService {
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
-            SpellInfos si = e.get(SpellInfos.class);
-            si.setChosenSpell(FIREBALL);
+            SpellBook sb = e.get(SpellBook.class);
+            sb.setChosenSpell(FIREBALL);
 
         } else {
             return;
