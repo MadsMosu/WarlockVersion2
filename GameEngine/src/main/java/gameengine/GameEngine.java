@@ -10,6 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -58,6 +59,7 @@ public class GameEngine implements ApplicationListener {
     private TiledMap map;
     private IsometricTiledMapRenderer renderer;
     public DotaCamera camera;
+    private OrthographicCamera hudCamera;
     private AssetManager assetManager;
     private MapLayers mapLayers, groundLayers;
     private float shrinkTimer, shrinkTime;
@@ -91,6 +93,9 @@ public class GameEngine implements ApplicationListener {
         Gdx.input.setInputProcessor(new GameInputProcessor(gameData));
         renderer = new IsometricTiledMapRenderer(map);
         camera = new DotaCamera();
+        hudCamera = new OrthographicCamera(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+        hudCamera.translate(gameData.getDisplayWidth() / 2, gameData.getDisplayHeight() / 2);
+        hudCamera.update();
         processors = new CopyOnWriteArrayList<>();
         entityPlugins = new CopyOnWriteArrayList<>();
 
@@ -172,9 +177,6 @@ public class GameEngine implements ApplicationListener {
         draw();
         
         spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
-        //Matrix4 normalProjection = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(),  Gdx.graphics.getHeight());
-        //hud.getStage().getBatch().setProjectionMatrix(hud.getStage().getCamera().combined);
-        //spriteBatch.setProjectionMatrix(normalProjection);
         hud.getStage().act(gameData.getDelta());
         hud.getStage().draw();
     }
@@ -273,6 +275,7 @@ public class GameEngine implements ApplicationListener {
         }
 
         camera.update();
+        hud.update(gameData);
     }
 
     @Override

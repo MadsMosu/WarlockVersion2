@@ -13,6 +13,7 @@ import States.MovementState;
 import data.ImageManager;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
+import data.componentdata.Health;
 import data.componentdata.Position;
 
 @ServiceProviders(value = {
@@ -38,10 +39,10 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         this.world = world;
         player = new Entity();
         player.setType(PLAYER);
-
-        player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
-
         Position pos = new Position(0.0f, 0.0f);
+        Health health = new Health(100);
+        player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
+        player.add(health);
         player.add(pos);
 
         player.setMaxSpeed(2);
