@@ -10,8 +10,10 @@ import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.MovementState;
+import static data.EntityType.ENEMY;
 import data.ImageManager;
 import data.componentdata.Body;
+import data.componentdata.Health;
 import data.componentdata.Position;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +55,14 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     private Entity makeEnemy() {
         Entity enemy = new Entity();
-        enemy.setType(PLAYER);
+        enemy.setType(ENEMY);
 
-        enemy.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
         Position pos = new Position(0.0f, 0.0f);
+        Health health = new Health(100);
+        enemy.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
+        enemy.add(health);
         enemy.add(pos);
+
 
         enemy.setMaxSpeed(2);
         enemy.setAcceleration(2);

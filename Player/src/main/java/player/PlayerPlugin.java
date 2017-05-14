@@ -51,7 +51,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
         player.setRadians(3.1415f / 2);
 
-        Body body = new Body(50, 32, Geometry.RECTANGLE);
+        Body body = new Body(50, 30, Geometry.RECTANGLE);
         player.add(body);
 
         player.setMoveState(MovementState.STANDINGRIGHT);
