@@ -5,9 +5,7 @@
  */
 package States;
 
-import com.badlogic.gdx.utils.PauseableThread;
 import java.io.Serializable;
-import javafx.animation.PauseTransition;
 
 /**
  *

@@ -1,14 +1,9 @@
 package data;
 
 import data.componentdata.Image;
-import com.badlogic.gdx.graphics.Texture;
 import java.io.Serializable;
-import java.util.ArrayList;
 import States.CharacterState;
 import States.MovementState;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,10 +29,7 @@ public final class Entity implements Serializable {
     private MovementState moveState;
     private int level;
     private int expPoints;
-
-
     private Image view;
-    private Rectangle rect;
     private Map<Class<?>, Object> data = new ConcurrentHashMap<>();
 
     public void add(Object data)
@@ -237,16 +229,6 @@ public final class Entity implements Serializable {
     public void setNumPoints(int numPoints) {
         this.numPoints = numPoints;
     }
-
-    public Rectangle getRect() {
-        return rect;
-    }
-
-    public void setRect(Rectangle rect) {
-        this.rect = rect;
-    }
-
-    
-    
+  
     
 }
