@@ -8,9 +8,9 @@ package data.componentdata;
 
 public class Body
 {
-    private int _height;
-    private int _width;
-    private Geometry _geometry;
+    private int height;
+    private int width;
+    private Geometry geometry;
 
     public enum Geometry
     {
@@ -19,38 +19,38 @@ public class Body
 
     public Body(int height, int width, Geometry geometry)
     {
-        _height = height;
-        _width = width;
-        _geometry = geometry;
+        this.height = height;
+        this.width = width;
+        this.geometry = geometry;
     }
 
     public Geometry getGeometry()
     {
-        return _geometry;
+        return geometry;
     }
 
     public void setGeometry(Geometry geometry)
     {
-        this._geometry = geometry;
+        this.geometry = geometry;
     }
 
     public int getHeight()
     {
-        return _height;
+        return height;
     }
 
     public void setHeight(int height)
     {
-        this._height = height;
+        this.height = height;
     }
 
     public int getWidth()
     {
-        return _width;
+        return width;
     }
 
     public void setWidth(int width)
     {
-        this._width = width;
+        this.width = width;
     }
 }
