@@ -40,6 +40,10 @@ import services.IGamePluginService;
 import services.MapSPI;
 import data.componentdata.Image;
 import data.ImageManager;
+import data.componentdata.Damage;
+import data.componentdata.DamageTaken;
+import data.componentdata.Health;
+import data.componentdata.Owner;
 import data.componentdata.Position;
 
 /**
@@ -64,6 +68,7 @@ public class GameEngine implements ApplicationListener {
     private AssetManager assetManager;
     private MapLayers mapLayers, groundLayers;
     private float shrinkTimer, shrinkTime;
+    private float lavaTimer= 0;
     private int layerCount;
     private ShapeRenderer sr;
     private SpriteBatch spriteBatch;
@@ -243,7 +248,6 @@ public class GameEngine implements ApplicationListener {
 
     private void mapShrink(int layerCount)
     {
-
         mapLayers.get(0).setVisible(false);
         for (int i = 0; i < groundLayers.getCount(); i++) {
             if (layerCount == i + 1 && i != 4) {
@@ -287,6 +291,7 @@ public class GameEngine implements ApplicationListener {
 //    }
     private boolean OnLava()
     {
+        
         for (Entity e : world.getEntities(PLAYER)) {
 
             float playerX = e.get(Position.class).getX();
@@ -294,13 +299,18 @@ public class GameEngine implements ApplicationListener {
 
             int tileRow = (int) (playerX / currentLayer.getTileWidth() - (playerY / currentLayer.getTileHeight()));
             int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + playerY) / (currentLayer.getTileHeight() / 2));
+            if(currentLayer.getCell(tileCol, tileCol) != null){
             if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 3) {
-                System.out.println("Walking on lava");
+                lavaTimer += gameData.getDelta();
+                if(lavaTimer >= 1){
+                e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
+                lavaTimer = 0;
+                    System.out.println(e.get(Health.class).getHp());
+                }
                 return true;
             }
+            }
         }
-        System.out.println("walking on ground");
-
         return false;
     }
 
