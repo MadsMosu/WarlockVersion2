@@ -16,10 +16,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import data.Entity;
 import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
@@ -64,13 +63,14 @@ public class GameEngine implements ApplicationListener {
     private SpriteBatch spriteBatch;
     private Animator animator;
     private HUD hud;
-    
+    private TiledMapTileLayer currentLayer;
     private MapProperties prop;
     private int mapHeight;
     private int mapWidth;
 
     @Override
-    public void create() {
+    public void create()
+    {
         world = new World();
         gameData = new GameData();
         maps = new CopyOnWriteArrayList<>();
@@ -98,18 +98,19 @@ public class GameEngine implements ApplicationListener {
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
-        
+
         prop = map.getProperties();
-        mapHeight = prop.get("height", Integer.class)* prop.get("tileheight", Integer.class);
+        mapHeight = prop.get("height", Integer.class) * prop.get("tileheight", Integer.class);
         mapWidth = prop.get("width", Integer.class) * prop.get("tilewidth", Integer.class);;
         System.out.println(mapHeight + "  " + mapWidth);
- 
+
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         //camera.setToOrtho(false, gameData.getMapWidth(), gameData.getMapHeight());
-        camera.position.set(mapWidth/2, 0, 0);
+        camera.position.set(mapWidth / 2, 0, 0);
+        currentLayer = (TiledMapTileLayer) mapLayers.get(0);
 
-        for (int i = 2; i < mapLayers.getCount(); i++) {
+        for (int i = 1; i < mapLayers.getCount(); i++) {
             mapLayers.get(i).setVisible(false);
             groundLayers.add(mapLayers.get(i));
         }
@@ -130,7 +131,8 @@ public class GameEngine implements ApplicationListener {
         hud = new HUD(spriteBatch, gameData, world);
     }
 
-    private void loadImages() {
+    private void loadImages()
+    {
         for (Image image : ImageManager.images()) {
             String imagePath = image.getImageFilePath();
 
@@ -142,7 +144,8 @@ public class GameEngine implements ApplicationListener {
         }
     }
 
-    private void loadMap() {
+    private void loadMap()
+    {
         if (!assetManager.isLoaded("assets/shrinkingmap.tmx", TiledMap.class)) {
             assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
             assetManager.load("assets/shrinkingmap.tmx", TiledMap.class);
@@ -151,14 +154,16 @@ public class GameEngine implements ApplicationListener {
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void resize(int width, int height)
+    {
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
     }
 
     @Override
-    public void render() {
+    public void render()
+    {
         gameData.setDelta(Gdx.graphics.getDeltaTime());
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -170,18 +175,16 @@ public class GameEngine implements ApplicationListener {
         draw();
     }
 
-    private void draw() {
+    private void draw()
+    {
 
-        
         for (Entity e : world.getEntities(PLAYER)) {
             Position p = e.get(Position.class);
             Image image = e.get(Image.class);
             if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
 
-                
-
                 if (!image.isRepeat()) {
-                    
+
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
                     spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
@@ -211,7 +214,6 @@ public class GameEngine implements ApplicationListener {
             System.out.println(world.getEntities(SPELL).size());
             if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
 
-                
                 animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class));
 
                 if (!image.isRepeat()) {
@@ -228,21 +230,71 @@ public class GameEngine implements ApplicationListener {
         hud.getStage().draw();
     }
 
-    private void mapShrink(int layerCount) {
+    private void mapShrink(int layerCount)
+    {
 
-        mapLayers.get(1).setVisible(false);
+        mapLayers.get(0).setVisible(false);
         for (int i = 0; i < groundLayers.getCount(); i++) {
             if (layerCount == i + 1 && i != 4) {
+                if (i > 0) {
+                    groundLayers.get(i - 1).setVisible(false);
+                }
                 groundLayers.get(i).setVisible(true);
-            }
-            else {
+                currentLayer = (TiledMapTileLayer) groundLayers.get(i);
+            } else {
                 groundLayers.get(i).setVisible(false);
             }
 
         }
     }
 
-    private void update() {
+//    private boolean checkIfOnLava()
+//    {
+//        for (Entity e : world.getEntities(PLAYER)) {
+//            float height = currentLayer.getTileHeight() * currentLayer.getHeight();
+//            float width = currentLayer.getTileWidth() * currentLayer.getWidth();
+//            
+//            float playerX = e.get(Position.class).getX();
+//            float playerY = e.get(Position.class).getY();
+//            
+//            int tileRow = (int) (playerX / currentLayer.getTileWidth());
+//            int tileCol = (int) Math.abs((playerY - (height / 2)) / currentLayer.getTileHeight());
+//            System.out.println("playerX: " + playerX);
+//            System.out.println("playerY: " + playerY);
+//            if(currentLayer.getCell(tileRow, tileCol).getTile() != null){
+//                if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 3) {
+//                    System.out.println("Walking on lava");
+//                    currentLayer.getCell(tileRow, tileCol).setTile(null);
+//                    return true;
+//                }
+//            }
+//            currentLayer.getCell(tileRow, tileCol).setTile(null);
+//        }
+//        System.out.println("walking on ground");
+//        
+//        return false;
+//    }
+    private boolean OnLava()
+    {
+        for (Entity e : world.getEntities(PLAYER)) {
+
+            float playerX = e.get(Position.class).getX();
+            float playerY = e.get(Position.class).getY();
+
+            int tileRow = (int) (playerX / currentLayer.getTileWidth() - (playerY / currentLayer.getTileHeight()));
+            int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + playerY) / (currentLayer.getTileHeight() / 2));
+            if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 3) {
+                System.out.println("Walking on lava");
+                return true;
+            }
+        }
+        System.out.println("walking on ground");
+
+        return false;
+    }
+
+    private void update()
+    {
         assetManager.update();
 
         gameData.setMousePosition(Gdx.input.getX() + (int) (camera.position.x - camera.viewportWidth / 2),
@@ -266,20 +318,24 @@ public class GameEngine implements ApplicationListener {
         }
 
         camera.update();
+        OnLava();
     }
 
     @Override
-    public void pause() {
+    public void pause()
+    {
 
     }
 
     @Override
-    public void resume() {
+    public void resume()
+    {
 
     }
 
     @Override
-    public void dispose() {
+    public void dispose()
+    {
         map.dispose();
         renderer.dispose();
         assetManager.dispose();
