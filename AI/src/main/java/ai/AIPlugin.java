@@ -98,7 +98,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         Random random = new Random();
         int randNumb = random.nextInt(sb.getSpells().size());
         
-        si.setChosenSpell(sb.getSpells().get(randNumb));
+        sb.setChosenSpell(sb.getSpells().get(randNumb));
     }
 
     private void behaviour(World world, Entity ai) {
