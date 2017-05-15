@@ -68,7 +68,7 @@ public class GameEngine implements ApplicationListener {
     private AssetManager assetManager;
     private MapLayers mapLayers, groundLayers;
     private float shrinkTimer, shrinkTime;
-    private float lavaTimer= 0;
+    private float lavaTimer = 0;
     private int layerCount;
     private ShapeRenderer sr;
     private SpriteBatch spriteBatch;
@@ -102,7 +102,7 @@ public class GameEngine implements ApplicationListener {
         camera = new DotaCamera();
         hudCamera = new OrthographicCamera(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         hudCamera.translate(gameData.getDisplayWidth() / 2, gameData.getDisplayHeight() / 2);
-        hudCamera.update();     
+        hudCamera.update();
         processors = new CopyOnWriteArrayList<>();
         entityPlugins = new CopyOnWriteArrayList<>();
 
@@ -187,7 +187,7 @@ public class GameEngine implements ApplicationListener {
         animator.updateStateTime(gameData.getDelta());
         update();
         draw();
-        
+
         spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
         hud.getStage().act(gameData.getDelta());
         hud.getStage().draw();
@@ -229,21 +229,21 @@ public class GameEngine implements ApplicationListener {
         for (Entity e : world.getEntities(SPELL)) {
             Position p = e.get(Position.class);
             Image image = e.get(Image.class);
-            System.out.println(world.getEntities(SPELL).size());
-            if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
+            if (!assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
+                assetManager.load(image.getImageFilePath(), Texture.class);
+                assetManager.finishLoading();
 
-                animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class));
+            }
+            animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class));
 
-                if (!image.isRepeat()) {
-                    spriteBatch.setProjectionMatrix(camera.combined);
-                    spriteBatch.begin();
-                    spriteBatch.draw(animator.getSpellTexture(), p.getX(), p.getY());
-                    spriteBatch.end();
-                }
+            if (image.isRepeat()) {
+                spriteBatch.setProjectionMatrix(camera.combined);
+                spriteBatch.begin();
+                spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY());
+                spriteBatch.end();
             }
         }
 
-        
     }
 
     private void mapShrink(int layerCount)
@@ -291,7 +291,7 @@ public class GameEngine implements ApplicationListener {
 //    }
     private boolean OnLava()
     {
-        
+
         for (Entity e : world.getEntities(PLAYER)) {
 
             float playerX = e.get(Position.class).getX();
@@ -299,16 +299,16 @@ public class GameEngine implements ApplicationListener {
 
             int tileRow = (int) (playerX / currentLayer.getTileWidth() - (playerY / currentLayer.getTileHeight()));
             int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + playerY) / (currentLayer.getTileHeight() / 2));
-            if(currentLayer.getCell(tileCol, tileCol) != null){
-            if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 3) {
-                lavaTimer += gameData.getDelta();
-                if(lavaTimer >= 1){
-                e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
-                lavaTimer = 0;
-                    System.out.println(e.get(Health.class).getHp());
+            if (currentLayer.getCell(tileCol, tileCol) != null) {
+                if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 3) {
+                    lavaTimer += gameData.getDelta();
+                    if (lavaTimer >= 1) {
+                        e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
+                        lavaTimer = 0;
+                        System.out.println(e.get(Health.class).getHp());
+                    }
+                    return true;
                 }
-                return true;
-            }
             }
         }
         return false;

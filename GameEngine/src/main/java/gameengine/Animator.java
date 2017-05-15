@@ -20,9 +20,9 @@ import data.GameData;
 public class Animator {
 
     private Texture texture;
-    private Texture spellTexture;
+    private Animation spellAnimation;
     private float stateTime;
-
+    Array<TextureRegion> frames = new Array<>();
     private TextureRegion chStandingRight, chStandingLeft, chStandingUp, chStandingDown;
 
     private Animation chRunningRight, chRunningLeft, chRunningUp, chRunningDown;
@@ -50,7 +50,7 @@ public class Animator {
         chStandingUp = new TextureRegion(texture, 0, 0, spriteWidth, spriteHeight);
         chStandingDown = new TextureRegion(texture, 1100, 0, spriteWidth, spriteHeight);
 
-        Array<TextureRegion> frames = new Array<>();
+        
 
         //run right
         for (int i = 0; i < 8; i++) {
@@ -87,11 +87,15 @@ public class Animator {
     }
 
     public void initializeSpell(Texture imageFile) {
-        spellTexture = imageFile;
+                for (int i = 0; i < 6; i++) {
+            frames.add(new TextureRegion(imageFile, i * 63, 0, 63, 19));
+        }
+        spellAnimation = new Animation(0.18f, frames);
+        frames.clear();
     }
 
-    public Texture getSpellTexture() {
-        return spellTexture;
+    public TextureRegion getSpellAnimation() {
+        return (TextureRegion) spellAnimation.getKeyFrame(stateTime, true);
     }
 
     public TextureRegion getFrame(Entity entity) {

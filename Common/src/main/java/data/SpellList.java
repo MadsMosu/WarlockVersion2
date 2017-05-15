@@ -12,6 +12,7 @@ import data.SpellType;
  */
 public class SpellList {
     
+    public static final String FIREBALL_IMAGE = "assets/fireballsprite.png";
     public static final SpellType spellType = SpellType.FIREBALL;
     public static final int FIREBALL_DMG = 10;
     public static final int FIREBALL_BOUNCE = 4;
@@ -28,4 +29,6 @@ public class SpellList {
         }
         return 0; 
     }
+    
+    
 }

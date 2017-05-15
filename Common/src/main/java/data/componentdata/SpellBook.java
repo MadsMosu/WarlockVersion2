@@ -18,9 +18,15 @@ public class SpellBook {
     private SpellType chosenSpell;
     private float globalCooldownTime;
     private float cooldownTimeLeft;
-    private List<SpellType> spells = new ArrayList<>();
+    private ArrayList<SpellType> spells;
     private Owner owner;
 
+    public SpellBook(Owner owner){
+        this.owner = owner;
+        spells = new ArrayList<>();
+        globalCooldownTime = 1.5f;
+    }
+    
     public float getGlobalCooldownTime() {
         return globalCooldownTime;
     }
@@ -37,6 +43,10 @@ public class SpellBook {
         this.cooldownTimeLeft = cooldownTimeLeft;
     }
 
+        public void reduceCooldownTimeLeft(float delta) {
+        this.cooldownTimeLeft -= delta;
+    }
+    
     public List<SpellType> getSpells() {
         return spells;
     }
@@ -45,7 +55,7 @@ public class SpellBook {
         spells.add(spell);
     }
 
-    public void setSpells(List<SpellType> spells) {
+    public void setSpells(ArrayList<SpellType> spells) {
         this.spells = spells;
     }
 

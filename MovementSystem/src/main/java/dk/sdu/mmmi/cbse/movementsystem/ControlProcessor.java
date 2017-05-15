@@ -41,19 +41,31 @@ public class ControlProcessor implements IEntityProcessingService {
     float sAngle;
     float angle;
     boolean spellIsMoving = false;
+    private int spellNumber = 0;
 
     @Override
     public void process(GameData gameData, World world) {
+        
+        if(gameData.getKeys().isPressed(NUM_1)){
+            spellNumber = 1;
+        }
+        
 
         for (Entity entity : world.getEntities(EntityType.PLAYER)) {
+           
+//            if(!entity.get(SpellBook.class).getSpells().contains(FIREBALL)){
+//                entity.get(SpellBook.class).addToSpellBook(FIREBALL);
+//                System.out.println("Fireball added to spellbook");
+//            }
+            
             handleMoveClick(entity, gameData);
             handleTargetClick(entity, gameData);
-            handleShoot(entity, gameData);
+            handleShoot(entity, gameData, world);
 
             for (Entity spell : world.getEntities(EntityType.SPELL)) {
                 Position sp = spell.get(Position.class);
-                if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
-
+                if (gameData.getKeys().isPressed(LEFT_MOUSE)) {
+                    gameData.getKeys().setKey(LEFT_MOUSE, false);
                     sStartX = sp.getX();
                     sStartY = sp.getY();
                     sEndX = gameData.getMousePositionX();
@@ -99,8 +111,9 @@ public class ControlProcessor implements IEntityProcessingService {
                 p.setX(startX);
                 p.setY(startY);
                 e.setCharState(CharacterState.MOVING);
+                setRunningState(e);
             }
-            setRunningState(e);
+            
         }
         if (e.getCharState().equals(CharacterState.MOVING)) {
             p.setX(p.getX() + directionX * speed * gameData.getDelta());
@@ -122,18 +135,18 @@ public class ControlProcessor implements IEntityProcessingService {
         }
     }
 
-    private void handleShoot(Entity e, GameData gameData) {
-        if (gameData.getKeys().isDown(LEFT_MOUSE)) {
-            SpellInfos spell = e.get(SpellInfos.class);
-//            if (spell.getChosenSpell() == null) {
-//                System.out.println("No spell chosen");
-//            }
-//            else {
+    private void handleShoot(Entity e, GameData gameData, World world) {
+        if (gameData.getKeys().isDown(LEFT_MOUSE) && spellNumber > 0 ) {
+            SpellType spell;
+            if(spellNumber == 1){
+                spell = e.get(SpellBook.class).getChosenSpell();
+            }
+
+            
             setStandingState(e);
-            System.out.println("shoot at target location");
             e.setCharState(CharacterState.CASTING);
-            //System.out.println("Shooting: + " + spell.getChosenSpell());
-            //}
+            
+            spellNumber = 1;
         }
     }
 
@@ -171,6 +184,7 @@ public class ControlProcessor implements IEntityProcessingService {
         }
         if (gameData.getKeys().isPressed(NUM_2)) {
             //e.setChosenSpell(SpellType.SPELL2);
+            System.out.println("Frostbolt chosen");
 
         }
         if (gameData.getKeys().isPressed(NUM_3)) {

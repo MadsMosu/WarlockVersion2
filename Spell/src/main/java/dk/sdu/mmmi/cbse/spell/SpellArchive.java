@@ -14,7 +14,7 @@ public class SpellArchive {
     private static final TreeMap spellArchive = new TreeMap<SpellType, Spell>();
 
     public SpellArchive(World world) {
-        spellArchive.put(SpellType.FIREBALL, new Spell(world, SpellType.FIREBALL, SpellList.FIREBALL_DMG, "assets/0029.png", SpellList.FIREBALL_STATIC, SpellList.FIREBALL_EXPIRATION, SpellList.FIREBALL_SPEED, SpellList.FIREBALL_ACCELERATION, SpellList.FIREBALL_COOLDOWN, SpellList.FIREBALL_BOUNCE));
+        spellArchive.put(SpellType.FIREBALL, new Spell(world, SpellType.FIREBALL, SpellList.FIREBALL_DMG, "assets/fireballsprite.png", SpellList.FIREBALL_STATIC, SpellList.FIREBALL_EXPIRATION, SpellList.FIREBALL_SPEED, SpellList.FIREBALL_ACCELERATION, SpellList.FIREBALL_COOLDOWN, SpellList.FIREBALL_BOUNCE));
     }
 
     public static TreeMap getSpellArchive() {
