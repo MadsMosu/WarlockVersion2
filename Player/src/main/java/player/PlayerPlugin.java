@@ -40,7 +40,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         this.world = world;
         player = new Entity();
         player.setType(PLAYER);
-        Position pos = new Position(0.0f, 0.0f);
+        Position pos = new Position(1888,0);
         Health health = new Health(100);
         SpellBook sb = new SpellBook();
         player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
