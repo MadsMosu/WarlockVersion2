@@ -10,7 +10,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayers;
@@ -19,6 +21,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import data.Entity;
 import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
@@ -55,6 +60,7 @@ public class GameEngine implements ApplicationListener {
     private TiledMap map;
     private IsometricTiledMapRenderer renderer;
     public DotaCamera camera;
+    private OrthographicCamera hudCamera;
     private AssetManager assetManager;
     private MapLayers mapLayers, groundLayers;
     private float shrinkTimer, shrinkTime;
@@ -89,6 +95,9 @@ public class GameEngine implements ApplicationListener {
         Gdx.input.setInputProcessor(new GameInputProcessor(gameData));
         renderer = new IsometricTiledMapRenderer(map);
         camera = new DotaCamera();
+        hudCamera = new OrthographicCamera(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+        hudCamera.translate(gameData.getDisplayWidth() / 2, gameData.getDisplayHeight() / 2);
+        hudCamera.update();     
         processors = new CopyOnWriteArrayList<>();
         entityPlugins = new CopyOnWriteArrayList<>();
 
@@ -173,6 +182,10 @@ public class GameEngine implements ApplicationListener {
         animator.updateStateTime(gameData.getDelta());
         update();
         draw();
+        
+        spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
+        hud.getStage().act(gameData.getDelta());
+        hud.getStage().draw();
     }
 
     private void draw()
@@ -225,9 +238,7 @@ public class GameEngine implements ApplicationListener {
             }
         }
 
-        spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
-        hud.getStage().act(gameData.getDelta());
-        hud.getStage().draw();
+        
     }
 
     private void mapShrink(int layerCount)
@@ -319,6 +330,7 @@ public class GameEngine implements ApplicationListener {
 
         camera.update();
         OnLava();
+        hud.update(gameData);
     }
 
     @Override

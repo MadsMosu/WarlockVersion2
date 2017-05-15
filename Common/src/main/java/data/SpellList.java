@@ -15,13 +15,13 @@ public class SpellList {
     public static final SpellType spellType = SpellType.FIREBALL;
     public static final int FIREBALL_DMG = 10;
     public static final int FIREBALL_BOUNCE = 4;
-    public static final int FIREBALL_SPEED = 200;
-    public static final int FIREBALL_EXPIRATION = 5;
-    public static final int FIREBALL_ACCELERATION = 20;
-    public static final int FIREBALL_COOLDOWN = 4;
+    public static final float FIREBALL_SPEED = 200f;
+    public static final float FIREBALL_EXPIRATION = 5f;
+    public static final float FIREBALL_ACCELERATION = 20f;
+    public static final float FIREBALL_COOLDOWN = 4f;
     public static final boolean FIREBALL_STATIC = false;
     
-    public static int getSpellSpeed(SpellType spellType){
+    public static float getSpellSpeed(SpellType spellType){
         switch(spellType){
             case FIREBALL:
                 return FIREBALL_SPEED;

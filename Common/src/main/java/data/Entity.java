@@ -26,7 +26,6 @@ public final class Entity implements Serializable {
     private float[] shapeX = new float[4];
     private float[] shapeY = new float[4];
     private float speed;
-    private int health;
     private float radius;
     private int size;
     private int numPoints;
@@ -111,14 +110,6 @@ public final class Entity implements Serializable {
 
     public float getRadius() {
         return radius;
-    }
-
-    public int getHealth() {
-        return health;
-    }
-
-    public void setHealth(int health) {
-        this.health = health;
     }
 
     public String getID() {

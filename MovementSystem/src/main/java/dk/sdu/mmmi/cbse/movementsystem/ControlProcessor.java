@@ -12,9 +12,11 @@ import data.EntityType;
 import data.GameData;
 import static data.GameKeys.*;
 import data.SpellType;
+import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.Body;
 import data.componentdata.Position;
+import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
 import org.openide.util.lookup.ServiceProvider;
 import services.IEntityProcessingService;
@@ -47,10 +49,11 @@ public class ControlProcessor implements IEntityProcessingService {
             handleMoveClick(entity, gameData);
             handleTargetClick(entity, gameData);
             handleShoot(entity, gameData);
-            
+
             for (Entity spell : world.getEntities(EntityType.SPELL)) {
+                Position sp = spell.get(Position.class);
                 if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
-                    Position sp = spell.get(Position.class);
+
                     sStartX = sp.getX();
                     sStartY = sp.getY();
                     sEndX = gameData.getMousePositionX();
@@ -64,15 +67,10 @@ public class ControlProcessor implements IEntityProcessingService {
                     sp.setY(sStartY);
                     spellIsMoving = true;
 
-                    if (spellIsMoving) {
-                        sp.setX(sp.getX() + sDirectionX * spell.getMaxSpeed() * gameData.getDelta());
-                        sp.setY(sp.getY() + sDirectionY * spell.getMaxSpeed() * gameData.getDelta());
-                        if ((float) Math.sqrt(Math.pow(sp.getX() - sStartX, 2) + Math.pow(sp.getY() - sStartY, 2)) >= sDistance) {
-                            sp.setX(sEndX);
-                            sp.setY(sEndY);
-                            spellIsMoving = false;
-                        }
-                    }
+                }
+                if (spellIsMoving) {
+                    sp.setX(sp.getX() + sDirectionX * spell.getMaxSpeed() * gameData.getDelta());
+                    sp.setY(sp.getY() + sDirectionY * spell.getMaxSpeed() * gameData.getDelta());
                 }
             }
         }
@@ -91,8 +89,7 @@ public class ControlProcessor implements IEntityProcessingService {
 
             if (startX == endX && startY == endY) {
                 e.setCharState(CharacterState.IDLE);
-            }
-            else {
+            } else {
                 angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX));
                 speed = 100;
                 distance = (float) Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
@@ -137,21 +134,17 @@ public class ControlProcessor implements IEntityProcessingService {
             e.setCharState(CharacterState.CASTING);
             //System.out.println("Shooting: + " + spell.getChosenSpell());
             //}
-
         }
     }
 
     private void setRunningState(Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.RUNNINGRIGHT);
-        }
-        else if (angle < 135 && angle > 45) {
+        } else if (angle < 135 && angle > 45) {
             e.setMoveState(MovementState.RUNNINGUP);
-        }
-        else if (angle > -135 && angle < -45) {
+        } else if (angle > -135 && angle < -45) {
             e.setMoveState(MovementState.RUNNINGDOWN);
-        }
-        else {
+        } else {
             e.setMoveState(MovementState.RUNNINGLEFT);
         }
     }
@@ -159,24 +152,21 @@ public class ControlProcessor implements IEntityProcessingService {
     private void setStandingState(Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.STANDINGRIGHT);
-        }
-        else if (angle < 135 && angle > 45) {
+        } else if (angle < 135 && angle > 45) {
             e.setMoveState(MovementState.STANDINGUP);
-        }
-        else if (angle > -135 && angle < -45) {
+        } else if (angle > -135 && angle < -45) {
             e.setMoveState(MovementState.STANDINGDOWN);
-        }
-        else {
+        } else {
             e.setMoveState(MovementState.STANDINGLEFT);
         }
     }
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
-            e.get(SpellInfos.class).setChosenSpell(SpellType.FIREBALL);
+            SpellBook sb = e.get(SpellBook.class);
+            sb.setChosenSpell(FIREBALL);
 
-        }
-        else {
+        } else {
             return;
         }
         if (gameData.getKeys().isPressed(NUM_2)) {

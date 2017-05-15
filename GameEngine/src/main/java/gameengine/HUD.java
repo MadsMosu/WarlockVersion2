@@ -13,13 +13,14 @@ import data.EntityType;
 import data.GameData;
 import data.World;
 import data.componentdata.Currency;
+import data.componentdata.Health;
 
 public class HUD {
 
     private Stage stage;
     private FitViewport viewPort;
 
-    private float health;
+    private double health;
     private int gold;
     private float roundTimer;
     private int roundNumb;
@@ -39,24 +40,23 @@ public class HUD {
 
         for (Entity player : world.getEntities(EntityType.PLAYER)) {
             gold = player.get(Currency.class).getGold();
-            health = player.getHealth();
+            health = player.get(Health.class).getHp();
             exp = player.getExpPoints();
             level = player.getLevel();
         }
 
-        viewPort = new FitViewport(gameData.getScreenX(), gameData.getScreenY(), new OrthographicCamera());
+        viewPort = new FitViewport(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         stage = new Stage(viewPort, spriteBatch);
 
         table = new Table();
         table.top();
         table.setFillParent(true);
 
-        goldLabel = new Label("GOLD", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        //roundTimerLabel = new Label(String.format("%04d", roundTimer), new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        roundTimerLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        roundNumbLabel = new Label("ROUND", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        levelLabel = new Label("LEVEL", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        expLabel = new Label("EXP", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
+        goldLabel = new Label(gold + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
+        roundTimerLabel = new Label(String.format("%.2f", roundTimer), new Label.LabelStyle(new BitmapFont(), Color.BLACK));
+        roundNumbLabel = new Label(roundNumb + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
+        levelLabel = new Label(level + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
+        expLabel = new Label(exp + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
 
         table.add(levelLabel).expandX().padTop(10);
         table.add(expLabel).expandX().padTop(10);
@@ -71,4 +71,8 @@ public class HUD {
         return stage;
     }
 
+    public void update(GameData gameData){
+        roundTimer -= gameData.getDelta();
+        roundTimerLabel.setText(String.format("%.2f", roundTimer));
+    }
 }

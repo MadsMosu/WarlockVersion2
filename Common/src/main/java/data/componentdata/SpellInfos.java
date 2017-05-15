@@ -16,7 +16,7 @@ public class SpellInfos {
 
     private Entity hitBy;
     private SpellType usedSpell;
-    private SpellType chosenSpell;
+
     private SpellType spellType;
     private float damage;
     private boolean isStatic;
@@ -33,15 +33,6 @@ public class SpellInfos {
         this.usedSpell = usedSpell;
     }
 
-    public SpellType getChosenSpell() {
-        return chosenSpell;
-    }
-
-    public void setChosenSpell(SpellType chosenSpell) {
-        this.chosenSpell = chosenSpell;
-    }
-
-    
     
     public SpellType hitByWhichSpell() {
         return getHitBy().get(SpellType.class);

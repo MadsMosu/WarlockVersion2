@@ -21,11 +21,11 @@ public class Spell {
     private Entity spellEntity;
     private float speed;
     private float acceleration;
-    private int cooldown;
+    private float cooldown;
     private int bouncePoints;
     private String SPELL_IMAGE_PATH = "";
 
-    public Spell(World world, SpellType spellType, float damage, String path, boolean isStatic, float expiration, float speed, float acceleration, int cooldown, int bouncePoints) {
+    public Spell(World world, SpellType spellType, float damage, String path, boolean isStatic, float expiration, float speed, float acceleration, float cooldown, int bouncePoints) {
         SPELL_IMAGE_PATH = Spell.class.getResource(path).getPath().replace("file:", "");
         ImageManager.createImage(SPELL_IMAGE_PATH, false);
 
@@ -55,7 +55,7 @@ public class Spell {
         return damage;
     }
 
-    public int getCooldown() {
+    public float getCooldown() {
         return cooldown;
     }
 

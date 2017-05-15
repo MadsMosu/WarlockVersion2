@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class SpellBook {
 
+    private SpellType chosenSpell;
     private float globalCooldownTime;
     private float cooldownTimeLeft;
     private List<SpellType> spells = new ArrayList<>();
@@ -40,6 +41,10 @@ public class SpellBook {
         return spells;
     }
 
+    public void addToSpellBook(SpellType spell) {
+        spells.add(spell);
+    }
+
     public void setSpells(List<SpellType> spells) {
         this.spells = spells;
     }
@@ -51,8 +56,13 @@ public class SpellBook {
     public void setOwner(Owner owner) {
         this.owner = owner;
     }
-    
-    
-    
-    
+
+    public SpellType getChosenSpell() {
+        return chosenSpell;
+    }
+
+    public void setChosenSpell(SpellType chosenSpell) {
+        this.chosenSpell = chosenSpell;
+    }
+
 }

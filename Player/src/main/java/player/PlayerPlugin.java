@@ -13,7 +13,9 @@ import States.MovementState;
 import data.ImageManager;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
+import data.componentdata.Health;
 import data.componentdata.Position;
+import data.componentdata.SpellBook;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IEntityProcessingService.class)
@@ -33,25 +35,25 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     @Override
     public void start(GameData gameData, World world) {
-        // Add entities to the world
         CHARACTER_FINAL_IMAGE_PATH = PlayerPlugin.class.getResource(CHARACTER_IMAGE_PATH).getPath().replace("file:", "");
         ImageManager.createImage(CHARACTER_FINAL_IMAGE_PATH, false);
         this.world = world;
         player = new Entity();
         player.setType(PLAYER);
-
-        player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
-
         Position pos = new Position(0.0f, 0.0f);
+        Health health = new Health(100);
+        SpellBook sb = new SpellBook();
+        player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
+        player.add(health);
         player.add(pos);
-
+        player.add(sb);
         player.setMaxSpeed(2);
         player.setAcceleration(2);
         player.setDeacceleration(1);
 
         player.setRadians(3.1415f / 2);
 
-        Body body = new Body(50, 32, Geometry.RECTANGLE);
+        Body body = new Body(50, 30, Geometry.RECTANGLE);
         player.add(body);
 
         player.setMoveState(MovementState.STANDINGRIGHT);
