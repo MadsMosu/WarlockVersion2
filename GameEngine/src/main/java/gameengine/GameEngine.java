@@ -219,7 +219,7 @@ public class GameEngine implements ApplicationListener {
 
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
-                    spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
+                    spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());                 
                     spriteBatch.end();
 
                 }
@@ -253,7 +253,8 @@ public class GameEngine implements ApplicationListener {
             if (image.isRepeat()) {
                 spriteBatch.setProjectionMatrix(camera.combined);
                 spriteBatch.begin();
-                spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY());
+                //spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY());
+                spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY(), 0, 0, animator.getSpellAnimation().getRegionWidth(), animator.getSpellAnimation().getRegionHeight(), 1, 1, e.getAngle());
                 spriteBatch.end();
             }
         }
