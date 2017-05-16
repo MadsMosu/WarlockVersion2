@@ -5,10 +5,9 @@
  */
 package dk.sdu.mmmi.cbse.spell;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
+
 import data.SpellType;
 import data.Entity;
-import static data.EntityType.PLAYER;
 import data.ImageManager;
 import data.World;
 import data.componentdata.Expiration;

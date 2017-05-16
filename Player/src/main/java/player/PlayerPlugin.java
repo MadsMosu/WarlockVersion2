@@ -14,7 +14,6 @@ import data.ImageManager;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
 import data.componentdata.Health;
-import data.componentdata.Image;
 import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
@@ -29,8 +28,7 @@ import data.componentdata.SpellBook;
  * @author jcs
  */
 public class PlayerPlugin implements IEntityProcessingService, IGamePluginService {
-	
-	
+
     private float[] shapex = new float[4];
     private float[] shapey = new float[4];
     private Entity player;
@@ -43,9 +41,26 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         CHARACTER_FINAL_IMAGE_PATH = PlayerPlugin.class.getResource(CHARACTER_IMAGE_PATH).getPath().replace("file:", "");
         ImageManager.createImage(CHARACTER_FINAL_IMAGE_PATH, false);
         this.world = world;
+        createPlayer();
+    }
+
+    @Override
+    public void process(GameData gameData, World world) {
+
+        for(Entity p : world.getEntities(PLAYER)){
+        setShape();
+        
+        }
+        
+        if (player.getCharState() == CharacterState.DEAD) {
+            stop();
+        }
+    }
+
+    private void createPlayer() {
         player = new Entity();
         player.setType(PLAYER);
-        Position pos = new Position(3200,0);
+        Position pos = new Position(3200, 0);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(player.getID()));
         player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
@@ -55,36 +70,25 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         player.setMaxSpeed(2);
         player.setAcceleration(2);
         player.setDeacceleration(1);
-
-
+        
         Body body = new Body(50, 50, Geometry.RECTANGLE);
         player.add(body);
-
         player.setMoveState(MovementState.STANDINGRIGHT);
         player.setCharState(CharacterState.IDLE);
         world.addEntity(player);
 
     }
 
-    @Override
-    public void process(GameData gameData, World world) {
-		
-		setShape();
-
-        if(player.getCharState() == CharacterState.DEAD){
-            stop();
-        }
-    }
-	private void setShape() {
+    private void setShape() {
         float height = player.get(Body.class).getHeight();
         float width = player.get(Body.class).getWidth();
         float playerX = player.get(Position.class).getX();
         float playerY = player.get(Position.class).getY();
-        
+
         shapex[0] = (float) (playerX);
         shapey[0] = (float) (playerY);
 
-        shapex[1] = (float) (playerX +width);
+        shapex[1] = (float) (playerX + width);
         shapey[1] = (float) (playerY);
 
         shapex[2] = (float) (playerX + width);
@@ -96,7 +100,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         player.setShapeX(shapex);
         player.setShapeY(shapey);
     }
-
 
     @Override
     public void stop() {

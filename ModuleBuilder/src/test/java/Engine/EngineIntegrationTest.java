@@ -6,6 +6,7 @@ package Engine;
  * and open the template in the editor.
  */
 
+import gameengine.Installer;
 import java.util.Set;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -14,6 +15,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openide.util.Exceptions;
+import services.IGamePluginService;
 
 /**
  *
@@ -63,12 +65,12 @@ public class EngineIntegrationTest
 //        {
 //            Exceptions.printStackTrace(ex);
 //        }
-//        World world = instance.gameEngine.world;
-//        Set<GamePluginSPI> gamePlugins = instance._game._gamePlugins;
+//        World world = instance.gameEngine;
+//        Set<IGamePluginService> gamePlugins = instance.gameEngine.entityPlugins;
 //        MapSPI map = instance._game._map;
 //        assertTrue(world.entities().size() > 0);
 //        // It is expected that the dependencies such as map has added something to the game.
-//        for (GamePluginSPI plugin : gamePlugins)
+//        for (IGamePluginService plugin : gamePlugins)
 //        {
 //            plugin.stop();
 //        }

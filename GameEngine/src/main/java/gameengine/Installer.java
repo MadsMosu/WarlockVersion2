@@ -13,6 +13,7 @@ import org.openide.modules.ModuleInstall;
 
 public class Installer extends ModuleInstall {
 
+    public GameEngine gameEngine;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     @Override
     public void restored()
@@ -26,8 +27,8 @@ public class Installer extends ModuleInstall {
         cfg.useGL30 = false;
         cfg.resizable = true;
 
-        GameEngine game = new GameEngine();
-        new LwjglApplication(game, cfg);
+         gameEngine= new GameEngine();
+        new LwjglApplication(gameEngine, cfg);
     }
 
 }

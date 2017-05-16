@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -23,9 +22,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import data.Entity;
 import static data.EntityType.ENEMY;
 import static data.EntityType.MAP;
@@ -48,6 +44,9 @@ import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
+import java.util.Collection;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 
 /**
  *
@@ -60,10 +59,6 @@ public class GameEngine implements ApplicationListener {
     private final Lookup lookup = Lookup.getDefault();
     private Lookup.Result<IGamePluginService> pluginResult;
     private List<IGamePluginService> entityPlugins;
-    private Lookup.Result<IEntityProcessingService> processorResult;
-    private List<IEntityProcessingService> processors;
-    private Lookup.Result<MapSPI> mapResult;
-    private List<MapSPI> maps;
     private TiledMap map;
     private IsometricTiledMapRenderer renderer;
     public DotaCamera camera;
@@ -86,15 +81,12 @@ public class GameEngine implements ApplicationListener {
     public void create() {
         world = new World();
         gameData = new GameData();
-        maps = new CopyOnWriteArrayList<>();
         animator = new Animator();
         shrinkTime = 15;
         AssetsJarFileResolver jfhr = new AssetsJarFileResolver();
         assetManager = new AssetManager(jfhr);
 
-        pluginResult = lookup.lookupResult(IGamePluginService.class);
-        processorResult = lookup.lookupResult(IEntityProcessingService.class);
-        mapResult = lookup.lookupResult(MapSPI.class);
+        
         sr = new ShapeRenderer();
         loadMap();
         map = assetManager.get("assets/shrinkingmap.tmx", TiledMap.class);
@@ -105,7 +97,6 @@ public class GameEngine implements ApplicationListener {
         hudCamera = new OrthographicCamera(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         hudCamera.translate(gameData.getDisplayWidth() / 2, gameData.getDisplayHeight() / 2);
         hudCamera.update();
-        processors = new CopyOnWriteArrayList<>();
         entityPlugins = new CopyOnWriteArrayList<>();
 
         mapLayers = map.getLayers();
@@ -126,8 +117,7 @@ public class GameEngine implements ApplicationListener {
         int longDiagonal = (int) (mapPixelWidth * (Math.sqrt(2 + 2 * Math.cos(120))));
         gameData.setMapHeight(mapPixelHeight);
         gameData.setMapWidth(mapPixelWidth);
-        
-        
+
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         //camera.setToOrtho(false, gameData.getMapWidth(), gameData.getMapHeight());
@@ -139,13 +129,12 @@ public class GameEngine implements ApplicationListener {
             groundLayers.add(mapLayers.get(i));
         }
 
+        pluginResult = lookup.lookupResult(IGamePluginService.class);
+        pluginResult.addLookupListener(lookupListener);
+        pluginResult.allItems();
         for (IGamePluginService plugin : pluginResult.allInstances()) {
             plugin.start(gameData, world);
             entityPlugins.add(plugin);
-        }
-
-        for (IEntityProcessingService processor : processorResult.allInstances()) {
-            processors.add(processor);
         }
 
         loadImages();
@@ -353,10 +342,7 @@ public class GameEngine implements ApplicationListener {
             shrinkTimer = 0;
         }
 
-//        for (MapSPI map : lookup.lookupAll(MapSPI.class)) {
-//            map.processMap(world, gameData);
-//        }
-        for (IEntityProcessingService processor : processors) {
+        for (IEntityProcessingService processor : getEntityProcessingServices()) {
             processor.process(gameData, world);
         }
 
@@ -365,6 +351,34 @@ public class GameEngine implements ApplicationListener {
         hud.update(gameData);
     }
 
+    
+        private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
+        return lookup.lookupAll(IEntityProcessingService.class);
+    }
+
+    private Collection<? extends IGamePluginService> getGamePluginServices() {
+        return lookup.lookupAll(IGamePluginService.class);
+    }
+
+    private final LookupListener lookupListener = new LookupListener() {
+        @Override
+        public void resultChanged(LookupEvent lookupEvent) {
+            Collection<? extends IGamePluginService> updated = pluginResult.allInstances();
+            for(IGamePluginService updatedService : updated) {
+                if(!entityPlugins.contains(updatedService)) {
+                    updatedService.start(gameData, world);
+                    entityPlugins.add(updatedService);
+                }
+            }
+            for(IGamePluginService pluginService : entityPlugins) {
+                if(!updated.contains(pluginService)) {
+                    pluginService.stop();
+                    entityPlugins.remove(pluginService);
+                }
+            }
+        }
+    };
+    
     @Override
     public void pause() {
 
