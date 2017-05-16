@@ -93,7 +93,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     }
 
     public void moveSpell(Entity entity, GameData gameData) {
-
+        //s
     }
 
     @Override
