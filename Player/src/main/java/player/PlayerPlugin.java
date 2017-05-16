@@ -45,7 +45,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         Position pos = new Position(1888,0);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(player.getID()));
-        sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
         player.add(health);
         player.add(pos);
