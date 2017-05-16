@@ -16,6 +16,8 @@ public class Position implements Serializable {
     private float x;
     private float y;
 
+    
+    
     public Position(Position pos) {
         x = pos.getX();
         y = pos.getY();
