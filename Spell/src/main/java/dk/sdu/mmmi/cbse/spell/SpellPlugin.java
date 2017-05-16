@@ -89,7 +89,6 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 Position p = caster.get(Position.class);
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
                 se.add(new Position(p.getX(), p.getY()));
-                se.setRadians(caster.getRadians());
                 se.setMaxSpeed(SpellList.getSpellSpeed(spellType));
                 
                 SPELL_IMAGE_PATH = SpellPlugin.class.getResource(SpellList.FIREBALL_IMAGE).getPath().replace("file:", "");

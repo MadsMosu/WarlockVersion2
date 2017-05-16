@@ -14,7 +14,7 @@ public final class Entity implements Serializable {
     private EntityType type;
     public float dx;
     public float dy;
-    private float radians;
+    private float angle;
     private float maxSpeed;
     private float acceleration;
     private float deacceleration;
@@ -132,12 +132,12 @@ public final class Entity implements Serializable {
         this.dy = dy;
     }
 
-    public float getRadians() {
-        return radians;
+    public float getAngle() {
+        return angle;
     }
 
-    public void setRadians(float radians) {
-        this.radians = radians;
+    public void setAngle(float angle) {
+        this.angle = angle;
     }
 
     public float getMaxSpeed() {
