@@ -14,6 +14,7 @@ import data.ImageManager;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
 import data.componentdata.Health;
+import data.componentdata.Image;
 import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
@@ -67,6 +68,9 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     @Override
     public void process(GameData gameData, World world) {
 
+        if(player.getCharState() == CharacterState.DEAD){
+            stop();
+        }
     }
 
     @Override

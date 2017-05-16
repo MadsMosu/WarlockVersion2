@@ -179,7 +179,9 @@ public class GameEngine implements ApplicationListener {
     public void render()
     {
         gameData.setDelta(Gdx.graphics.getDeltaTime());
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        
+        
+        Gdx.gl.glClearColor(255/255, 165/255, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         renderer.setView(camera);
         renderer.render();

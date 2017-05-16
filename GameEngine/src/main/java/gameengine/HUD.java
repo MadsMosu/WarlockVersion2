@@ -32,13 +32,16 @@ public class HUD {
     private Label roundNumbLabel;
     private Label expLabel;
     private Label levelLabel;
+    private Label healthLabel;
     private Table table;
+    private Entity player;
 
     public HUD(SpriteBatch spriteBatch, GameData gameData, World world) {
         roundTimer = gameData.getRoundTime();
         roundNumb = gameData.getRoundNumber();
 
         for (Entity player : world.getEntities(EntityType.PLAYER)) {
+            this.player = player;
             gold = player.get(Currency.class).getGold();
             health = player.get(Health.class).getHp();
             exp = player.getExpPoints();
@@ -57,10 +60,12 @@ public class HUD {
         roundNumbLabel = new Label(roundNumb + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
         levelLabel = new Label(level + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
         expLabel = new Label(exp + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
+        healthLabel = new Label(health + "", new Label.LabelStyle(new BitmapFont(), Color.GREEN));
+        
 
         table.add(levelLabel).expandX().padTop(10);
         table.add(expLabel).expandX().padTop(10);
-        table.add(goldLabel).expandX().padTop(10);
+        table.add(healthLabel).expandX().padTop(10);
         table.add(roundNumbLabel).expandX().padTop(10);
         table.add(roundTimerLabel).expandX().padTop(10);
 
@@ -74,5 +79,6 @@ public class HUD {
     public void update(GameData gameData){
         roundTimer -= gameData.getDelta();
         roundTimerLabel.setText(String.format("%.2f", roundTimer));
+        healthLabel.setText(player.get(Health.class).getHp() + "");
     }
 }
