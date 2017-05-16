@@ -13,6 +13,7 @@ import data.Entity;
 import data.EntityType;
 import data.GameData;
 import static data.GameKeys.*;
+import data.ImageManager;
 import data.SpellType;
 import static data.SpellType.FIREBALL;
 import data.World;
@@ -115,6 +116,7 @@ public class ControlProcessor implements IEntityProcessingService {
             sEndX = gameData.getMousePositionX();
             sEndY = gameData.getMousePositionY();
             sAngle = (float) Math.toDegrees(Math.atan2(sEndY - sStartY, sEndX - sStartX));
+            spell.setAngle(sAngle);
             sDistance = (float) Math.sqrt(Math.pow(sEndX - sStartX, 2) + Math.pow(sEndY - sStartY, 2));
 
             sDirectionX = (sEndX - sStartX) / sDistance;
@@ -211,6 +213,7 @@ public class ControlProcessor implements IEntityProcessingService {
             e.setMoveState(MovementState.STANDINGLEFT);
         }
     }
+    
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {

@@ -31,13 +31,6 @@ public class Animator {
 
     }
 
-    public void render(GameData gameData) {
-        
-        //batch.setProjectionMatrix();
-//        batch.begin();
-//        batch.draw(getFrame(entity), entity.getX(), entity.getY());
-//        batch.end();
-    }
 
     public void initializeSprite(Texture imageFile, GameData gameData) {
         texture = imageFile;

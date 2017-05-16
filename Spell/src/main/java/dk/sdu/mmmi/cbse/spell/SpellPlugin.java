@@ -10,20 +10,15 @@ import services.IGamePluginService;
 import data.SpellType;
 import static States.CharacterState.CASTING;
 import static States.CharacterState.IDLE;
-import data.EntityType;
-import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
-import static data.GameKeys.LEFT_MOUSE;
 import data.ImageManager;
 import data.SpellList;
 import data.componentdata.Expiration;
-import data.componentdata.Image;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
+
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IGamePluginService.class),
@@ -96,7 +91,6 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 se.setMaxSpeed(SpellList.getSpellSpeed(spellType));
                 se.add(si);
                 SPELL_IMAGE_PATH = SpellPlugin.class.getResource(SpellList.FIREBALL_IMAGE).getPath().replace("file:", "");
-                System.out.println(SPELL_IMAGE_PATH);
                 ImageManager.createImage(SPELL_IMAGE_PATH, true);
                 se.add(ImageManager.getImage(SPELL_IMAGE_PATH));
                 world.addEntity(se);
