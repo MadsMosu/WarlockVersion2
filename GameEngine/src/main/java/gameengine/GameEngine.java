@@ -187,7 +187,7 @@ public class GameEngine implements ApplicationListener {
         gameData.setDelta(Gdx.graphics.getDeltaTime());
         
         
-        Gdx.gl.glClearColor(255/255, 165/255, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         renderer.setView(camera);
         renderer.render();
@@ -323,7 +323,7 @@ public class GameEngine implements ApplicationListener {
             int tileRow = (int) (playerX / currentLayer.getTileWidth() - (playerY / currentLayer.getTileHeight()));
             int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + playerY) / (currentLayer.getTileHeight() / 2));
             if (currentLayer.getCell(tileCol, tileCol) != null) {
-                if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 3) {
+                if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 5) {
                     lavaTimer += gameData.getDelta();
                     if (lavaTimer >= 1) {
                         e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
@@ -342,7 +342,7 @@ public class GameEngine implements ApplicationListener {
 
         gameData.setMousePosition(Gdx.input.getX() + (int) (camera.position.x - camera.viewportWidth / 2),
                 -Gdx.input.getY() + Gdx.graphics.getHeight() + (int) (camera.position.y - camera.viewportHeight / 2));
-
+        
         shrinkTimer += gameData.getDelta();
         if (shrinkTimer >= shrinkTime) {
             layerCount++;
