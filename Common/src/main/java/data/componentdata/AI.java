@@ -1,37 +1,39 @@
-
 package data.componentdata;
 
 import data.Entity;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class AI {
-    
-    private Entity beingAttacked;
-    private Entity closestEntity;
-    private Entity spellToAvoid;
-    private boolean avoidSpell = false;
-    private Map<Entity, Float> AllEntities = new HashMap();
 
-    public Map<Entity, Float> getAllEntities() {
-        return AllEntities;
-    }
-    
-    public void isAttackingWho(Entity entity){
+    private Entity beingAttacked;
+    private Entity spellToAvoid;
+    private Entity closestEntity;
+    private boolean avoidSpell = false;
+    private Map<Entity, Float> allEntities = new HashMap();
+
+    public void isAttackingWho(Entity entity) {
         this.beingAttacked = entity;
     }
-    
-    public Entity getBeingAttacked(){
+
+    public Entity getBeingAttacked() {
         return beingAttacked;
     }
-    
-    public boolean getAvoidSpell(){
+
+    public boolean getAvoidSpell() {
         return avoidSpell;
     }
-    
-    public void setAvoidSpell(boolean avoidSpell){
+
+    public void setAvoidSpell(boolean avoidSpell) {
         this.avoidSpell = avoidSpell;
+    }
+
+    public Entity getSpellToAvoid() {
+        return spellToAvoid;
+    }
+
+    public void setSpellToAvoid(Entity spellToAvoid) {
+        this.spellToAvoid = spellToAvoid;
     }
 
     public Entity getClosestEntity() {
@@ -42,11 +44,10 @@ public class AI {
         this.closestEntity = closestEntity;
     }
 
-    public Entity getSpellToAvoid() {
-        return spellToAvoid;
+    public Map<Entity, Float> getAllEntities() {
+        return allEntities;
     }
 
-    public void setSpellToAvoid(Entity spellToAvoid) {
-        this.spellToAvoid = spellToAvoid;
-    }
+
+
 }

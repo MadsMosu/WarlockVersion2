@@ -95,7 +95,6 @@ public class ControlProcessor implements IEntityProcessingService {
             ai.setCharState(MOVING);
             setRunningState(ai.getAngle(), ai);
             if (distance < 250) {
-                System.out.println("virker");
                 p.setX(p.getX() + aiDirectionX * aiSpeed * gameData.getDelta());
                 p.setY(p.getY() + aiDirectionY * aiSpeed * gameData.getDelta());
             } else {
