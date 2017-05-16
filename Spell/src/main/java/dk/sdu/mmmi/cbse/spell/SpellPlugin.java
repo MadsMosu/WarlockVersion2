@@ -21,6 +21,7 @@ import data.componentdata.Expiration;
 import data.componentdata.Image;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
+import data.componentdata.SpellInfos;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -87,15 +88,19 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 Entity se = new Entity();
                 se.setType(SPELL);
                 Position p = caster.get(Position.class);
+                SpellInfos si = new SpellInfos();
+                si.setIsMoving(false);
+                book.setCooldownTimeLeft(book.getGlobalCooldownTime());
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
                 se.add(new Position(p.getX(), p.getY()));
                 se.setMaxSpeed(SpellList.getSpellSpeed(spellType));
-                
+                se.add(si);
                 SPELL_IMAGE_PATH = SpellPlugin.class.getResource(SpellList.FIREBALL_IMAGE).getPath().replace("file:", "");
                 System.out.println(SPELL_IMAGE_PATH);
                 ImageManager.createImage(SPELL_IMAGE_PATH, true);
                 se.add(ImageManager.getImage(SPELL_IMAGE_PATH));
                 world.addEntity(se);
+                book.setChosenSpell(null);
 
             }
         }

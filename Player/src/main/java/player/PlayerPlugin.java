@@ -14,6 +14,7 @@ import data.ImageManager;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
 import data.componentdata.Health;
+import data.componentdata.Image;
 import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
@@ -47,7 +48,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         Position pos = new Position(1888,0);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(player.getID()));
-        sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
         player.add(health);
         player.add(pos);
@@ -71,6 +71,9 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 		
 		setShape();
 
+        if(player.getCharState() == CharacterState.DEAD){
+            stop();
+        }
     }
 	private void setShape() {
         float height = player.get(Body.class).getHeight();

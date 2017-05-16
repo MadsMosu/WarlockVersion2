@@ -19,7 +19,7 @@ public class SpellInfos {
 
     private SpellType spellType;
     private float damage;
-    private boolean isStatic;
+    private boolean isMoving;
     private float speed;
     private float acceleration;
     private int cooldown;
@@ -62,12 +62,12 @@ public class SpellInfos {
         this.damage = damage;
     }
 
-    public boolean isIsStatic() {
-        return isStatic;
+    public boolean isMoving() {
+        return isMoving;
     }
 
-    public void setIsStatic(boolean isStatic) {
-        this.isStatic = isStatic;
+    public void setIsMoving(boolean isMoving) {
+        this.isMoving = isMoving;
     }
 
     public float getSpeed() {
