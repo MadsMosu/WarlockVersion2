@@ -60,7 +60,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Entity enemy = new Entity();
         enemy.setType(ENEMY);
 
-        Position pos = new Position(1600,0);
+        Position pos = new Position(3300,0);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
         AI ai = new AI();

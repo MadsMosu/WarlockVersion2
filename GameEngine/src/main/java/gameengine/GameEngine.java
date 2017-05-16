@@ -9,12 +9,14 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -26,6 +28,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import data.Entity;
 import static data.EntityType.ENEMY;
+import static data.EntityType.MAP;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
 import data.GameData;
@@ -80,8 +83,7 @@ public class GameEngine implements ApplicationListener {
     private int mapWidth;
 
     @Override
-    public void create()
-    {
+    public void create() {
         world = new World();
         gameData = new GameData();
         maps = new CopyOnWriteArrayList<>();
@@ -118,6 +120,14 @@ public class GameEngine implements ApplicationListener {
         mapWidth = prop.get("width", Integer.class) * prop.get("tilewidth", Integer.class);;
         System.out.println(mapHeight + "  " + mapWidth);
 
+        int mapPixelWidth = prop.get("width", Integer.class) * prop.get("tilewidth", Integer.class);
+        int mapPixelHeight = prop.get("height", Integer.class) * prop.get("tileheight", Integer.class);
+        int shortDiagonal = (int) (mapPixelHeight * (Math.sqrt(2 + 2 * Math.cos(60))));
+        int longDiagonal = (int) (mapPixelWidth * (Math.sqrt(2 + 2 * Math.cos(120))));
+        gameData.setMapHeight(mapPixelHeight);
+        gameData.setMapWidth(mapPixelWidth);
+        
+        
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         //camera.setToOrtho(false, gameData.getMapWidth(), gameData.getMapHeight());
@@ -145,8 +155,7 @@ public class GameEngine implements ApplicationListener {
         hud = new HUD(spriteBatch, gameData, world);
     }
 
-    private void loadImages()
-    {
+    private void loadImages() {
         for (Image image : ImageManager.images()) {
             String imagePath = image.getImageFilePath();
 
@@ -158,8 +167,7 @@ public class GameEngine implements ApplicationListener {
         }
     }
 
-    private void loadMap()
-    {
+    private void loadMap() {
         if (!assetManager.isLoaded("assets/shrinkingmap.tmx", TiledMap.class)) {
             assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
             assetManager.load("assets/shrinkingmap.tmx", TiledMap.class);
@@ -168,20 +176,18 @@ public class GameEngine implements ApplicationListener {
     }
 
     @Override
-    public void resize(int width, int height)
-    {
+    public void resize(int width, int height) {
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
     }
 
     @Override
-    public void render()
-    {
+    public void render() {
         gameData.setDelta(Gdx.graphics.getDeltaTime());
         
         
-        Gdx.gl.glClearColor(255/255, 165/255, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         renderer.setView(camera);
         renderer.render();
@@ -195,8 +201,25 @@ public class GameEngine implements ApplicationListener {
         hud.getStage().draw();
     }
 
-    private void draw()
-    {
+    private void draw() {
+
+        for (Entity e : world.getEntities(MAP, PLAYER)) {
+            sr.setColor(Color.MAGENTA);
+            sr.begin(ShapeType.Line);
+
+            float[] shapex = e.getShapeX();
+            float[] shapey = e.getShapeY();
+
+            for (int i = 0, j = shapex.length - 1;
+                    i < shapex.length;
+                    j = i++) {
+
+                sr.line(shapex[i], shapey[i], shapex[j], shapey[j]);
+
+            }
+            sr.setProjectionMatrix(camera.combined);
+            sr.end();
+        }
 
         for (Entity e : world.getEntities(PLAYER)) {
             Position p = e.get(Position.class);
@@ -248,8 +271,7 @@ public class GameEngine implements ApplicationListener {
 
     }
 
-    private void mapShrink(int layerCount)
-    {
+    private void mapShrink(int layerCount) {
         mapLayers.get(0).setVisible(false);
         for (int i = 0; i < groundLayers.getCount(); i++) {
             if (layerCount == i + 1 && i != 4) {
@@ -291,8 +313,7 @@ public class GameEngine implements ApplicationListener {
 //        
 //        return false;
 //    }
-    private boolean OnLava()
-    {
+    private boolean OnLava() {
 
         for (Entity e : world.getEntities(PLAYER)) {
 
@@ -302,7 +323,7 @@ public class GameEngine implements ApplicationListener {
             int tileRow = (int) (playerX / currentLayer.getTileWidth() - (playerY / currentLayer.getTileHeight()));
             int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + playerY) / (currentLayer.getTileHeight() / 2));
             if (currentLayer.getCell(tileCol, tileCol) != null) {
-                if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 3) {
+                if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 5) {
                     lavaTimer += gameData.getDelta();
                     if (lavaTimer >= 1) {
                         e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
@@ -316,13 +337,12 @@ public class GameEngine implements ApplicationListener {
         return false;
     }
 
-    private void update()
-    {
+    private void update() {
         assetManager.update();
 
         gameData.setMousePosition(Gdx.input.getX() + (int) (camera.position.x - camera.viewportWidth / 2),
                 -Gdx.input.getY() + Gdx.graphics.getHeight() + (int) (camera.position.y - camera.viewportHeight / 2));
-
+        
         shrinkTimer += gameData.getDelta();
         if (shrinkTimer >= shrinkTime) {
             layerCount++;
@@ -346,20 +366,17 @@ public class GameEngine implements ApplicationListener {
     }
 
     @Override
-    public void pause()
-    {
+    public void pause() {
 
     }
 
     @Override
-    public void resume()
-    {
+    public void resume() {
 
     }
 
     @Override
-    public void dispose()
-    {
+    public void dispose() {
         map.dispose();
         renderer.dispose();
         assetManager.dispose();

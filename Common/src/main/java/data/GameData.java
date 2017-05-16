@@ -22,6 +22,9 @@ public class GameData {
     private float roundTime;
     private int roundNumber;
     private float currentTime;
+    private int mapHeight;
+    private int mapWidth;
+    
     
     private int mousePositionX;
     private int mousePositionY;
@@ -155,6 +158,18 @@ public class GameData {
 
     public int getScreenX() {
         return screenX;
+    }
+    public void setMapHeight(int mapHeight){
+        this.mapHeight = mapHeight;
+    }
+    public void setMapWidth(int mapWidth){
+        this.mapWidth = mapWidth;
+    }
+    public int getMapHeight(){
+        return mapHeight;
+    }
+    public int getMapWidth(){
+        return mapWidth;
     }
 
 }
