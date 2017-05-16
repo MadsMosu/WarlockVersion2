@@ -53,7 +53,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         player.setAcceleration(2);
         player.setDeacceleration(1);
 
-        player.setRadians(3.1415f / 2);
 
         Body body = new Body(50, 50, Geometry.RECTANGLE);
         player.add(body);

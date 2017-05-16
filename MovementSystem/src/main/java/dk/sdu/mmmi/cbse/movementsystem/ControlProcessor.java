@@ -6,7 +6,9 @@
 package dk.sdu.mmmi.cbse.movementsystem;
 
 import States.CharacterState;
+import static States.CharacterState.MOVING;
 import States.MovementState;
+import com.badlogic.gdx.math.Vector2;
 import data.Entity;
 import data.EntityType;
 import data.GameData;
@@ -14,10 +16,12 @@ import static data.GameKeys.*;
 import data.SpellType;
 import static data.SpellType.FIREBALL;
 import data.World;
+import data.componentdata.AI;
 import data.componentdata.Body;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
+import java.util.Random;
 import org.openide.util.lookup.ServiceProvider;
 import services.IEntityProcessingService;
 
@@ -43,48 +47,92 @@ public class ControlProcessor implements IEntityProcessingService {
     boolean spellIsMoving = false;
     private int spellNumber = 0;
 
+    private float changeDirection = 2f;
+    private float directionTimer = 0f;
+
     @Override
     public void process(GameData gameData, World world) {
-        
-        if(gameData.getKeys().isPressed(NUM_1)){
+
+        if (gameData.getKeys().isPressed(NUM_1)) {
             spellNumber = 1;
         }
-        
 
         for (Entity entity : world.getEntities(EntityType.PLAYER)) {
-           
+
 //            if(!entity.get(SpellBook.class).getSpells().contains(FIREBALL)){
 //                entity.get(SpellBook.class).addToSpellBook(FIREBALL);
 //                System.out.println("Fireball added to spellbook");
 //            }
-            
             handleMoveClick(entity, gameData);
             handleTargetClick(entity, gameData);
             handleShoot(entity, gameData, world);
 
-            for (Entity spell : world.getEntities(EntityType.SPELL)) {
-                Position sp = spell.get(Position.class);
-                if (gameData.getKeys().isPressed(LEFT_MOUSE)) {
-                    gameData.getKeys().setKey(LEFT_MOUSE, false);
-                    sStartX = sp.getX();
-                    sStartY = sp.getY();
-                    sEndX = gameData.getMousePositionX();
-                    sEndY = gameData.getMousePositionY();
-                    sAngle = (float) Math.toDegrees(Math.atan2(sEndY - sStartY, sEndX - sStartX));
-                    sDistance = (float) Math.sqrt(Math.pow(sEndX - sStartX, 2) + Math.pow(sEndY - sStartY, 2));
+        }
+        for (Entity enemy : world.getEntities(EntityType.ENEMY)) {
+            handleAiMovement(gameData, enemy);
+        }
+        for (Entity spell : world.getEntities(EntityType.SPELL)) {
+            handleSpellMovement(spell, gameData);
+        }
+    }
 
-                    sDirectionX = (sEndX - sStartX) / sDistance;
-                    sDirectionY = (sEndY - sStartY) / sDistance;
-                    sp.setX(sStartX);
-                    sp.setY(sStartY);
-                    spellIsMoving = true;
+    private void handleAiMovement(GameData gameData, Entity ai) {
+        AI aiComp = ai.get(AI.class);
+        Position p = ai.get(Position.class);
+        
+        if (aiComp.getClosestEntity() != null) {
+            Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
+            Vector2 entityPosition = new Vector2(aiComp.getClosestEntity().get(Position.class).getX(), aiComp.getClosestEntity().get(Position.class).getY());
+            float distance = aiPosition.dst(entityPosition);
+            float aiDistance = (float) Math.sqrt(Math.pow(entityPosition.x - aiPosition.x, 2) + Math.pow(entityPosition.y - aiPosition.y, 2));
+            float aiDirectionX = (entityPosition.x - aiPosition.x) / aiDistance;
+            float aiDirectionY = (entityPosition.y - aiPosition.y) / aiDistance;
 
+            float aiAngle = (float) Math.toDegrees(Math.atan2(entityPosition.y - aiPosition.y, entityPosition.x - aiPosition.x));
+            ai.setAngle(aiAngle);
+            float aiSpeed = 50;
+
+            ai.setCharState(MOVING);
+            setRunningState(ai.getAngle(), ai);
+            if (distance < 250) {
+                System.out.println("virker");
+                p.setX(p.getX() + aiDirectionX * aiSpeed * gameData.getDelta());
+                p.setY(p.getY() + aiDirectionY * aiSpeed * gameData.getDelta());
+            } else {
+                directionTimer += gameData.getDelta();
+                if (directionTimer >= changeDirection) {
+                    Random rand = new Random();
+                    float n = rand.nextFloat();
+                    aiDirectionX = aiDirectionX * n;
+                    aiDirectionY = aiDirectionY * n;
                 }
-                if (spellIsMoving) {
-                    sp.setX(sp.getX() + sDirectionX * spell.getMaxSpeed() * gameData.getDelta());
-                    sp.setY(sp.getY() + sDirectionY * spell.getMaxSpeed() * gameData.getDelta());
-                }
+                p.setX(p.getX() + aiDirectionX * aiSpeed * gameData.getDelta());
+                p.setY(p.getY() + aiDirectionY * aiSpeed * gameData.getDelta());
             }
+        }
+    }
+
+    private void handleSpellMovement(Entity spell, GameData gameData) {
+        Position sp = spell.get(Position.class);
+        if (gameData.getKeys().isPressed(LEFT_MOUSE)) {
+            gameData.getKeys().setKey(LEFT_MOUSE, false);
+            sStartX = sp.getX();
+            sStartY = sp.getY();
+            sEndX = gameData.getMousePositionX();
+            sEndY = gameData.getMousePositionY();
+            sAngle = (float) Math.toDegrees(Math.atan2(sEndY - sStartY, sEndX - sStartX));
+            sDistance = (float) Math.sqrt(Math.pow(sEndX - sStartX, 2) + Math.pow(sEndY - sStartY, 2));
+
+            sDirectionX = (sEndX - sStartX) / sDistance;
+            sDirectionY = (sEndY - sStartY) / sDistance;
+            sp.setX(sStartX);
+            sp.setY(sStartY);
+            spellIsMoving = true;
+
+        }
+        if (spellIsMoving) {
+            sp.setX(sp.getX() + sDirectionX * spell.getMaxSpeed() * gameData.getDelta());
+            sp.setY(sp.getY() + sDirectionY * spell.getMaxSpeed() * gameData.getDelta());
         }
     }
 
@@ -103,6 +151,7 @@ public class ControlProcessor implements IEntityProcessingService {
                 e.setCharState(CharacterState.IDLE);
             } else {
                 angle = (float) Math.toDegrees(Math.atan2(endY - startY, endX - startX));
+                e.setAngle(angle);
                 speed = 100;
                 distance = (float) Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
 
@@ -111,9 +160,9 @@ public class ControlProcessor implements IEntityProcessingService {
                 p.setX(startX);
                 p.setY(startY);
                 e.setCharState(CharacterState.MOVING);
-                setRunningState(e);
+                setRunningState(e.getAngle(), e);
             }
-            
+
         }
         if (e.getCharState().equals(CharacterState.MOVING)) {
             p.setX(p.getX() + directionX * speed * gameData.getDelta());
@@ -123,7 +172,7 @@ public class ControlProcessor implements IEntityProcessingService {
                 p.setX(endX);
                 p.setY(endY);
                 e.setCharState(CharacterState.IDLE);
-                setStandingState(e);
+                setStandingState(e.getAngle(), e);
             }
         }
         if (gameData.getKeys().isPressed(ESCAPE)) {
@@ -136,21 +185,20 @@ public class ControlProcessor implements IEntityProcessingService {
     }
 
     private void handleShoot(Entity e, GameData gameData, World world) {
-        if (gameData.getKeys().isDown(LEFT_MOUSE) && spellNumber > 0 ) {
+        if (gameData.getKeys().isDown(LEFT_MOUSE) && spellNumber > 0) {
             SpellType spell;
-            if(spellNumber == 1){
+            if (spellNumber == 1) {
                 spell = e.get(SpellBook.class).getChosenSpell();
             }
 
-            
-            setStandingState(e);
+            setStandingState(e.getAngle(), e);
             e.setCharState(CharacterState.CASTING);
-            
+
             spellNumber = 1;
         }
     }
 
-    private void setRunningState(Entity e) {
+    private void setRunningState(float angle, Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.RUNNINGRIGHT);
         } else if (angle < 135 && angle > 45) {
@@ -162,7 +210,7 @@ public class ControlProcessor implements IEntityProcessingService {
         }
     }
 
-    private void setStandingState(Entity e) {
+    private void setStandingState(float angle, Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.STANDINGRIGHT);
         } else if (angle < 135 && angle > 45) {

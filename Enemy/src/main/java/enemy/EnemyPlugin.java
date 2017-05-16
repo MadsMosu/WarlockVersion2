@@ -12,9 +12,12 @@ import services.IGamePluginService;
 import States.MovementState;
 import static data.EntityType.ENEMY;
 import data.ImageManager;
+import data.componentdata.AI;
 import data.componentdata.Body;
 import data.componentdata.Health;
+import data.componentdata.Owner;
 import data.componentdata.Position;
+import data.componentdata.SpellBook;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,20 +60,22 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Entity enemy = new Entity();
         enemy.setType(ENEMY);
 
-        Position pos = new Position(0.0f, 0.0f);
+        Position pos = new Position(1600,0);
         Health health = new Health(100);
+        SpellBook sb = new SpellBook(new Owner(enemy.getID()));
+        AI ai = new AI();
+        sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         enemy.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
         enemy.add(health);
         enemy.add(pos);
-
-
+        enemy.add(sb);
+        enemy.add(ai);
         enemy.setMaxSpeed(2);
         enemy.setAcceleration(2);
         enemy.setDeacceleration(1);
 
-        enemy.setRadians(3.1415f / 2);
 
-        Body body = new Body(50, 32, Body.Geometry.RECTANGLE);
+        Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         enemy.add(body);
 
         enemy.setMoveState(MovementState.STANDINGRIGHT);
