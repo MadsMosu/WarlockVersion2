@@ -17,6 +17,7 @@ import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
+import data.componentdata.Velocity;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IEntityProcessingService.class)
@@ -63,13 +64,14 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         Position pos = new Position(3200, 0);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(player.getID()));
+        Velocity v = new Velocity();
+        v.setSpeed(100);
         player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
         player.add(health);
         player.add(pos);
         player.add(sb);
-        player.setMaxSpeed(2);
-        player.setAcceleration(2);
-        player.setDeacceleration(1);
+        player.add(v);
+
         
         Body body = new Body(50, 50, Geometry.RECTANGLE);
         player.add(body);

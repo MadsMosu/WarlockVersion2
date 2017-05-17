@@ -14,10 +14,12 @@ import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
 import data.ImageManager;
 import data.SpellList;
+import data.componentdata.Body;
 import data.componentdata.Expiration;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
+import data.componentdata.Velocity;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IGamePluginService.class)
@@ -60,7 +62,6 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             if (e.getExpiration() <= 0) {
                 world.removeEntity(spell);
             }
-            moveSpell(spell, gameData);
         }
     }
 
@@ -76,14 +77,17 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 book.setCooldownTimeLeft(book.getGlobalCooldownTime());
                 Entity se = new Entity();
                 se.setType(SPELL);
-                se.setMaxSpeed(SpellList.getSpellSpeed(spellType));
                 Position p = caster.get(Position.class);
                 SpellInfos si = new SpellInfos();
+                Velocity v = new Velocity();
+                v.setSpeed(SpellList.getSpellSpeed(spellType));
                 si.setSpellType(spellType);
                 si.setIsMoving(false);
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
                 se.add(new Position(p));
+                se.get(Position.class).setPosition(p.getX() + caster.get(Body.class).getWidth()/2, p.getY() + caster.get(Body.class).getHeight()/2);
                 se.add(si);
+                se.add(v);
                 se.add(ImageManager.getImage(SPELL_IMAGE_PATH));
                 world.addEntity(se);
                 book.setChosenSpell(null);
@@ -97,9 +101,6 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         
     }
 
-    public void moveSpell(Entity entity, GameData gameData) {
-        //s
-    }
 
     @Override
     public void stop() {
