@@ -38,6 +38,9 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public static String CHARACTER_FINAL_IMAGE_PATH = "";
     private World world;
     private List<Entity> enemies;
+    private Entity enemy;
+    private float[] shapex = new float[4];
+    private float[] shapey = new float[4];
 
     @Override
     public void start(GameData gameData, World world) {
@@ -53,11 +56,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     @Override
     public void process(GameData gameData, World world) {
-
+        setShape();
     }
 
     private Entity makeEnemy() {
-        Entity enemy = new Entity();
+        enemy = new Entity();
         enemy.setType(ENEMY);
 
         Position pos = new Position(3300,0);
@@ -83,6 +86,29 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         world.addEntity(enemy);
         return enemy;
     }
+    
+     private void setShape() {
+        float height = enemy.get(Body.class).getHeight();
+        float width = enemy.get(Body.class).getWidth();
+        float playerX = enemy.get(Position.class).getX();
+        float playerY = enemy.get(Position.class).getY();
+
+        shapex[0] = (float) (playerX);
+        shapey[0] = (float) (playerY);
+
+        shapex[1] = (float) (playerX + width);
+        shapey[1] = (float) (playerY);
+
+        shapex[2] = (float) (playerX + width);
+        shapey[2] = (float) (playerY + height);
+
+        shapex[3] = (float) (playerX);
+        shapey[3] = (float) (playerY + height);
+
+        enemy.setShapeX(shapex);
+        enemy.setShapeY(shapey);
+    }
+
 
     @Override
     public void stop() {

@@ -190,7 +190,7 @@ public class GameEngine implements ApplicationListener {
 
     private void draw() {
 
-        for (Entity e : world.getEntities(MAP, PLAYER)) {
+        for (Entity e : world.getEntities(MAP, PLAYER, SPELL, ENEMY)) {
             sr.setColor(Color.MAGENTA);
             sr.begin(ShapeType.Line);
 
