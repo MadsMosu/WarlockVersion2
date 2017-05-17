@@ -84,6 +84,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
                 se.add(new Position(p));
                 se.add(si);
+                si.setSpellEntity(se);
                 se.add(ImageManager.getImage(SPELL_IMAGE_PATH));
                 world.addEntity(se);
                 book.setChosenSpell(null);
