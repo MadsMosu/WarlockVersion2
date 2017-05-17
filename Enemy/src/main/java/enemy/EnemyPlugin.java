@@ -18,7 +18,6 @@ import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
-import data.componentdata.Velocity;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +70,9 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.add(pos);
         enemy.add(sb);
         enemy.add(ai);
-        enemy.setMaxSpeed(70);
+        enemy.setMaxSpeed(2);
+        enemy.setAcceleration(2);
+        enemy.setDeacceleration(1);
 
 
         Body body = new Body(50, 50, Body.Geometry.RECTANGLE);

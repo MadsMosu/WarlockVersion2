@@ -67,7 +67,9 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         player.add(health);
         player.add(pos);
         player.add(sb);
-        player.setMaxSpeed(100);
+        player.setMaxSpeed(2);
+        player.setAcceleration(2);
+        player.setDeacceleration(1);
         
         Body body = new Body(50, 50, Geometry.RECTANGLE);
         player.add(body);

@@ -1,4 +1,8 @@
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package data.componentdata;
 
 import data.Entity;
@@ -11,7 +15,6 @@ import data.SpellType;
 public class SpellInfos {
 
     private Entity hitBy;
-    private Entity spellEntity;
     private SpellType usedSpell;
 
     private SpellType spellType;
@@ -21,7 +24,6 @@ public class SpellInfos {
     private float acceleration;
     private int cooldown;
     private int bouncePoints;
-    private boolean isHit = false;
 
     public SpellType getUsedSpell() {
         return usedSpell;
@@ -31,21 +33,6 @@ public class SpellInfos {
         this.usedSpell = usedSpell;
     }
 
-    public Entity getSpellEntity() {
-        return spellEntity;
-    }
-
-    public void setSpellEntity(Entity spellEntity) {
-        this.spellEntity = spellEntity;
-    }
-
-    public boolean isIsHit() {
-        return isHit;
-    }
-
-    public void setIsHit(boolean isHit) {
-        this.isHit = isHit;
-    }
     
     public SpellType hitByWhichSpell() {
         return getHitBy().get(SpellType.class);
