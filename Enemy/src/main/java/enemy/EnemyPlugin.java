@@ -35,7 +35,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     private float directionY;
     private float directionX;
-    public static final String CHARACTER_IMAGE_PATH = "assets/Characters.png";
+    public static final String CHARACTER_IMAGE_PATH = "assets/enemysprites.png";
     public static String CHARACTER_FINAL_IMAGE_PATH = "";
     private World world;
     private List<Entity> enemies;

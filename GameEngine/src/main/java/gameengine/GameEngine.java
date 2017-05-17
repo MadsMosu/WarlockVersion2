@@ -114,8 +114,6 @@ public class GameEngine implements ApplicationListener {
 
         int mapPixelWidth = prop.get("width", Integer.class) * prop.get("tilewidth", Integer.class);
         int mapPixelHeight = prop.get("height", Integer.class) * prop.get("tileheight", Integer.class);
-        int shortDiagonal = (int) (mapPixelHeight * (Math.sqrt(2 + 2 * Math.cos(60))));
-        int longDiagonal = (int) (mapPixelWidth * (Math.sqrt(2 + 2 * Math.cos(120))));
         gameData.setMapHeight(mapPixelHeight);
         gameData.setMapWidth(mapPixelWidth);
 

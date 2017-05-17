@@ -99,8 +99,11 @@ public class MapPlugin implements IGamePluginService {
         
         int shortDiagonal = (int) (gameData.getMapHeight() *(Math.sqrt(2+2* Math.cos(60))));
         int longDiagonal = (int) (gameData.getMapWidth() *(Math.sqrt(2+2* Math.cos(120))));
-        float[] shapeX = new float[]   {0, longDiagonal/4+94,longDiagonal/2+180, longDiagonal/4+92};
-        float[] shapeY = new float[] {16,-shortDiagonal*2+240,16,shortDiagonal*2-208};
+        
+        float[] shapeX = new float[] {0, 3200, 6400, 3200};
+        float[] shapeY = new float[] {16, 1600, 0, -1600};
+//        float[] shapeX = new float[]   {0, longDiagonal/4+94,longDiagonal/2+180, longDiagonal/4+92};
+//        float[] shapeY = new float[] {16,-shortDiagonal*2+240,16,shortDiagonal*2-208};
         mapBoundary.setShapeX(shapeX);
         mapBoundary.setShapeY(shapeY);
 //        float[] vertices = new float[] {0,16,longDiagonal/4+94,-shortDiagonal*2+240,longDiagonal/2+180,16,longDiagonal/4+92,shortDiagonal*2-208};
