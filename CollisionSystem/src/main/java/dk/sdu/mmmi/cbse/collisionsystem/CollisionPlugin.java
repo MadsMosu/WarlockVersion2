@@ -11,6 +11,7 @@ import static data.EntityType.*;
 import data.GameData;
 import data.World;
 import data.componentdata.Body;
+import data.componentdata.Owner;
 import data.componentdata.Position;
 import events.Event;
 import events.EventType;
@@ -52,12 +53,18 @@ public class CollisionPlugin implements IEntityProcessingService {
             if (handled.getType() == MAP && collideWith.getType() == PLAYER && !handled.contains(collideWith.get(Position.class).getX(), collideWith.get(Position.class).getY())) {
                 System.out.println("Player collision with Map");
                 collideWith.get(Position.class).setX(1800);
-            } else if (handled.getType() == SPELL && collideWith.getType() == ENEMY && !handled.contains(collideWith.get(Position.class).getX(), collideWith.get(Position.class).getY())) {
-                System.out.println("Spell collision with enemy");
-            } else if(handled.getType() == SPELL && collideWith.getType() == PLAYER && !handled.contains(collideWith.get(Position.class).getX(), collideWith.get(Position.class).getY())){
-                System.out.println("Spell collision with player");
-            } else {
-                System.out.println("NO COLISSION");
+            } else if (handled.getType() == SPELL && collideWith.getType() == ENEMY && collideWith.contains(handled.get(Position.class).getX(), handled.get(Position.class).getY())) {
+               
+                if(!handled.get(Owner.class).getID().equals(collideWith.getID())){
+                    world.removeEntity(handled);
+                    System.out.println("Spell collision with enemy");
+                }
+                
+            } else if(handled.getType() == SPELL && collideWith.getType() == PLAYER && collideWith.contains(handled.get(Position.class).getX(), handled.get(Position.class).getY())){
+                if(!handled.get(Owner.class).getID().equals(collideWith.getID())){
+                    world.removeEntity(handled);
+                    System.out.println("Spell collision with player");
+                }
             }
 
         }

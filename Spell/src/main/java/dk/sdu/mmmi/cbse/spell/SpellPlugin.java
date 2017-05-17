@@ -17,6 +17,7 @@ import data.SpellList;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
 import data.componentdata.Expiration;
+import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
@@ -61,7 +62,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             }
         }
         for (Entity spell : world.getEntities(SPELL)) {
-            setShape(world, spell);
+            setShape(spell);
             float dt = gameData.getDelta();
             Expiration e = spell.get(Expiration.class);
             e.reduceExpiration(dt);
@@ -84,6 +85,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 Entity se = new Entity();
                 se.setType(SPELL);
                 Position p = caster.get(Position.class);
+                
                 SpellInfos si = new SpellInfos();
                 Body b = new Body(spellArchive.getSpell(spellType).getHeight(), spellArchive.getSpell(spellType).getWidth(), Geometry.CIRCLE);
                 Velocity v = new Velocity();
@@ -92,7 +94,9 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 si.setIsMoving(false);
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
                 se.add(new Position(p));
+                se.add(new Owner(caster.getID()));
                 se.get(Position.class).setPosition(p.getX() + caster.get(Body.class).getWidth()/2, p.getY() + caster.get(Body.class).getHeight()/2);
+                
                 se.add(si);
                 se.add(v);
                 se.add(ImageManager.getImage(SPELL_IMAGE_PATH));
@@ -104,16 +108,17 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         }
     }
     
-    private void setShape(World world, Entity spell){
+    private void setShape(Entity spell){
         float[] shapex = new float[4];
         float[] shapey = new float[4];
+        float angle = spell.getAngle();
         
         
             shapex[0] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth() - 5;
-            shapey[0] = spell.get(Position.class).getY()+ 10;
+            shapey[0] = spell.get(Position.class).getY();
             
             shapex[1] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth();
-            shapey[1] = spell.get(Position.class).getY() + 10;
+            shapey[1] = spell.get(Position.class).getY();
             
             shapex[2] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth();
             shapey[2] = spell.get(Position.class).getY() + spell.get(Body.class).getHeight();
