@@ -15,9 +15,6 @@ public final class Entity implements Serializable {
     public float dx;
     public float dy;
     private float angle;
-    private float maxSpeed;
-    private float acceleration;
-    private float deacceleration;
     private float[] shapeX = new float[4];
     private float[] shapeY = new float[4];
     private float speed;
@@ -138,30 +135,6 @@ public final class Entity implements Serializable {
 
     public void setAngle(float angle) {
         this.angle = angle;
-    }
-
-    public float getMaxSpeed() {
-        return maxSpeed;
-    }
-
-    public void setMaxSpeed(float maxSpeed) {
-        this.maxSpeed = maxSpeed;
-    }
-
-    public float getAcceleration() {
-        return acceleration;
-    }
-
-    public void setAcceleration(float acceleration) {
-        this.acceleration = acceleration;
-    }
-
-    public float getDeacceleration() {
-        return deacceleration;
-    }
-
-    public void setDeacceleration(float deacceleration) {
-        this.deacceleration = deacceleration;
     }
 
     public float[] getShapeX() {

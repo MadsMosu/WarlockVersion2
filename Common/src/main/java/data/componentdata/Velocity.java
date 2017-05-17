@@ -15,12 +15,6 @@ public class Velocity {
     private float speed;
 
     
-    public Velocity(float directionX, float directionY, float speed){
-        this.directionX = directionX;
-        this.directionY = directionY;
-        this.speed = speed;
-    }
-    
     public float getDirectionX() {
         return directionX;
     }
