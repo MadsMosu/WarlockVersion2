@@ -91,6 +91,11 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             }
         }
     }
+    
+    private void setShape(){
+        
+        
+    }
 
     public void moveSpell(Entity entity, GameData gameData) {
         //s
