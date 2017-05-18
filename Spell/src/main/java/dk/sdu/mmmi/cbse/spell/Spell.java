@@ -15,7 +15,7 @@ import data.componentdata.Expiration;
 public class Spell {
 
     private SpellType spellType;
-    private final float damage;
+    private final int damage;
     private boolean isStatic;
     private Entity spellEntity;
     private float speed;
@@ -26,7 +26,7 @@ public class Spell {
     private int width;
     private int height;
 
-    public Spell(World world, SpellType spellType, float damage, String path, boolean isStatic, float expiration, float speed, float acceleration, float cooldown, int bouncePoints, int width, int height) {
+    public Spell(World world, SpellType spellType, int damage, String path, boolean isStatic, float expiration, float speed, float acceleration, float cooldown, int bouncePoints, int width, int height) {
         SPELL_IMAGE_PATH = Spell.class.getResource(path).getPath().replace("file:", "");
         ImageManager.createImage(SPELL_IMAGE_PATH, false);
 
@@ -61,7 +61,7 @@ public class Spell {
         return spellType;
     }
 
-    public float getDamage() {
+    public int getDamage() {
         return damage;
     }
 
