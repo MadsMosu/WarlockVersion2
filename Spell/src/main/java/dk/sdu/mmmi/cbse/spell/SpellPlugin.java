@@ -17,6 +17,8 @@ import data.ImageManager;
 import data.SpellList;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
+import data.componentdata.Bounce;
+import data.componentdata.Damage;
 import data.componentdata.Expiration;
 import data.componentdata.Owner;
 import data.componentdata.Position;
@@ -88,10 +90,14 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 
                 SpellInfos si = new SpellInfos();
                 Body b = new Body(spellArchive.getSpell(spellType).getHeight(), spellArchive.getSpell(spellType).getWidth(), Geometry.CIRCLE);
+                Damage dmg = new Damage(spellArchive.getSpell(spellType).getDamage());
+                Bounce bounce = new Bounce(spellArchive.getSpell(spellType).getBouncePoints());
                 Velocity v = new Velocity();
                 v.setSpeed(SpellList.getSpellSpeed(spellType));
                 si.setSpellType(spellType);
                 si.setIsMoving(false);
+                se.add(dmg);
+                se.add(bounce);
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
                 se.add(new Owner(caster.getID()));
                 float x = p.getX() + caster.get(Body.class).getWidth()/2 - spellArchive.getSpell(spellType).getWidth()/2;

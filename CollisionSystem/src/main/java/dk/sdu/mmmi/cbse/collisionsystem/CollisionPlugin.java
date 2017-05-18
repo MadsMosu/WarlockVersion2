@@ -11,6 +11,9 @@ import static data.EntityType.*;
 import data.GameData;
 import data.World;
 import data.componentdata.Body;
+import data.componentdata.Damage;
+import data.componentdata.DamageTaken;
+import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
 import events.Event;
@@ -51,49 +54,43 @@ public class CollisionPlugin implements IEntityProcessingService {
         if (handled != null && collideWith != null) {
 
             if (handled.getType() == MAP && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
-                //System.out.println("Player collision with Map");
+
                 collideWith.get(Position.class).setX(1800);
             } else if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
 
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+                    Damage dmg = new Damage(handled.get(Damage.class).getDamage());
+                    System.out.println("Damage: " + dmg.getDamage());
+                    Owner owner = new Owner(collideWith.getID());
+                    DamageTaken dmgTaken = new DamageTaken(dmg, owner);
+                    System.out.println("dmgTaken: " + dmgTaken.getDamage());
+                    collideWith.get(Health.class).addDamageTaken(dmgTaken);
+                    System.out.println(collideWith.get(Health.class).getHp());
                     world.removeEntity(handled);
-                    //System.out.println("Spell collision with enemy");
+
                 }
             } else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+                    collideWith.get(Health.class).addDamageTaken(new DamageTaken(new Damage(handled.get(Damage.class).getDamage()), new Owner(collideWith.getID())));
+                    
                     world.removeEntity(handled);
-                    //System.out.println("Spell collision with player");
+
                 }
             } else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+
                     
-                    //System.out.println("Player collision with enemy");
                 }
 
             } else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+
                     
-                    //System.out.println("Enemy collision with enemy");
                 }
 
             }
 
         }
-//            if (handled.contains(collideWith.get(Position.class).getX(), collideWith.get(Position.class).getY()) && handled.getType() == SPELL && collideWith.getType() == PLAYER) {
-//                System.out.println("PLAYER collision with SPELL");
-//                
-//            }  else if (handled.contains(collideWith.get(Position.class).getX(), collideWith.get(Position.class).getY()) && handled.getType() == MAP && collideWith.getType() == PLAYER) {
-//                System.out.println("PLAYER collision with MAP");
-//                collideWith.setSpeed(0);
-//                
-//            }  else if (handled.contains(collideWith.get(Position.class).getX(), collideWith.get(Position.class).getY()) && handled.getType() == MAP && collideWith.getType() == ENEMY) {
-//                System.out.println("ENEMY collision with MAP");
-//                collideWith.setSpeed(0);
-//                
-//            } else if (handled.contains(collideWith.get(Position.class).getX(), collideWith.get(Position.class).getY()) && handled.getType() == SPELL && collideWith.getType() == ENEMY) {
-//                System.out.println("SPELL collision with ENEMY");
-//                world.removeEntity(collideWith);
-//                //gameData.addEvent(new Event(EventType.ASTEROID_SPLIT, handled.getID()));
-//            }
+
     }
 }
