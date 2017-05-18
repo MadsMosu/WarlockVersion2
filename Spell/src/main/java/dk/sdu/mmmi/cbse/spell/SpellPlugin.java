@@ -110,25 +110,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     }
     
     private void setShape(Entity spell){
-        float[] shapex = new float[4];
-        float[] shapey = new float[4];
-        float angle = spell.getAngle();
-        Position p= spell.get(Position.class);
-        
-            shapex[0] = p.getX();
-            shapey[0] = p.getY();
-            
-            shapex[1] = p.getX()+ spell.get(Body.class).getWidth(); 
-            shapey[1] = p.getY();
-            
-            shapex[2] = p.getX() + spell.get(Body.class).getWidth();
-            shapey[2] = p.getY() + spell.get(Body.class).getHeight();
-            
-            shapex[3] = p.getX();
-            shapey[3] = p.getY() + spell.get(Body.class).getHeight();
-            
-            spell.setShapeX(shapex);
-            spell.setShapeY(shapey);
+
         
         
     }
