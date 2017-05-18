@@ -24,10 +24,7 @@ import data.componentdata.Velocity;
     ,
     @ServiceProvider(service = IGamePluginService.class)
 })
-/**
- *
- * @author jcs
- */
+
 public class PlayerPlugin implements IEntityProcessingService, IGamePluginService {
 
     private float[] shapex = new float[4];
@@ -51,8 +48,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         for(Entity p : world.getEntities(PLAYER)){
         setShape();
         
-        }
-        
+        }       
         if (player.getCharState() == CharacterState.DEAD) {
             stop();
         }

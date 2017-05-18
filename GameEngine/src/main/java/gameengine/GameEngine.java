@@ -5,6 +5,7 @@
  */
 package gameengine;
 
+import States.AiStateMachine;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -36,10 +37,9 @@ import managers.GameInputProcessor;
 import org.openide.util.Lookup;
 import services.IEntityProcessingService;
 import services.IGamePluginService;
-import services.MapSPI;
 import data.componentdata.Image;
 import data.ImageManager;
-import data.componentdata.Body;
+import data.componentdata.AI;
 import data.componentdata.Damage;
 import data.componentdata.DamageTaken;
 import data.componentdata.Health;
@@ -87,7 +87,6 @@ public class GameEngine implements ApplicationListener {
         AssetsJarFileResolver jfhr = new AssetsJarFileResolver();
         assetManager = new AssetManager(jfhr);
 
-        
         sr = new ShapeRenderer();
         loadMap();
         map = assetManager.get("assets/shrinkingmap.tmx", TiledMap.class);
@@ -173,8 +172,7 @@ public class GameEngine implements ApplicationListener {
     @Override
     public void render() {
         gameData.setDelta(Gdx.graphics.getDeltaTime());
-        
-        
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         renderer.setView(camera);
@@ -218,7 +216,7 @@ public class GameEngine implements ApplicationListener {
 
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
-                    spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());                 
+                    spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
                     spriteBatch.end();
 
                 }
@@ -303,26 +301,33 @@ public class GameEngine implements ApplicationListener {
 //    }
     private boolean OnLava() {
 
-        for (Entity e : world.getEntities(PLAYER)) {
+        for (Entity e : world.getEntities(PLAYER, ENEMY)) {
 
-            float playerX = e.get(Position.class).getX();
-            float playerY = e.get(Position.class).getY();
+            float entityX = e.get(Position.class).getX();
+            float entityY = e.get(Position.class).getY();
 
-            int tileRow = (int) (playerX / currentLayer.getTileWidth() - (playerY / currentLayer.getTileHeight()));
-            int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + playerY) / (currentLayer.getTileHeight() / 2));
+            int tileRow = (int) (entityX / currentLayer.getTileWidth() - (entityY / currentLayer.getTileHeight()));
+            int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + entityY) / (currentLayer.getTileHeight() / 2));
             if (currentLayer.getCell(tileCol, tileCol) != null) {
                 if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 5) {
                     lavaTimer += gameData.getDelta();
                     if (lavaTimer >= 1) {
+                        if (e.isType(ENEMY)) {
+                            e.get(AI.class).setState(AiStateMachine.INLAVA);
+                        }
                         e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
                         lavaTimer = 0;
                         System.out.println(e.get(Health.class).getHp());
                     }
                     return true;
+                } else {
+                    if (e.isType(ENEMY)) {
+                        e.get(AI.class).setState(AiStateMachine.NOTINLAVA);
+                    }
                 }
             }
         }
-        return false;
+            return false;
     }
 
     private void update() {
@@ -330,7 +335,7 @@ public class GameEngine implements ApplicationListener {
 
         gameData.setMousePosition(Gdx.input.getX() + (int) (camera.position.x - camera.viewportWidth / 2),
                 -Gdx.input.getY() + Gdx.graphics.getHeight() + (int) (camera.position.y - camera.viewportHeight / 2));
-        
+
         shrinkTimer += gameData.getDelta();
         if (shrinkTimer >= shrinkTime) {
             layerCount++;
@@ -350,8 +355,7 @@ public class GameEngine implements ApplicationListener {
         hud.update(gameData);
     }
 
-    
-        private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
+    private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
         return lookup.lookupAll(IEntityProcessingService.class);
     }
 
@@ -363,21 +367,21 @@ public class GameEngine implements ApplicationListener {
         @Override
         public void resultChanged(LookupEvent lookupEvent) {
             Collection<? extends IGamePluginService> updated = pluginResult.allInstances();
-            for(IGamePluginService updatedService : updated) {
-                if(!entityPlugins.contains(updatedService)) {
+            for (IGamePluginService updatedService : updated) {
+                if (!entityPlugins.contains(updatedService)) {
                     updatedService.start(gameData, world);
                     entityPlugins.add(updatedService);
                 }
             }
-            for(IGamePluginService pluginService : entityPlugins) {
-                if(!updated.contains(pluginService)) {
+            for (IGamePluginService pluginService : entityPlugins) {
+                if (!updated.contains(pluginService)) {
                     pluginService.stop();
                     entityPlugins.remove(pluginService);
                 }
             }
         }
     };
-    
+
     @Override
     public void pause() {
 

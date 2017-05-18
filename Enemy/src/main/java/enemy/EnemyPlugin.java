@@ -3,7 +3,6 @@ package enemy;
 import States.AiStateMachine;
 import States.CharacterState;
 import data.Entity;
-import static data.EntityType.PLAYER;
 import data.GameData;
 import data.World;
 import org.openide.util.lookup.ServiceProvider;
@@ -59,6 +58,12 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     @Override
     public void process(GameData gameData, World world) {
         setShape();
+        
+        for(Entity enemy : world.getEntities(ENEMY)){
+            if(enemy.getCharState().equals(CharacterState.DEAD)){
+                world.removeEntity(enemy);
+            }
+        }
     }
 
     private Entity makeEnemy(float xPosition, float yPosition) {
