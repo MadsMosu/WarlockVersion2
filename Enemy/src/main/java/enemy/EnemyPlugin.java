@@ -1,5 +1,6 @@
 package enemy;
 
+import States.AiStateMachine;
 import States.CharacterState;
 import data.Entity;
 import static data.EntityType.PLAYER;
@@ -35,8 +36,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     private float directionY;
     private float directionX;
-    public static final String CHARACTER_IMAGE_PATH = "assets/enemysprites.png";
-    public static String CHARACTER_FINAL_IMAGE_PATH = "";
+    public static final String ENEMY_IMAGE_PATH = "assets/enemysprites.png";
+    public static String ENEMY_FINAL_IMAGE_PATH = "";
     private World world;
     private List<Entity> enemies;
     private Entity enemy;
@@ -45,12 +46,13 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     @Override
     public void start(GameData gameData, World world) {
-        CHARACTER_FINAL_IMAGE_PATH = EnemyPlugin.class.getResource(CHARACTER_IMAGE_PATH).getPath().replace("file:", "");
-        ImageManager.createImage(CHARACTER_FINAL_IMAGE_PATH, false);
+        ENEMY_FINAL_IMAGE_PATH = EnemyPlugin.class.getResource(ENEMY_IMAGE_PATH).getPath().replace("file:", "");
+        ImageManager.createImage(ENEMY_FINAL_IMAGE_PATH, false);
         this.world = world;
         enemies = new ArrayList();
 
-        enemies.add(makeEnemy());
+        enemies.add(makeEnemy(3000,0));
+        enemies.add(makeEnemy(3600, 0));
 
     }
 
@@ -59,11 +61,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         setShape();
     }
 
-    private Entity makeEnemy() {
+    private Entity makeEnemy(float xPosition, float yPosition) {
         enemy = new Entity();
         enemy.setType(ENEMY);
 
-        Position pos = new Position(3300, 0);
+        Position pos = new Position(xPosition, yPosition);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
         Owner ow = new Owner(enemy.getID());
@@ -71,7 +73,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Velocity v = new Velocity();
         sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         enemy.add(ow);
-        enemy.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
+        enemy.add(ImageManager.getImage(ENEMY_FINAL_IMAGE_PATH));
         enemy.add(health);
         enemy.add(pos);
         enemy.add(sb);
@@ -83,8 +85,9 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         enemy.add(body);
 
-        enemy.setMoveState(MovementState.STANDINGRIGHT);
+        enemy.setMoveState(MovementState.STANDING);
         enemy.setCharState(CharacterState.IDLE);
+        ai.setState(AiStateMachine.IDLE);
         world.addEntity(enemy);
         return enemy;
     }

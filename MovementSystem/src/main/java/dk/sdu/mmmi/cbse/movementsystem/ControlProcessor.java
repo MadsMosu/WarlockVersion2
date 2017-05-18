@@ -5,6 +5,7 @@
  */
 package dk.sdu.mmmi.cbse.movementsystem;
 
+import States.AiStateMachine;
 import States.CharacterState;
 import static States.CharacterState.MOVING;
 import States.MovementState;
@@ -34,12 +35,9 @@ import services.IEntityProcessingService;
  */
 public class ControlProcessor implements IEntityProcessingService {
 
-    private float changeDirection = 2f;
-    private float directionTimer = 0f;
-    
     private float startX, startY;
     private float endX, endY;
-    private float distance; 
+    private float distance;
 
     @Override
     public void process(GameData gameData, World world) {
@@ -64,30 +62,50 @@ public class ControlProcessor implements IEntityProcessingService {
         Position p = ai.get(Position.class);
         Velocity v = ai.get(Velocity.class);
 
-        if (aiComp.getClosestEntity() != null) {
+        if (aiComp.getCurrentTarget() != null) {
             Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
-            Vector2 entityPosition = new Vector2(aiComp.getClosestEntity().get(Position.class).getX(), aiComp.getClosestEntity().get(Position.class).getY());
+            Vector2 entityPosition = new Vector2(aiComp.getCurrentTarget().get(Position.class).getX(), aiComp.getCurrentTarget().get(Position.class).getY());
             float gap = aiPosition.dst(entityPosition);
             float aiDistance = (float) Math.sqrt(Math.pow(entityPosition.x - aiPosition.x, 2) + Math.pow(entityPosition.y - aiPosition.y, 2));
             v.setDirectionX((entityPosition.x - aiPosition.x) / aiDistance);
             v.setDirectionY((entityPosition.y - aiPosition.y) / aiDistance);
 
-            ai.setAngle((float) Math.toDegrees(Math.atan2(entityPosition.y - aiPosition.y, entityPosition.x - aiPosition.x)));
-
-
             ai.setCharState(MOVING);
-            setRunningState(ai.getAngle(), ai);
-            if (gap < 250) {
+
+            if (aiComp.getState().equals(AiStateMachine.INLAVA)) {
+                float distanceToMiddle = (float) Math.sqrt(Math.pow(gameData.getMapWidth() / 2 - aiPosition.x, 2) + Math.pow(gameData.getMapHeight() / 2 - aiPosition.y, 2));
+                ai.setAngle((float) Math.toDegrees(Math.atan2(gameData.getMapHeight() / 2 - aiPosition.y, gameData.getMapWidth() / 2 - aiPosition.x)));
+                setRunningState(ai.getAngle(), ai);
+
+                v.setDirectionX((gameData.getMapWidth() / 2 - aiPosition.x) - distanceToMiddle);
+                v.setDirectionY((gameData.getMapHeight() / 2 - aiPosition.y) - distanceToMiddle);
+
                 p.setX(p.getX() + v.getDirectionX() * v.getSpeed() * gameData.getDelta());
                 p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());
             } else {
-                directionTimer += gameData.getDelta();
-                if (directionTimer >= changeDirection) {
-                    Random rand = new Random();
-                    float n = rand.nextFloat();
-                    v.setDirectionX(v.getDirectionX() * n);
-                    v.setDirectionY(v.getDirectionY() * n);
+                if (gap > 200) {
+                    ai.setAngle((float) Math.toDegrees(Math.atan2(entityPosition.y - aiPosition.y, entityPosition.x - aiPosition.x)));
+                    setRunningState(ai.getAngle(), ai);
+
+                    p.setX(p.getX() + v.getDirectionX() * v.getSpeed() * gameData.getDelta());
+                    p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());
+                } else {
+                    ai.setAngle((float) Math.toDegrees(Math.atan2(aiPosition.y - entityPosition.y, aiPosition.x - entityPosition.x)));
+                    setRunningState(ai.getAngle(), ai);
+
+                    p.setX(p.getX() - v.getDirectionX() * v.getSpeed() * gameData.getDelta());
+                    p.setY(p.getY() - v.getDirectionY() * v.getSpeed() * gameData.getDelta());
+
                 }
+            }
+            if (aiComp.getState().equals(AiStateMachine.AVOIDINGSPELL)) {
+                float distanceToMove = (float) Math.sqrt(Math.pow(aiPosition.x + 20 - aiPosition.x, 2) + Math.pow(aiPosition.y + 20 - aiPosition.y, 2));
+                v.setDirectionX((aiPosition.x + 20 - aiPosition.x) / distanceToMove);
+                v.setDirectionY((aiPosition.y + 20 - aiPosition.y) / distanceToMove);
+
+                ai.setAngle((float) Math.toDegrees(Math.atan2(aiPosition.y + 20 - aiPosition.y, aiPosition.x + 20 - aiPosition.x)));
+                setRunningState(ai.getAngle(), ai);
+
                 p.setX(p.getX() + v.getDirectionX() * v.getSpeed() * gameData.getDelta());
                 p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());
             }
@@ -126,7 +144,6 @@ public class ControlProcessor implements IEntityProcessingService {
         Body b = e.get(Body.class);
         Velocity v = e.get(Velocity.class);
 
-
         if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
             gameData.getKeys().setKey(RIGHT_MOUSE, false);
 
@@ -139,7 +156,7 @@ public class ControlProcessor implements IEntityProcessingService {
                 e.setCharState(CharacterState.IDLE);
             } else {
                 e.setAngle((float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)));
-                
+
                 distance = (float) Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
 
                 v.setDirectionX((endX - startX) / distance);
@@ -157,7 +174,7 @@ public class ControlProcessor implements IEntityProcessingService {
                 p.setX(endX);
                 p.setY(endY);
                 e.setCharState(CharacterState.IDLE);
-                setStandingState(e.getAngle(), e);
+                e.setMoveState(MovementState.STANDING);
             }
         }
         if (gameData.getKeys().isPressed(ESCAPE)) {
@@ -171,7 +188,7 @@ public class ControlProcessor implements IEntityProcessingService {
 
     private void handleShoot(Entity e, GameData gameData, World world) {
         if (gameData.getKeys().isDown(LEFT_MOUSE) && e.get(SpellBook.class).getChosenSpell() != null) {
-            setStandingState(e.getAngle(), e);
+            e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
 
         }
@@ -189,17 +206,7 @@ public class ControlProcessor implements IEntityProcessingService {
         }
     }
 
-    private void setStandingState(float angle, Entity e) {
-        if (angle > -45 && angle < 45) {
-            e.setMoveState(MovementState.STANDINGRIGHT);
-        } else if (angle < 135 && angle > 45) {
-            e.setMoveState(MovementState.STANDINGUP);
-        } else if (angle > -135 && angle < -45) {
-            e.setMoveState(MovementState.STANDINGDOWN);
-        } else {
-            e.setMoveState(MovementState.STANDINGLEFT);
-        }
-    }
+
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
