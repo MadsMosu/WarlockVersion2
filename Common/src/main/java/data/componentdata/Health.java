@@ -13,23 +13,23 @@ import java.util.ArrayList;
  */
 public class Health
 {
-    private double maxHp;
-    private double hp;
+    private float maxHp;
+    private float hp;
     private ArrayList<DamageTaken> damageTaken;
 
-    public Health(double maxHp)
+    public Health(float maxHp)
     {
         this.maxHp = maxHp;
         this.hp = maxHp;
         damageTaken = new ArrayList<>();
     }
 
-    public double getHp()
+    public float getHp()
     {
         return hp;
     }
 
-    public void setHp(double hp)
+    public void setHp(float hp)
     {
         this.hp = hp;
     }
@@ -40,7 +40,7 @@ public class Health
         return maxHp;
     }
 
-    public void setMaxHp(double maxHp)
+    public void setMaxHp(float maxHp)
     {
         this.maxHp = maxHp;
     }

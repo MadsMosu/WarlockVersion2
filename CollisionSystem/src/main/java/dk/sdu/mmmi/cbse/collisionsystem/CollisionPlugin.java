@@ -51,29 +51,29 @@ public class CollisionPlugin implements IEntityProcessingService {
         if (handled != null && collideWith != null) {
 
             if (handled.getType() == MAP && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
-                System.out.println("Player collision with Map");
+                //System.out.println("Player collision with Map");
                 collideWith.get(Position.class).setX(1800);
             } else if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
 
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     world.removeEntity(handled);
-                    System.out.println("Spell collision with enemy");
+                    //System.out.println("Spell collision with enemy");
                 }
             } else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     world.removeEntity(handled);
-                    System.out.println("Spell collision with player");
+                    //System.out.println("Spell collision with player");
                 }
             } else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     
-                    System.out.println("Player collision with enemy");
+                    //System.out.println("Player collision with enemy");
                 }
 
             } else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     
-                    System.out.println("Enemy collision with enemy");
+                    //System.out.println("Enemy collision with enemy");
                 }
 
             }
