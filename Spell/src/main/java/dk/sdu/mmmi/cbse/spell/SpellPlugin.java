@@ -14,10 +14,13 @@ import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
 import data.ImageManager;
 import data.SpellList;
+import data.componentdata.Body;
+import data.componentdata.Body.Geometry;
 import data.componentdata.Expiration;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
+import data.componentdata.Velocity;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IGamePluginService.class)
@@ -25,13 +28,16 @@ import data.componentdata.SpellInfos;
     @ServiceProvider(service = IEntityProcessingService.class)
 })
 
+
 public class SpellPlugin implements IGamePluginService, IEntityProcessingService {
 
+    SpellArchive spellArchive;
     String SPELL_IMAGE_PATH = "";
     private World world;
-
+    
     @Override
     public void start(GameData gameData, World world) {
+        spellArchive = new SpellArchive(world);
         SPELL_IMAGE_PATH = SpellPlugin.class.getResource(SpellList.FIREBALL_IMAGE).getPath().replace("file:", "");
         ImageManager.createImage(SPELL_IMAGE_PATH, true);
         this.world = world;
@@ -49,18 +55,19 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             book.reduceCooldownTimeLeft(gameData.getDelta());
             if (entity.getCharState() == CASTING && book.getChosenSpell() != null && book.getCooldownTimeLeft() <= 0) {
                 useSpell(book.getChosenSpell(), entity);
+                
 
                 entity.setCharState(IDLE);
             }
         }
         for (Entity spell : world.getEntities(SPELL)) {
+            setShape(world, spell);
             float dt = gameData.getDelta();
             Expiration e = spell.get(Expiration.class);
             e.reduceExpiration(dt);
             if (e.getExpiration() <= 0) {
                 world.removeEntity(spell);
             }
-            moveSpell(spell, gameData);
         }
     }
 
@@ -76,15 +83,20 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 book.setCooldownTimeLeft(book.getGlobalCooldownTime());
                 Entity se = new Entity();
                 se.setType(SPELL);
-                se.setMaxSpeed(SpellList.getSpellSpeed(spellType));
                 Position p = caster.get(Position.class);
                 SpellInfos si = new SpellInfos();
+                Body b = new Body(spellArchive.getSpell(spellType).getHeight(), spellArchive.getSpell(spellType).getWidth(), Geometry.CIRCLE);
+                Velocity v = new Velocity();
+                v.setSpeed(SpellList.getSpellSpeed(spellType));
                 si.setSpellType(spellType);
                 si.setIsMoving(false);
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
                 se.add(new Position(p));
+                se.get(Position.class).setPosition(p.getX() + caster.get(Body.class).getWidth()/2, p.getY() + caster.get(Body.class).getHeight()/2);
                 se.add(si);
+                se.add(v);
                 se.add(ImageManager.getImage(SPELL_IMAGE_PATH));
+                se.add(b);
                 world.addEntity(se);
                 book.setChosenSpell(null);
 
@@ -92,14 +104,29 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         }
     }
     
-    private void setShape(){
+    private void setShape(World world, Entity spell){
+        float[] shapex = new float[4];
+        float[] shapey = new float[4];
+        
+        
+            shapex[0] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth() - 5;
+            shapey[0] = spell.get(Position.class).getY()+ 10;
+            
+            shapex[1] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth();
+            shapey[1] = spell.get(Position.class).getY() + 10;
+            
+            shapex[2] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth();
+            shapey[2] = spell.get(Position.class).getY() + spell.get(Body.class).getHeight();
+            
+            shapex[3] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth() - 5;
+            shapey[3] = spell.get(Position.class).getY() + spell.get(Body.class).getHeight();
+            
+            spell.setShapeX(shapex);
+            spell.setShapeY(shapey);
         
         
     }
 
-    public void moveSpell(Entity entity, GameData gameData) {
-        //s
-    }
 
     @Override
     public void stop() {

@@ -39,12 +39,14 @@ import services.IGamePluginService;
 import services.MapSPI;
 import data.componentdata.Image;
 import data.ImageManager;
+import data.componentdata.Body;
 import data.componentdata.Damage;
 import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
 import java.util.Collection;
+import managers.AnimationHandler;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 
@@ -70,7 +72,7 @@ public class GameEngine implements ApplicationListener {
     private int layerCount;
     private ShapeRenderer sr;
     private SpriteBatch spriteBatch;
-    private Animator animator;
+    private AnimationHandler animator;
     private HUD hud;
     private TiledMapTileLayer currentLayer;
     private MapProperties prop;
@@ -81,12 +83,11 @@ public class GameEngine implements ApplicationListener {
     public void create() {
         world = new World();
         gameData = new GameData();
-        animator = new Animator();
+        animator = new AnimationHandler();
         shrinkTime = 15;
         AssetsJarFileResolver jfhr = new AssetsJarFileResolver();
         assetManager = new AssetManager(jfhr);
 
-        
         sr = new ShapeRenderer();
         loadMap();
         map = assetManager.get("assets/shrinkingmap.tmx", TiledMap.class);
@@ -134,23 +135,28 @@ public class GameEngine implements ApplicationListener {
             plugin.start(gameData, world);
             entityPlugins.add(plugin);
         }
-
         loadImages();
 
         spriteBatch = new SpriteBatch();
 
         hud = new HUD(spriteBatch, gameData, world);
+
     }
 
     private void loadImages() {
         for (Image image : ImageManager.images()) {
             String imagePath = image.getImageFilePath();
-
             if (!assetManager.isLoaded(imagePath, Texture.class)) {
                 assetManager.load(imagePath, Texture.class);
                 assetManager.finishLoading();
-                animator.initializeSprite(assetManager.get(imagePath, Texture.class), gameData);
             }
+        }
+        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
+            if (entity.get(Image.class) != null) {
+                String imagePath = entity.get(Image.class).getImageFilePath();
+                animator.initializeCharacters(assetManager.get(imagePath, Texture.class), entity, gameData);
+            }
+
         }
     }
 
@@ -172,8 +178,7 @@ public class GameEngine implements ApplicationListener {
     @Override
     public void render() {
         gameData.setDelta(Gdx.graphics.getDeltaTime());
-        
-        
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         renderer.setView(camera);
@@ -190,7 +195,7 @@ public class GameEngine implements ApplicationListener {
 
     private void draw() {
 
-        for (Entity e : world.getEntities(MAP, PLAYER)) {
+        for (Entity e : world.getEntities(MAP, PLAYER, SPELL, ENEMY)) {
             sr.setColor(Color.MAGENTA);
             sr.begin(ShapeType.Line);
 
@@ -217,7 +222,7 @@ public class GameEngine implements ApplicationListener {
 
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
-                    spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());                 
+                    spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
                     spriteBatch.end();
 
                 }
@@ -227,6 +232,7 @@ public class GameEngine implements ApplicationListener {
         for (Entity e : world.getEntities(ENEMY)) {
             Position p = e.get(Position.class);
             Image image = e.get(Image.class);
+                System.out.println(image.getImageFilePath());
             if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
 
                 if (!image.isRepeat()) {
@@ -251,7 +257,6 @@ public class GameEngine implements ApplicationListener {
             if (image.isRepeat()) {
                 spriteBatch.setProjectionMatrix(camera.combined);
                 spriteBatch.begin();
-                //spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY());
                 spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY(), 0, 0, animator.getSpellAnimation().getRegionWidth(), animator.getSpellAnimation().getRegionHeight(), 1, 1, e.getAngle());
                 spriteBatch.end();
             }
@@ -268,7 +273,8 @@ public class GameEngine implements ApplicationListener {
                 }
                 groundLayers.get(i).setVisible(true);
                 currentLayer = (TiledMapTileLayer) groundLayers.get(i);
-            } else {
+            }
+            else {
                 groundLayers.get(i).setVisible(false);
             }
 
@@ -330,7 +336,7 @@ public class GameEngine implements ApplicationListener {
 
         gameData.setMousePosition(Gdx.input.getX() + (int) (camera.position.x - camera.viewportWidth / 2),
                 -Gdx.input.getY() + Gdx.graphics.getHeight() + (int) (camera.position.y - camera.viewportHeight / 2));
-        
+
         shrinkTimer += gameData.getDelta();
         if (shrinkTimer >= shrinkTime) {
             layerCount++;
@@ -350,8 +356,7 @@ public class GameEngine implements ApplicationListener {
         hud.update(gameData);
     }
 
-    
-        private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
+    private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
         return lookup.lookupAll(IEntityProcessingService.class);
     }
 
@@ -363,21 +368,21 @@ public class GameEngine implements ApplicationListener {
         @Override
         public void resultChanged(LookupEvent lookupEvent) {
             Collection<? extends IGamePluginService> updated = pluginResult.allInstances();
-            for(IGamePluginService updatedService : updated) {
-                if(!entityPlugins.contains(updatedService)) {
+            for (IGamePluginService updatedService : updated) {
+                if (!entityPlugins.contains(updatedService)) {
                     updatedService.start(gameData, world);
                     entityPlugins.add(updatedService);
                 }
             }
-            for(IGamePluginService pluginService : entityPlugins) {
-                if(!updated.contains(pluginService)) {
+            for (IGamePluginService pluginService : entityPlugins) {
+                if (!updated.contains(pluginService)) {
                     pluginService.stop();
                     entityPlugins.remove(pluginService);
                 }
             }
         }
     };
-    
+
     @Override
     public void pause() {
 
