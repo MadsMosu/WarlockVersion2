@@ -8,7 +8,6 @@ public class AI {
 
     private Entity currentTarget;
     private Entity spellToAvoid;
-    private Entity chasedBy;
     private boolean avoidSpell = false;
     private Map<Entity, Float> allEntities = new HashMap();
     private Map<Entity, Float> EntitiesHealthInDist = new HashMap();
@@ -50,12 +49,5 @@ public class AI {
         return EntitiesHealthInDist;
     }
 
-    public Entity getChasedBy() {
-        return chasedBy;
-    }
-
-    public void setChasedBy(Entity chasedBy) {
-        this.chasedBy = chasedBy;
-    }
 
 }
