@@ -39,10 +39,7 @@ public class ControlProcessor implements IEntityProcessingService {
     public void process(GameData gameData, World world) {
 
         for (Entity entity : world.getEntities(EntityType.PLAYER)) {
-
             handleMoveClick(entity, gameData);
-            handleTargetClick(entity, gameData);
-            handleShoot(entity, gameData, world);
 
         }
         for (Entity enemy : world.getEntities(EntityType.ENEMY)) {
@@ -165,14 +162,6 @@ public class ControlProcessor implements IEntityProcessingService {
         }
     }
 
-    private void handleShoot(Entity e, GameData gameData, World world) {
-        if (gameData.getKeys().isDown(LEFT_MOUSE) && e.get(SpellBook.class).getChosenSpell() != null) {
-            e.setMoveState(MovementState.STANDING);
-            e.setCharState(CharacterState.CASTING);
-
-        }
-    }
-
     private void setRunningState(float angle, Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.RUNNINGRIGHT);
@@ -183,30 +172,6 @@ public class ControlProcessor implements IEntityProcessingService {
         } else {
             e.setMoveState(MovementState.RUNNINGLEFT);
         }
-    }
-
-    private void handleTargetClick(Entity e, GameData gameData) {
-        if (gameData.getKeys().isPressed(NUM_1)) {
-            SpellBook sb = e.get(SpellBook.class);
-            sb.setChosenSpell(FIREBALL);
-
-        } else {
-            return;
-        }
-        if (gameData.getKeys().isPressed(NUM_2)) {
-            //e.setChosenSpell(SpellType.SPELL2);
-            System.out.println("Frostbolt chosen");
-
-        }
-        if (gameData.getKeys().isPressed(NUM_3)) {
-            //Spell 3
-
-        }
-        if (gameData.getKeys().isPressed(NUM_4)) {
-            //Spell 4
-
-        }
-
     }
 
 }
