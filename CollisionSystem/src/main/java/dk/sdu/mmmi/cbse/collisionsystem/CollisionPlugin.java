@@ -59,7 +59,12 @@ public class CollisionPlugin implements IEntityProcessingService {
             } else if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
 
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-                    collideWith.get(Health.class).addDamageTaken(new DamageTaken(new Damage(handled.get(Damage.class).getDamage()), new Owner(collideWith.getID())));
+                    Damage dmg = new Damage(handled.get(Damage.class).getDamage());
+                    System.out.println("Damage: " + dmg.getDamage());
+                    Owner owner = new Owner(collideWith.getID());
+                    DamageTaken dmgTaken = new DamageTaken(dmg, owner);
+                    System.out.println("dmgTaken: " + dmgTaken.getDamage());
+                    collideWith.get(Health.class).addDamageTaken(dmgTaken);
                     System.out.println(collideWith.get(Health.class).getHp());
                     world.removeEntity(handled);
 

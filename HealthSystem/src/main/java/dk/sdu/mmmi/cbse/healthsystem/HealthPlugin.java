@@ -22,7 +22,7 @@ import services.IGamePluginService;
 
 public class HealthPlugin implements IGamePluginService, IEntityProcessingService {
 
-    float regenTime = 2;
+    float regenTime = 4;
     float regenTimer = 0;
 
     @Override
@@ -71,6 +71,7 @@ public class HealthPlugin implements IGamePluginService, IEntityProcessingServic
             if (e.get(Health.class).getHp() < e.get(Health.class).getMaxHp() && e.get(Health.class).getHp() > 0) {
                 e.get(Health.class).setHp(e.get(Health.class).getHp() + 1);
             }
+            regenTimer = 0;
         }
     }
 
