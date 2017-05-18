@@ -15,12 +15,12 @@ public class AssetManager
 {
     private static Map<String, Asset> assets = new ConcurrentHashMap<>();
 
-    public static Collection<Asset> views()
+    public static Collection<Asset> assets()
     {
         return assets.values();
     }
 
-    public static void createView(String path, boolean repeatImage)
+    public static void createAsset(String path, boolean repeatImage)
     {
         Asset a = null;
         try
@@ -35,12 +35,12 @@ public class AssetManager
         }
     }
 
-    public static Asset getView(String path)
+    public static Asset getAssets(String path)
     {
         return assets.get(path);
     }
 
-    public static void removeView(String path)
+    public static void removeAssets(String path)
     {
         assets.remove(path);
     }
