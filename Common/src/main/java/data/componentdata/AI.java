@@ -11,9 +11,9 @@ public class AI {
     private Entity chasedBy;
     private boolean avoidSpell = false;
     private Map<Entity, Float> allEntities = new HashMap();
-    private Map<Entity, Double> allEntitiesHealth = new HashMap();
+    private Map<Entity, Float> EntitiesHealthInDist = new HashMap();
     private Map<Entity, Float> closeSpells = new HashMap();
-
+    
     public Map<Entity, Float> getCloseSpells() {
         return closeSpells;
     }
@@ -34,7 +34,6 @@ public class AI {
         this.spellToAvoid = spellToAvoid;
     }
 
-
     public Map<Entity, Float> getAllEntities() {
         return allEntities;
     }
@@ -47,11 +46,9 @@ public class AI {
         this.currentTarget = currentTarget;
     }
 
-
-    public Map<Entity, Double> getAllEntitiesHealth() {
-        return allEntitiesHealth;
+    public Map<Entity, Float> getEntitiesHealthInDist() {
+        return EntitiesHealthInDist;
     }
-
 
     public Entity getChasedBy() {
         return chasedBy;
@@ -60,13 +57,5 @@ public class AI {
     public void setChasedBy(Entity chasedBy) {
         this.chasedBy = chasedBy;
     }
-
-
-
-    
-
-    
-
-
 
 }

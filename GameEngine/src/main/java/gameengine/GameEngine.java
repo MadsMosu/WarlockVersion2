@@ -47,6 +47,7 @@ import data.componentdata.Owner;
 import data.componentdata.Position;
 import java.util.Collection;
 import managers.AnimationHandler;
+import managers.MapManager;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 
@@ -61,72 +62,45 @@ public class GameEngine implements ApplicationListener {
     private final Lookup lookup = Lookup.getDefault();
     private Lookup.Result<IGamePluginService> pluginResult;
     private List<IGamePluginService> entityPlugins;
-    private TiledMap map;
     private IsometricTiledMapRenderer renderer;
     public DotaCamera camera;
     private OrthographicCamera hudCamera;
     private AssetManager assetManager;
-    private MapLayers mapLayers, groundLayers;
-    private float shrinkTimer, shrinkTime;
-    private float lavaTimer = 0;
-    private int layerCount;
     private ShapeRenderer sr;
     private SpriteBatch spriteBatch;
     private AnimationHandler animator;
+    private MapManager mapManager;
     private HUD hud;
-    private TiledMapTileLayer currentLayer;
-    private MapProperties prop;
-    private int mapHeight;
-    private int mapWidth;
 
     @Override
     public void create() {
         world = new World();
+        spriteBatch = new SpriteBatch();
         gameData = new GameData();
         animator = new AnimationHandler();
-        shrinkTime = 15;
+        mapManager = new MapManager();
+        
         AssetsJarFileResolver jfhr = new AssetsJarFileResolver();
         assetManager = new AssetManager(jfhr);
 
         sr = new ShapeRenderer();
-        loadMap();
-        map = assetManager.get("assets/shrinkingmap.tmx", TiledMap.class);
-
+        mapManager.loadMap(assetManager, gameData);
         Gdx.input.setInputProcessor(new GameInputProcessor(gameData));
-        renderer = new IsometricTiledMapRenderer(map);
+        renderer = new IsometricTiledMapRenderer(mapManager.getMap());
         camera = new DotaCamera();
         hudCamera = new OrthographicCamera(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         hudCamera.translate(gameData.getDisplayWidth() / 2, gameData.getDisplayHeight() / 2);
         hudCamera.update();
         entityPlugins = new CopyOnWriteArrayList<>();
 
-        mapLayers = map.getLayers();
-        groundLayers = new MapLayers();
-
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
 
-        prop = map.getProperties();
-        mapHeight = prop.get("height", Integer.class) * prop.get("tileheight", Integer.class);
-        mapWidth = prop.get("width", Integer.class) * prop.get("tilewidth", Integer.class);;
-        System.out.println(mapHeight + "  " + mapWidth);
-
-        int mapPixelWidth = prop.get("width", Integer.class) * prop.get("tilewidth", Integer.class);
-        int mapPixelHeight = prop.get("height", Integer.class) * prop.get("tileheight", Integer.class);
-        gameData.setMapHeight(mapPixelHeight);
-        gameData.setMapWidth(mapPixelWidth);
-
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         //camera.setToOrtho(false, gameData.getMapWidth(), gameData.getMapHeight());
-        camera.position.set(mapWidth / 2, 0, 0);
-        currentLayer = (TiledMapTileLayer) mapLayers.get(0);
-
-        for (int i = 1; i < mapLayers.getCount(); i++) {
-            mapLayers.get(i).setVisible(false);
-            groundLayers.add(mapLayers.get(i));
-        }
+        camera.position.set(mapManager.getMapWidth() / 2, 0, 0);
 
         pluginResult = lookup.lookupResult(IGamePluginService.class);
         pluginResult.addLookupListener(lookupListener);
@@ -136,10 +110,10 @@ public class GameEngine implements ApplicationListener {
             entityPlugins.add(plugin);
         }
         loadImages();
-
-        spriteBatch = new SpriteBatch();
-
         hud = new HUD(spriteBatch, gameData, world);
+        
+
+        
 
     }
 
@@ -218,7 +192,7 @@ public class GameEngine implements ApplicationListener {
             sr.end();
         }
 
-        for (Entity e : world.getEntities(PLAYER)) {
+        for (Entity e : world.getEntities(PLAYER, ENEMY)) {
             Position p = e.get(Position.class);
             Image image = e.get(Image.class);
             if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
@@ -230,20 +204,6 @@ public class GameEngine implements ApplicationListener {
                     spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
                     spriteBatch.end();
 
-                }
-            }
-        }
-
-        for (Entity e : world.getEntities(ENEMY)) {
-            Position p = e.get(Position.class);
-            Image image = e.get(Image.class);
-            if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
-
-                if (!image.isRepeat()) {
-                    spriteBatch.setProjectionMatrix(camera.combined);
-                    spriteBatch.begin();
-                    spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
-                    spriteBatch.end();
                 }
             }
         }
@@ -251,89 +211,18 @@ public class GameEngine implements ApplicationListener {
         for (Entity e : world.getEntities(SPELL)) {
             Position p = e.get(Position.class);
             Image image = e.get(Image.class);
-            if (!assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
-                assetManager.load(image.getImageFilePath(), Texture.class);
-                assetManager.finishLoading();
+            if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
 
-            }
-            animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class));
-            if (image.isRepeat()) {
-                spriteBatch.setProjectionMatrix(camera.combined);
-                spriteBatch.begin();
-                spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY(), 0, animator.getSpellAnimation().getRegionHeight()/2, animator.getSpellAnimation().getRegionWidth(), animator.getSpellAnimation().getRegionHeight(), 1, 1, e.getAngle());
-                spriteBatch.end();
-            }
-        }
-
-    }
-
-    private void mapShrink(int layerCount) {
-        mapLayers.get(0).setVisible(false);
-        for (int i = 0; i < groundLayers.getCount(); i++) {
-            if (layerCount == i + 1 && i != 4) {
-                if (i > 0) {
-                    groundLayers.get(i - 1).setVisible(false);
-                }
-                groundLayers.get(i).setVisible(true);
-                currentLayer = (TiledMapTileLayer) groundLayers.get(i);
-            } else {
-                groundLayers.get(i).setVisible(false);
-            }
-
-        }
-    }
-
-//    private boolean checkIfOnLava()
-//    {
-//        for (Entity e : world.getEntities(PLAYER)) {
-//            float height = currentLayer.getTileHeight() * currentLayer.getHeight();
-//            float width = currentLayer.getTileWidth() * currentLayer.getWidth();
-//            
-//            float playerX = e.get(Position.class).getX();
-//            float playerY = e.get(Position.class).getY();
-//            
-//            int tileRow = (int) (playerX / currentLayer.getTileWidth());
-//            int tileCol = (int) Math.abs((playerY - (height / 2)) / currentLayer.getTileHeight());
-//            System.out.println("playerX: " + playerX);
-//            System.out.println("playerY: " + playerY);
-//            if(currentLayer.getCell(tileRow, tileCol).getTile() != null){
-//                if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 3) {
-//                    System.out.println("Walking on lava");
-//                    currentLayer.getCell(tileRow, tileCol).setTile(null);
-//                    return true;
-//                }
-//            }
-//            currentLayer.getCell(tileRow, tileCol).setTile(null);
-//        }
-//        System.out.println("walking on ground");
-//        
-//        return false;
-//    }
-    private boolean OnLava() {
-
-        for (Entity e : world.getEntities(PLAYER, ENEMY)) {
-
-            float entityX = e.get(Position.class).getX();
-            float entityY = e.get(Position.class).getY();
-
-            int tileRow = (int) (entityX / currentLayer.getTileWidth() - (entityY / currentLayer.getTileHeight()));
-            int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + entityY) / (currentLayer.getTileHeight() / 2));
-            if (currentLayer.getCell(tileCol, tileCol) != null) {
-                if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 5) {
-                    lavaTimer += gameData.getDelta();
-                    if (lavaTimer >= 1) {
-                        e.get(Position.class).setInLava(true);
-                        e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
-                        lavaTimer = 0;
-                        System.out.println(e.get(Health.class).getHp());
-                    }
-                    return true;
-                } else {
-                    e.get(Position.class).setInLava(false);
+                animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class));
+                if (image.isRepeat()) {
+                    spriteBatch.setProjectionMatrix(camera.combined);
+                    spriteBatch.begin();
+                    spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY(), 0, animator.getSpellAnimation().getRegionHeight() / 2, animator.getSpellAnimation().getRegionWidth(), animator.getSpellAnimation().getRegionHeight(), 1, 1, e.getAngle());
+                    spriteBatch.end();
                 }
             }
+
         }
-        return false;
     }
 
     private void update() {
@@ -342,22 +231,13 @@ public class GameEngine implements ApplicationListener {
         gameData.setMousePosition(Gdx.input.getX() + (int) (camera.position.x - camera.viewportWidth / 2),
                 -Gdx.input.getY() + Gdx.graphics.getHeight() + (int) (camera.position.y - camera.viewportHeight / 2));
 
-        shrinkTimer += gameData.getDelta();
-        if (shrinkTimer >= shrinkTime) {
-            layerCount++;
-            if (layerCount >= groundLayers.getCount()) {
-                layerCount--;
-            }
-            mapShrink(layerCount);
-            shrinkTimer = 0;
-        }
-
         for (IEntityProcessingService processor : getEntityProcessingServices()) {
             processor.process(gameData, world);
         }
 
         camera.update();
-        OnLava();
+        mapManager.ShrinkMap(gameData);
+        mapManager.OnLava(world, gameData);
         hud.update(gameData, world);
     }
 
@@ -400,7 +280,6 @@ public class GameEngine implements ApplicationListener {
 
     @Override
     public void dispose() {
-        map.dispose();
         renderer.dispose();
         assetManager.dispose();
     }

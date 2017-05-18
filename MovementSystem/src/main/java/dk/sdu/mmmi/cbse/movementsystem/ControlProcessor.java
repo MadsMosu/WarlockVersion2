@@ -73,8 +73,8 @@ public class ControlProcessor implements IEntityProcessingService {
                 ai.setAngle((float) Math.toDegrees(Math.atan2(gameData.getMapHeight() / 2 - aiPosition.y, gameData.getMapWidth() / 2 - aiPosition.x)));
                 setRunningState(ai.getAngle(), ai);
 
-                v.setDirectionX((gameData.getMapWidth() / 2 - aiPosition.x) - distanceToMiddle);
-                v.setDirectionY((gameData.getMapHeight() / 2 - aiPosition.y) - distanceToMiddle);
+                v.setDirectionX((gameData.getMapWidth() / 2 - aiPosition.x) / distanceToMiddle);
+                v.setDirectionY((gameData.getMapHeight() / 2 - aiPosition.y) / distanceToMiddle);
 
                 p.setX(p.getX() + v.getDirectionX() * v.getSpeed() * gameData.getDelta());
                 p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());

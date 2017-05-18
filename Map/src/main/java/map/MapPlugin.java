@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package map;
 
 import com.badlogic.gdx.maps.MapLayers;
@@ -11,8 +7,8 @@ import org.openide.util.lookup.ServiceProvider;
 import services.MapSPI;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import data.AssetManager;
 import data.Entity;
-import static data.EntityType.MAP;
 import data.GameData;
 import services.IGamePluginService;
 import org.openide.util.lookup.ServiceProviders;
@@ -21,10 +17,12 @@ import org.openide.util.lookup.ServiceProviders;
  *
  * @author jonaspedersen
  */
-@ServiceProviders(value = {
-    @ServiceProvider(service = IGamePluginService.class)
-})
-public class MapPlugin implements IGamePluginService {
+//@ServiceProviders(value = {
+//    @ServiceProvider(service = IGamePluginService.class),
+//    @ServiceProvider(service = MapSPI.class)
+//        
+//})
+public class MapPlugin implements IGamePluginService, MapSPI {
 
     private World world;
     private TiledMap map;
@@ -32,16 +30,22 @@ public class MapPlugin implements IGamePluginService {
     private int layerCount;
     private float shrinkTimer;
     private Entity mapBoundary;
-
+    String MAP_PATH = "assets/shrinkingmap.tmx";
+    String MAP_FINAL_PATH = "";
     
+    
+    @Override
     public void unloadMap()
     {
         
     }
 
     
+    @Override
     public TiledMap generateMap(World world,GameData gameData, int shrinkTime)
     {
+        MAP_FINAL_PATH = MapPlugin.class.getResource(MAP_PATH).getPath().replace("file:", "");
+        AssetManager.createAsset(MAP_FINAL_PATH, false);
         this.world = world;
         gameData.setShrinkTime(shrinkTime);
         
@@ -59,6 +63,7 @@ public class MapPlugin implements IGamePluginService {
     }
 
     
+    @Override
     public void mapShrink(int layerCount)
     {
 
@@ -73,11 +78,13 @@ public class MapPlugin implements IGamePluginService {
         }
     }
     
+    @Override
     public TiledMap getMap(){
         return this.map;
     }
 
     
+    @Override
     public void processMap(World world, GameData gameData)
     {
         this.shrinkTimer += gameData.getDelta();
