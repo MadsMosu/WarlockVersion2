@@ -93,9 +93,10 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 si.setSpellType(spellType);
                 si.setIsMoving(false);
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
-                se.add(new Position(p));
                 se.add(new Owner(caster.getID()));
-                se.get(Position.class).setPosition(p.getX() + caster.get(Body.class).getWidth()/2, p.getY() + caster.get(Body.class).getHeight()/2);
+                float x = p.getX() + caster.get(Body.class).getWidth()/2 - spellArchive.getSpell(spellType).getWidth()/2;
+                float y = p.getY() + caster.get(Body.class).getHeight()/2 - spellArchive.getSpell(spellType).getHeight()/2;
+                se.add(new Position (x, y));
                 
                 se.add(si);
                 se.add(v);
@@ -112,19 +113,19 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         float[] shapex = new float[4];
         float[] shapey = new float[4];
         float angle = spell.getAngle();
+        Position p= spell.get(Position.class);
         
-        
-            shapex[0] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth() - 5;
-            shapey[0] = spell.get(Position.class).getY();
+            shapex[0] = p.getX();
+            shapey[0] = p.getY();
             
-            shapex[1] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth();
-            shapey[1] = spell.get(Position.class).getY();
+            shapex[1] = p.getX()+ spell.get(Body.class).getWidth(); 
+            shapey[1] = p.getY();
             
-            shapex[2] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth();
-            shapey[2] = spell.get(Position.class).getY() + spell.get(Body.class).getHeight();
+            shapex[2] = p.getX() + spell.get(Body.class).getWidth();
+            shapey[2] = p.getY() + spell.get(Body.class).getHeight();
             
-            shapex[3] = spell.get(Position.class).getX() + spell.get(Body.class).getWidth() - 5;
-            shapey[3] = spell.get(Position.class).getY() + spell.get(Body.class).getHeight();
+            shapex[3] = p.getX();
+            shapey[3] = p.getY() + spell.get(Body.class).getHeight();
             
             spell.setShapeX(shapex);
             spell.setShapeY(shapey);

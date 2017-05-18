@@ -232,7 +232,6 @@ public class GameEngine implements ApplicationListener {
         for (Entity e : world.getEntities(ENEMY)) {
             Position p = e.get(Position.class);
             Image image = e.get(Image.class);
-                System.out.println(image.getImageFilePath());
             if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
 
                 if (!image.isRepeat()) {
@@ -253,11 +252,10 @@ public class GameEngine implements ApplicationListener {
 
             }
             animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class));
-
             if (image.isRepeat()) {
                 spriteBatch.setProjectionMatrix(camera.combined);
                 spriteBatch.begin();
-                spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY(), 0, 0, animator.getSpellAnimation().getRegionWidth(), animator.getSpellAnimation().getRegionHeight(), 1, 1, e.getAngle());
+                spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY(), 0, animator.getSpellAnimation().getRegionHeight()/2, animator.getSpellAnimation().getRegionWidth(), animator.getSpellAnimation().getRegionHeight(), 1, 1, e.getAngle());
                 spriteBatch.end();
             }
         }
