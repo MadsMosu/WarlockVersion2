@@ -62,10 +62,10 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return false;
     }
 
-    private boolean tooFarDistance(Entity ai, Entity opponent, float distanceValue) {
+    private float getDistance(Entity ai, Entity opponent) {
         Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
         Vector2 entityPosition = new Vector2(opponent.get(Position.class).getX(), opponent.get(Position.class).getY());
-        return aiPosition.dst(entityPosition) > distanceValue;
+        return aiPosition.dst(entityPosition);
     }
 
     private void detectEnemies(World world, Entity ai) {
@@ -92,16 +92,16 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
-    private void detectEnemiesHealth(World world, Entity ai) {
+    private void detectEnemiesHealthInDist(World world, Entity ai, float distanceValue) {
         AI aiComp = ai.get(AI.class);
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
-            if (!entity.equals(ai)) {
-                aiComp.getAllEntitiesHealth().put(entity, entity.get(Health.class).getHp());
+            if (!entity.equals(ai) && opponentInDistance(world, ai, distanceValue)) {
+                aiComp.getEntitiesHealthInDist().put(entity, entity.get(Health.class).getHp());
             }
         }
     }
 
-    private Entity lowestDistance(Map<Entity, Float> map) {
+    private Entity lowestValue(Map<Entity, Float> map) {
         Entry<Entity, Float> min = null;
         for (Entry<Entity, Float> entry : map.entrySet()) {
             if (min == null || min.getValue() > entry.getValue()) {
@@ -111,32 +111,10 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return min.getKey();
     }
 
-    private Entity lowestHealth(Map<Entity, Double> map) {
-        Entry<Entity, Double> min = null;
-        for (Entry<Entity, Double> entry : map.entrySet()) {
-            if (min == null || min.getValue() > entry.getValue()) {
-                min = entry;
-            }
-        }
-        return min.getKey();
-    }
-
-    private void chase(Entity ai, Entity opponent) {
-        AI aiComp = ai.get(AI.class);
-        AI opponentAI = opponent.get(AI.class);
-        if (!opponent.get(Position.class).isInLava()) {
-            aiComp.setCurrentTarget(opponent);
-        } else {
-            changeTarget(ai, aiComp.getCurrentTarget());
-        }
-        if (opponent.isType(ENEMY)) {
-            opponentAI.setChasedBy(ai);
-        }
-
-    }
 
     private void avoidSpell(Entity ai, World world) {
         AI aiComp = ai.get(AI.class);
+        aiComp.setAvoidSpell(true);
 //        for (Entry<Entity, Float> entry : aiComp.getCloseSpells().entrySet()) {
 //            if(entry.getKey().get(Velocity.class).getDirectionX()){
 //                aiComp.setSpellToAvoid(lowestDistance(aiComp.getCloseSpells()));               
@@ -145,64 +123,54 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         aiComp.setSpellToAvoid(null);
     }
 
-    private void attack(Entity ai) {
+    private void attack(World world, Entity ai) {
         AI aiComp = ai.get(AI.class);
         SpellBook sb = ai.get(SpellBook.class);
-        //Random random = new Random();
-        //int randNumb = random.nextInt(sb.getSpells().size());
-
-        //sb.setChosenSpell(sb.getSpells().get(randNumb));
-        sb.setChosenSpell(FIREBALL);
-        ai.setCharState(CASTING);
-        aiComp.setCurrentTarget(lowestDistance(aiComp.getAllEntities()));
+        if (opponentInDistance(world, ai, 200) && !ai.get(Position.class).isInLava()) {
+            sb.setChosenSpell(FIREBALL);
+            ai.setCharState(CASTING);
+            aiComp.setCurrentTarget(lowestValue(aiComp.getEntitiesHealthInDist()));
+        } else {
+            aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
+        } 
     }
 
-    private void changeTarget(Entity ai, Entity newTarget) {
-        AI aiComp = ai.get(AI.class);
-        if (aiComp.getChasedBy() != null) {
-            newTarget = aiComp.getChasedBy();
-        } else if (!lowestHealth(aiComp.getAllEntitiesHealth()).get(Position.class).isInLava()) {
-            newTarget = lowestHealth(aiComp.getAllEntitiesHealth());
-        } else {
-            newTarget = null;
+    private void escapeLava(World world, Entity ai) {
+        if (SpellInDistance(world, ai, 150)) {
+            avoidSpell(ai, world);
         }
+        attack(world, ai);
     }
 
     private void clearRadar(Entity ai) {
-        AI aiComp = ai.get(AI.class);
+        AI aiComp = ai.get(AI.class
+        );
         aiComp.getAllEntities().clear();
-        aiComp.getAllEntitiesHealth().clear();
         aiComp.getCloseSpells().clear();
+        aiComp.getEntitiesHealthInDist().clear();
     }
 
     private void raderScan(World world, Entity ai) {
         detectEnemies(world, ai);
-        detectIncommingSpells(world, ai, 70);
-        detectEnemiesHealth(world, ai);
+        detectIncommingSpells(world, ai, 150);
+        detectEnemiesHealthInDist(world, ai, 200);
+
     }
 
     private void behaviour(World world, Entity ai) {
-        AI aiComp = ai.get(AI.class);
+        AI aiComp = ai.get(AI.class
+        );
         clearRadar(ai);
         raderScan(world, ai);
 
         if (aiComp.getCurrentTarget() == null) {
-            aiComp.setCurrentTarget(lowestDistance(aiComp.getAllEntities()));
+            aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
+
         }
-
-        if (!ai.get(Position.class).isInLava()) {
-
-            if (opponentInDistance(world, ai, 200)) {
-                attack(ai);
-            } else {
-                chase(ai, lowestDistance(aiComp.getAllEntities()));
-            }
-            if (SpellInDistance(world, ai, 300)) {
-                avoidSpell(ai, world);
-            }
-            if (tooFarDistance(ai, aiComp.getCurrentTarget(), 350)) {
-                changeTarget(ai, aiComp.getCurrentTarget());
-            }
+        if (SpellInDistance(world, ai, 150) || ai.get(Position.class).isInLava()) {
+            escapeLava(world, ai);
+        } else {
+            attack(world, ai);
         }
     }
 
