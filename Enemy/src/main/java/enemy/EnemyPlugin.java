@@ -66,9 +66,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Position pos = new Position(3300, 0);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
+        Owner ow = new Owner(enemy.getID());
         AI ai = new AI();
         Velocity v = new Velocity();
         sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
+        enemy.add(ow);
         enemy.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
         enemy.add(health);
         enemy.add(pos);

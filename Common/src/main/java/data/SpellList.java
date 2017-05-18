@@ -21,7 +21,7 @@ public class SpellList {
     public static final float FIREBALL_ACCELERATION = 20f;
     public static final float FIREBALL_COOLDOWN = 4f;
     public static final boolean FIREBALL_STATIC = false;
-    public static final int FIREBALL_WIDTH = 55;
+    public static final int FIREBALL_WIDTH = 15;
     public static final int FIREBALL_HEIGHT = 15;
     
     public static float getSpellSpeed(SpellType spellType){

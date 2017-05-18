@@ -63,9 +63,11 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         player.setType(PLAYER);
         Position pos = new Position(3200, 0);
         Health health = new Health(100);
+        Owner ow = new Owner(player.getID());
         SpellBook sb = new SpellBook(new Owner(player.getID()));
         Velocity v = new Velocity();
         v.setSpeed(100);
+        player.add(ow);
         player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
         player.add(health);
         player.add(pos);
