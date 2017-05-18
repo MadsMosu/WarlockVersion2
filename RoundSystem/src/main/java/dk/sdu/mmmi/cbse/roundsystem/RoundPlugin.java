@@ -1,6 +1,5 @@
 package dk.sdu.mmmi.cbse.roundsystem;
 
-import com.badlogic.gdx.Gdx;
 import data.Entity;
 import data.EntityType;
 import data.GameData;
@@ -22,22 +21,21 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
     @Override
     public void start(GameData gameData, World world) {
         gameData.setRoundNumber(1);
-        gameData.setCurrentTime(0);
-        gameData.setRoundTime(3);
+        gameData.setCurrentTime(60);
+        gameData.setRoundTime(60);
     }
 
     @Override
     public void process(GameData gameData, World world) {
         //DONT DELETE
-//        float dt = Gdx.graphics.getDeltaTime();
-//        
-//        gameData.setCurrentTime(gameData.getRoundTime() - dt);
-//        int minutes = ((int)gameData.getRoundTime()) / 60;
-//        int seconds = ((int)gameData.getRoundTime()) % 60;
-//        if(gameData.getCurrentTime() <= 0){
-//            gameData.setGameState(GameState.ROUNDEND);
-//            gameData.setRoundNumber(gameData.getRoundNumber() + 1);
-//        }
+        float dt = gameData.getDelta();
+        float currentTime = gameData.getCurrentTime() - dt;
+        
+        gameData.setCurrentTime(currentTime);
+        if(gameData.getCurrentTime() <= 0){
+            gameData.setGameState(GameState.ROUNDEND);
+            gameData.setRoundNumber(gameData.getRoundNumber() + 1);
+        }
         
     }
 

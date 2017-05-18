@@ -40,6 +40,7 @@ public class HUD {
         roundTimer = gameData.getRoundTime();
         roundNumb = gameData.getRoundNumber();
 
+        
         for (Entity player : world.getEntities(EntityType.PLAYER)) {
             this.player = player;
             gold = player.get(Currency.class).getGold();
@@ -77,7 +78,7 @@ public class HUD {
     }
 
     public void update(GameData gameData){
-        roundTimer -= gameData.getDelta();
+        roundTimer = gameData.getCurrentTime();
         roundTimerLabel.setText(String.format("%.2f", roundTimer));
         healthLabel.setText(player.get(Health.class).getHp() + "");
     }

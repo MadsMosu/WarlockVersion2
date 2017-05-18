@@ -50,21 +50,32 @@ public class CollisionPlugin implements IEntityProcessingService {
     {
         if (handled != null && collideWith != null) {
 
-            if (handled.getType() == MAP && collideWith.getType() == PLAYER && !handled.contains(collideWith.get(Position.class).getX(), collideWith.get(Position.class).getY())) {
+            if (handled.getType() == MAP && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
                 System.out.println("Player collision with Map");
                 collideWith.get(Position.class).setX(1800);
-            } else if (handled.getType() == SPELL && collideWith.getType() == ENEMY && collideWith.contains(handled.get(Position.class).getX(), handled.get(Position.class).getY())) {
-               
-                if(!handled.get(Owner.class).getID().equals(collideWith.getID())){
+            } else if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+
+                if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     world.removeEntity(handled);
                     System.out.println("Spell collision with enemy");
                 }
-                
-            } else if(handled.getType() == SPELL && collideWith.getType() == PLAYER && collideWith.contains(handled.get(Position.class).getX(), handled.get(Position.class).getY())){
-                if(!handled.get(Owner.class).getID().equals(collideWith.getID())){
+            } else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
+                if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     world.removeEntity(handled);
                     System.out.println("Spell collision with player");
                 }
+            } else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+                if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+                    
+                    System.out.println("Player collision with enemy");
+                }
+
+            } else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+                if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+                    
+                    System.out.println("Enemy collision with enemy");
+                }
+
             }
 
         }

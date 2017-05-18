@@ -92,25 +92,19 @@ public class MapPlugin implements IGamePluginService {
     }
 	@Override
     public void start(GameData gameData, World world) {
-        this.world = world;
-        mapBoundary = new Entity();
-        mapBoundary.setType(MAP);
-        
-        
-        int shortDiagonal = (int) (gameData.getMapHeight() *(Math.sqrt(2+2* Math.cos(60))));
-        int longDiagonal = (int) (gameData.getMapWidth() *(Math.sqrt(2+2* Math.cos(120))));
-        
-        float[] shapeX = new float[] {0, 3200, 6400, 3200};
-        float[] shapeY = new float[] {16, 1600, 0, -1600};
-//        float[] shapeX = new float[]   {0, longDiagonal/4+94,longDiagonal/2+180, longDiagonal/4+92};
-//        float[] shapeY = new float[] {16,-shortDiagonal*2+240,16,shortDiagonal*2-208};
-        mapBoundary.setShapeX(shapeX);
-        mapBoundary.setShapeY(shapeY);
-//        float[] vertices = new float[] {0,16,longDiagonal/4+94,-shortDiagonal*2+240,longDiagonal/2+180,16,longDiagonal/4+92,shortDiagonal*2-208};
-//        poly = new Polygon(vertices);
-//        mapBoundary.setPolygon(poly);
-//        mapBoundary.setVertices(vertices);
-        world.addEntity(mapBoundary);
+//        this.world = world;
+//        mapBoundary = new Entity();
+//        mapBoundary.setType(MAP);
+//        
+//        
+//        int shortDiagonal = (int) (gameData.getMapHeight() *(Math.sqrt(2+2* Math.cos(60))));
+//        int longDiagonal = (int) (gameData.getMapWidth() *(Math.sqrt(2+2* Math.cos(120))));
+//        
+//        float[] shapeX = new float[] {0, 3200, 6400, 3200};
+//        float[] shapeY = new float[] {16, 1600, 0, -1600};
+//        mapBoundary.setShapeX(shapeX);
+//        mapBoundary.setShapeY(shapeY);
+//        world.addEntity(mapBoundary);
     }
 
     @Override

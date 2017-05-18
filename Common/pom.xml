@@ -20,6 +20,7 @@
                         <publicPackage>componentdata</publicPackage>
                         <publicPackage>data</publicPackage>
                         <publicPackage>data.componentdata</publicPackage>
+                        <publicPackage>data.util</publicPackage>
                         <publicPackage>events</publicPackage>
                         <publicPackage>services</publicPackage>
                     </publicPackages>
