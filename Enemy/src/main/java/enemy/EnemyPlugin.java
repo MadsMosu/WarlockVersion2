@@ -10,6 +10,7 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.MovementState;
 import static data.EntityType.ENEMY;
+import static data.GameKeys.LEFT_MOUSE;
 import data.ImageManager;
 import data.componentdata.AI;
 import data.componentdata.Body;
@@ -60,11 +61,18 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         
         for(Entity enemy : world.getEntities(ENEMY)){
             if(enemy.getCharState().equals(CharacterState.DEAD)){
-                System.out.println("hi im dead");
                 world.removeEntity(enemy);
             }
+            handleShoot(enemy, gameData);
         }
     }
+    
+    private void handleShoot(Entity e, GameData gameData) {
+        if (e.get(SpellBook.class).getChosenSpell() != null) {
+            e.setMoveState(MovementState.STANDING);
+            e.setCharState(CharacterState.CASTING);
+        }
+        }
 
     private Entity makeEnemy(float xPosition, float yPosition) {
         enemy = new Entity();
