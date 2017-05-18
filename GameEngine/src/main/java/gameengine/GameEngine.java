@@ -39,6 +39,7 @@ import services.IGamePluginService;
 import data.componentdata.Image;
 import data.ImageManager;
 import data.componentdata.AI;
+import data.componentdata.Body;
 import data.componentdata.Damage;
 import data.componentdata.DamageTaken;
 import data.componentdata.Health;
@@ -198,7 +199,10 @@ public class GameEngine implements ApplicationListener {
             sr.setColor(Color.MAGENTA);
             sr.begin(ShapeType.Line);
 
-            float[] shapex = e.getShapeX();
+            if(e.getType() == SPELL){
+                sr.circle(e.get(Position.class).getX(), e.get(Position.class).getY(), e.get(Body.class).getWidth() / 2);
+            } else {
+                float[] shapex = e.getShapeX();
             float[] shapey = e.getShapeY();
 
             for (int i = 0, j = shapex.length - 1;
@@ -207,6 +211,8 @@ public class GameEngine implements ApplicationListener {
 
                 sr.line(shapex[i], shapey[i], shapex[j], shapey[j]);
 
+            }
+            
             }
             sr.setProjectionMatrix(camera.combined);
             sr.end();
@@ -352,7 +358,7 @@ public class GameEngine implements ApplicationListener {
 
         camera.update();
         OnLava();
-        hud.update(gameData);
+        hud.update(gameData, world);
     }
 
     private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {

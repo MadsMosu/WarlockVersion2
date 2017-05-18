@@ -2,18 +2,26 @@ package gameengine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import data.Entity;
 import data.EntityType;
 import data.GameData;
 import data.World;
+import data.componentdata.Body;
 import data.componentdata.Currency;
 import data.componentdata.Health;
+import data.componentdata.HealthBar;
+import data.componentdata.Position;
 
 public class HUD {
 
@@ -36,11 +44,11 @@ public class HUD {
     private Table table;
     private Entity player;
 
-    public HUD(SpriteBatch spriteBatch, GameData gameData, World world) {
+    public HUD(SpriteBatch spriteBatch, GameData gameData, World world)
+    {
         roundTimer = gameData.getRoundTime();
         roundNumb = gameData.getRoundNumber();
 
-        
         for (Entity player : world.getEntities(EntityType.PLAYER)) {
             this.player = player;
             gold = player.get(Currency.class).getGold();
@@ -62,7 +70,6 @@ public class HUD {
         levelLabel = new Label(level + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
         expLabel = new Label(exp + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
         healthLabel = new Label(health + "", new Label.LabelStyle(new BitmapFont(), Color.GREEN));
-        
 
         table.add(levelLabel).expandX().padTop(10);
         table.add(expLabel).expandX().padTop(10);
@@ -70,16 +77,39 @@ public class HUD {
         table.add(roundNumbLabel).expandX().padTop(10);
         table.add(roundTimerLabel).expandX().padTop(10);
 
+        for (Entity entity : world.getEntities(EntityType.PLAYER, EntityType.PLAYER)) {
+                entity.add(new HealthBar(entity, 10));
+                stage.addActor(entity.get(HealthBar.class).getHealthBar());
+        }
+
         stage.addActor(table);
     }
 
-    public Stage getStage() {
+    public Stage getStage()
+    {
         return stage;
     }
 
-    public void update(GameData gameData){
+    public void update(GameData gameData, World world)
+    {
         roundTimer = gameData.getCurrentTime();
         roundTimerLabel.setText(String.format("%.2f", roundTimer));
         healthLabel.setText(player.get(Health.class).getHp() + "");
+
     }
+
+    private ProgressBarStyle setSkin()
+    {
+        Color bgColor = new Color(100 / 256f, 100 / 256f, 100 / 256f, 1f);
+        Skin skin;
+        skin = new Skin();
+        Pixmap pixmap = new Pixmap(1, 10, Pixmap.Format.RGBA8888);
+        pixmap.fill();
+        skin.add("white", new Texture(pixmap));
+        ProgressBar.ProgressBarStyle barStyle;
+        barStyle = new ProgressBar.ProgressBarStyle(skin.newDrawable("white", bgColor), skin.newDrawable("white", Color.RED));
+        barStyle.knobAfter = barStyle.knob;
+        return barStyle;
+    }
+
 }
