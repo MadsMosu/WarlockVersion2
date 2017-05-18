@@ -85,13 +85,14 @@ public class ControlProcessor implements IEntityProcessingService {
 
                     p.setX(p.getX() + v.getDirectionX() * v.getSpeed() * gameData.getDelta());
                     p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());
-                } else if (gap < 100 && !ai.get(AI.class).getCurrentTarget().get(Position.class).isInLava()) {
-                    ai.setAngle((float) Math.toDegrees(Math.atan2(aiPosition.y - entityPosition.y, aiPosition.x - entityPosition.x)));
-                    setRunningState(ai.getAngle(), ai);
-
-                    p.setX(p.getX() - v.getDirectionX() * v.getSpeed() * gameData.getDelta());
-                    p.setY(p.getY() - v.getDirectionY() * v.getSpeed() * gameData.getDelta());
-                }
+                } 
+//                else if (gap < 100 && !ai.get(AI.class).getCurrentTarget().get(Position.class).isInLava()) {
+//                    ai.setAngle((float) Math.toDegrees(Math.atan2(aiPosition.y - entityPosition.y, aiPosition.x - entityPosition.x)));
+//                    setRunningState(ai.getAngle(), ai);
+//
+//                    p.setX(p.getX() - v.getDirectionX() * v.getSpeed() * gameData.getDelta());
+//                    p.setY(p.getY() - v.getDirectionY() * v.getSpeed() * gameData.getDelta());
+//                }
             }
         }
     }
