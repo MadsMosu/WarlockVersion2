@@ -1,5 +1,6 @@
 package enemy;
 
+import States.AiStateMachine;
 import States.CharacterState;
 import data.Entity;
 import static data.EntityType.PLAYER;
@@ -50,7 +51,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         this.world = world;
         enemies = new ArrayList();
 
-        enemies.add(makeEnemy());
+        enemies.add(makeEnemy(3000,0));
+        enemies.add(makeEnemy(3600, 0));
 
     }
 
@@ -59,11 +61,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         setShape();
     }
 
-    private Entity makeEnemy() {
+    private Entity makeEnemy(float xPosition, float yPosition) {
         enemy = new Entity();
         enemy.setType(ENEMY);
 
-        Position pos = new Position(3300, 0);
+        Position pos = new Position(xPosition, yPosition);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
         AI ai = new AI();
@@ -83,6 +85,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
         enemy.setMoveState(MovementState.STANDING);
         enemy.setCharState(CharacterState.IDLE);
+        ai.setState(AiStateMachine.IDLE);
         world.addEntity(enemy);
         return enemy;
     }
