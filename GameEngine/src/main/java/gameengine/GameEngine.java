@@ -153,6 +153,8 @@ public class GameEngine implements ApplicationListener {
         spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
         hud.getStage().act(gameData.getDelta());
         hud.getStage().draw();
+        
+        
     }
 
     private void draw() {

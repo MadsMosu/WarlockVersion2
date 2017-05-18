@@ -6,6 +6,7 @@
 package dk.sdu.mmmi.cbse.collisionsystem;
 
 import data.Entity;
+import data.EntityType;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
 import data.componentdata.Position;
@@ -25,8 +26,9 @@ public class CollisionDAO
     public int width;
     public Geometry geometry;
 
-    public CollisionDAO(Entity e)
-    {
+    public CollisionDAO(Entity e){
+    
+        if(e.getType() != EntityType.MAP){    
         Position pos = e.get(Position.class);
         Body body = e.get(Body.class);
         x = pos.getX();
@@ -36,5 +38,6 @@ public class CollisionDAO
         geometry = body.getGeometry();
         centerX = x + width / 2;
         centerY = y + height / 2;
+        }
     }
 }
