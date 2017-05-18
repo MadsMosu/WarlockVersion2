@@ -10,6 +10,7 @@ import services.IGamePluginService;
 import data.SpellType;
 import static States.CharacterState.CASTING;
 import static States.CharacterState.IDLE;
+import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
 import data.ImageManager;
@@ -48,7 +49,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     @Override
     public void process(GameData gameData, World world) {
 
-        for (Entity entity : world.getEntities(PLAYER)) {
+        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             SpellBook book = entity.get(SpellBook.class);
             if (book.getSpells().isEmpty()) {
                 book.addToSpellBook(SpellType.FIREBALL);
@@ -56,7 +57,6 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             book.reduceCooldownTimeLeft(gameData.getDelta());
             if (entity.getCharState() == CASTING && book.getChosenSpell() != null && book.getCooldownTimeLeft() <= 0) {
                 useSpell(book.getChosenSpell(), entity);
-                
 
                 entity.setCharState(IDLE);
             }

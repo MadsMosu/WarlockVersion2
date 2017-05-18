@@ -71,7 +71,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         
         Body body = new Body(50, 50, Geometry.RECTANGLE);
         player.add(body);
-        player.setMoveState(MovementState.STANDINGDOWN);
+        player.setMoveState(MovementState.STANDING);
         player.setCharState(CharacterState.IDLE);
         world.addEntity(player);
 

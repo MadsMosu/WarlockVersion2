@@ -33,7 +33,6 @@ public class Spell {
         spellEntity = new Entity();
         spellEntity.add(new Expiration(expiration));
         spellEntity.setView(ImageManager.getImage(SPELL_IMAGE_PATH));
-        world.addEntity(spellEntity);
 
         this.spellType = spellType;
         this.damage = damage;

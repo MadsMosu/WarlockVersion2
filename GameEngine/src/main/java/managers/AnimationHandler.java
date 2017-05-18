@@ -3,74 +3,78 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gameengine;
+package managers;
 
+import gameengine.*;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import data.Entity;
 import data.GameData;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  * @author mads1
  */
-public class Animator {
+public class AnimationHandler {
 
     private Texture texture;
     private Animation spellAnimation;
     private float stateTime;
-    Array<TextureRegion> frames = new Array<>();
-    private TextureRegion chStandingRight, chStandingLeft, chStandingUp, chStandingDown;
+    private Map<Entity, Animation> anRunningRight;
+    private Map<Entity, Animation> anRunningLeft;
+    private Map<Entity, Animation> anRunningUp;
+    private Map<Entity, Animation> anRunningDown;
+    private Map<Entity, TextureRegion> standing;
+    private Array<TextureRegion> frames;
 
-    private Animation chRunningRight, chRunningLeft, chRunningUp, chRunningDown;
 
-    public void Animator() {
-
+    public AnimationHandler() {
+        anRunningRight = new ConcurrentHashMap<>();
+        anRunningLeft = new ConcurrentHashMap<>();
+        anRunningUp = new ConcurrentHashMap<>();
+        anRunningDown = new ConcurrentHashMap<>();
+        standing = new ConcurrentHashMap<>();
+        frames = new Array<>();
     }
 
 
-    public void initializeSprite(Texture imageFile, GameData gameData) {
+    public void initializeCharacters(Texture imageFile, Entity e, GameData gameData) {
         texture = imageFile;
         int spriteHeight = 50;
         int spriteWidth = 50;
         stateTime = 0;
-
-        chStandingRight = new TextureRegion(texture, 700, 0, spriteWidth, spriteHeight);
-        chStandingLeft = new TextureRegion(texture, 300, 0, spriteWidth, spriteHeight);
-        chStandingUp = new TextureRegion(texture, 0, 0, spriteWidth, spriteHeight);
-        chStandingDown = new TextureRegion(texture, 1100, 0, spriteWidth, spriteHeight);
-
-        
-
+       
         //run right
         for (int i = 0; i < 8; i++) {
             frames.add(new TextureRegion(texture, 700 + i * 50, 0, 50, 50));
         }
-        chRunningRight = new Animation(0.18f, frames);
+        anRunningRight.put(e, new Animation(0.18f, frames));
         frames.clear();
 
         //run left
         for (int i = 0; i < 8; i++) {
             frames.add(new TextureRegion(texture, 300 + i * 50, 0, 50, 50));
         }
-        chRunningLeft = new Animation(0.18f, frames);
+        anRunningLeft.put(e, new Animation(0.18f, frames));
         frames.clear();
 
         //run down
         for (int i = 0; i < 6; i++) {
             frames.add(new TextureRegion(texture, i * 50, 0, 50, 50));
         }
-        chRunningDown = new Animation(0.18f, frames);
+        anRunningDown.put(e, new Animation(0.18f, frames));
+        standing.put(e, frames.first());
         frames.clear();
 
         //run up
         for (int i = 0; i < 6; i++) {
             frames.add(new TextureRegion(texture, 1100 + i * 50, 0, 50, 50));
         }
-        chRunningUp = new Animation(0.18f, frames);
+        anRunningUp.put(e, new Animation(0.18f, frames));
         frames.clear();
 
     }
@@ -96,33 +100,25 @@ public class Animator {
 
         switch (entity.getMoveState()) {
             case RUNNINGRIGHT:
-                region = (TextureRegion) chRunningRight.getKeyFrame(stateTime, true);
-                chStandingRight = region;
+                region = (TextureRegion) anRunningRight.get(entity).getKeyFrame(stateTime, true);
+                standing.get(entity).setRegion(region);
                 break;
             case RUNNINGLEFT:
-                region = (TextureRegion) chRunningLeft.getKeyFrame(stateTime, true);
-                chStandingLeft = region;
+                region = (TextureRegion) anRunningLeft.get(entity).getKeyFrame(stateTime, true);
+                standing.get(entity).setRegion(region);
                 break;
             case RUNNINGUP:
-                region = (TextureRegion) chRunningUp.getKeyFrame(stateTime, true);
-                chStandingUp = region;
+                region = (TextureRegion) anRunningUp.get(entity).getKeyFrame(stateTime, true);
+                standing.get(entity).setRegion(region);
                 break;
             case RUNNINGDOWN:
-                region = (TextureRegion) chRunningDown.getKeyFrame(stateTime, true);
-                chStandingDown = region;
+                region = (TextureRegion) anRunningDown.get(entity).getKeyFrame(stateTime, true);
+                standing.get(entity).setRegion(region);
                 break;
-            case STANDINGRIGHT:
-                region = chStandingRight;
+            case STANDING:
+                region = standing.get(entity);
                 break;
-            case STANDINGLEFT:
-                region = chStandingLeft;
-                break;
-            case STANDINGUP:
-                region = chStandingUp;
-                break;
-            case STANDINGDOWN:
-                region = chStandingDown;
-                break;
+
         }
         return region;
     }

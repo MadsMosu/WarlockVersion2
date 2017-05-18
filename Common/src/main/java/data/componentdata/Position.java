@@ -15,9 +15,16 @@ public class Position implements Serializable {
 
     private float x;
     private float y;
+    private boolean inLava = false;
 
-    
-    
+    public boolean isInLava() {
+        return inLava;
+    }
+
+    public void setInLava(boolean inLava) {
+        this.inLava = inLava;
+    }
+     
     public Position(Position pos) {
         x = pos.getX();
         y = pos.getY();

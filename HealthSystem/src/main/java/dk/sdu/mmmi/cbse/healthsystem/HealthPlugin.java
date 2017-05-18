@@ -37,7 +37,7 @@ public class HealthPlugin implements IGamePluginService, IEntityProcessingServic
 
     @Override
     public void process(GameData data, World world) {
-        for (Entity e : world.getEntities(EntityType.PLAYER)) {
+        for (Entity e : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
             Health health = e.get(Health.class);
 
             if (health.getHp() > 0 && !health.getDamageTaken().isEmpty()) {

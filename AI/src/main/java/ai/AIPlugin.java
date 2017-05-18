@@ -1,6 +1,5 @@
 package ai;
 
-import States.AiStateMachine;
 import static States.CharacterState.CASTING;
 import com.badlogic.gdx.math.Vector2;
 import data.Entity;
@@ -14,6 +13,7 @@ import data.componentdata.AI;
 import data.componentdata.Health;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
+import data.componentdata.Velocity;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.openide.util.lookup.ServiceProvider;
@@ -70,7 +70,6 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
     private void detectEnemies(World world, Entity ai) {
         AI aiComp = ai.get(AI.class);
-        aiComp.getAllEntities().clear();
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
                 Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
@@ -95,7 +94,6 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
     private void detectEnemiesHealth(World world, Entity ai) {
         AI aiComp = ai.get(AI.class);
-        aiComp.getAllEntities().clear();
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
                 aiComp.getAllEntitiesHealth().put(entity, entity.get(Health.class).getHp());
@@ -126,21 +124,28 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     private void chase(Entity ai, Entity opponent) {
         AI aiComp = ai.get(AI.class);
         AI opponentAI = opponent.get(AI.class);
-        aiComp.setCurrentTarget(opponent);
-        aiComp.setState(AiStateMachine.CHASING);
+        if (!opponent.get(Position.class).isInLava()) {
+            aiComp.setCurrentTarget(opponent);
+        } else {
+            changeTarget(ai, aiComp.getCurrentTarget());
+        }
         if (opponent.isType(ENEMY)) {
             opponentAI.setChasedBy(ai);
         }
+
     }
 
     private void avoidSpell(Entity ai, World world) {
         AI aiComp = ai.get(AI.class);
-
-        aiComp.setState(AiStateMachine.AVOIDINGSPELL);
-        aiComp.setSpellToAvoid(lowestDistance(aiComp.getCloseSpells()));
+//        for (Entry<Entity, Float> entry : aiComp.getCloseSpells().entrySet()) {
+//            if(entry.getKey().get(Velocity.class).getDirectionX()){
+//                aiComp.setSpellToAvoid(lowestDistance(aiComp.getCloseSpells()));               
+//            }
+//        }
+        aiComp.setSpellToAvoid(null);
     }
 
-    private void attack(Entity ai, World world) {
+    private void attack(Entity ai) {
         AI aiComp = ai.get(AI.class);
         SpellBook sb = ai.get(SpellBook.class);
         //Random random = new Random();
@@ -152,12 +157,14 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         aiComp.setCurrentTarget(lowestDistance(aiComp.getAllEntities()));
     }
 
-    private void changeTarget(Entity ai, World world, Entity newTarget) {
+    private void changeTarget(Entity ai, Entity newTarget) {
         AI aiComp = ai.get(AI.class);
         if (aiComp.getChasedBy() != null) {
             newTarget = aiComp.getChasedBy();
-        } else {
+        } else if (!lowestHealth(aiComp.getAllEntitiesHealth()).get(Position.class).isInLava()) {
             newTarget = lowestHealth(aiComp.getAllEntitiesHealth());
+        } else {
+            newTarget = null;
         }
     }
 
@@ -183,18 +190,18 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
             aiComp.setCurrentTarget(lowestDistance(aiComp.getAllEntities()));
         }
 
-        if (!aiComp.getState().equals(AiStateMachine.INLAVA)) {
+        if (!ai.get(Position.class).isInLava()) {
 
             if (opponentInDistance(world, ai, 200)) {
-                attack(ai, world);
+                attack(ai);
             } else {
                 chase(ai, lowestDistance(aiComp.getAllEntities()));
             }
-            if (SpellInDistance(world, ai, 70)) {
+            if (SpellInDistance(world, ai, 300)) {
                 avoidSpell(ai, world);
             }
-            if (tooFarDistance(ai, aiComp.getCurrentTarget(), 300)) {
-                changeTarget(ai, world, aiComp.getCurrentTarget());
+            if (tooFarDistance(ai, aiComp.getCurrentTarget(), 350)) {
+                changeTarget(ai, aiComp.getCurrentTarget());
             }
         }
     }

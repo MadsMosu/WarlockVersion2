@@ -1,6 +1,5 @@
 package enemy;
 
-import States.AiStateMachine;
 import States.CharacterState;
 import data.Entity;
 import data.GameData;
@@ -35,8 +34,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     private float directionY;
     private float directionX;
-    public static final String CHARACTER_IMAGE_PATH = "assets/enemysprites.png";
-    public static String CHARACTER_FINAL_IMAGE_PATH = "";
+    public static final String ENEMY_IMAGE_PATH = "assets/enemysprites.png";
+    public static String ENEMY_FINAL_IMAGE_PATH = "";
     private World world;
     private List<Entity> enemies;
     private Entity enemy;
@@ -45,8 +44,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     @Override
     public void start(GameData gameData, World world) {
-        CHARACTER_FINAL_IMAGE_PATH = EnemyPlugin.class.getResource(CHARACTER_IMAGE_PATH).getPath().replace("file:", "");
-        ImageManager.createImage(CHARACTER_FINAL_IMAGE_PATH, false);
+        ENEMY_FINAL_IMAGE_PATH = EnemyPlugin.class.getResource(ENEMY_IMAGE_PATH).getPath().replace("file:", "");
+        ImageManager.createImage(ENEMY_FINAL_IMAGE_PATH, false);
         this.world = world;
         enemies = new ArrayList();
 
@@ -61,6 +60,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         
         for(Entity enemy : world.getEntities(ENEMY)){
             if(enemy.getCharState().equals(CharacterState.DEAD)){
+                System.out.println("hi im dead");
                 world.removeEntity(enemy);
             }
         }
@@ -75,8 +75,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
         AI ai = new AI();
         Velocity v = new Velocity();
-        sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
-        enemy.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
+        enemy.add(ImageManager.getImage(ENEMY_FINAL_IMAGE_PATH));
         enemy.add(health);
         enemy.add(pos);
         enemy.add(sb);
@@ -88,9 +87,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         enemy.add(body);
 
-        enemy.setMoveState(MovementState.STANDINGDOWN);
+        enemy.setMoveState(MovementState.STANDING);
         enemy.setCharState(CharacterState.IDLE);
-        ai.setState(AiStateMachine.IDLE);
         world.addEntity(enemy);
         return enemy;
     }
@@ -122,6 +120,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public void stop() {
         // Remove entities
         for (Entity enemy : enemies) {
+            
             world.removeEntity(enemy);
         }
     }

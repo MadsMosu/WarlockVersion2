@@ -5,7 +5,6 @@
  */
 package gameengine;
 
-import States.AiStateMachine;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -46,6 +45,7 @@ import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
 import java.util.Collection;
+import managers.AnimationHandler;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 
@@ -71,7 +71,7 @@ public class GameEngine implements ApplicationListener {
     private int layerCount;
     private ShapeRenderer sr;
     private SpriteBatch spriteBatch;
-    private Animator animator;
+    private AnimationHandler animator;
     private HUD hud;
     private TiledMapTileLayer currentLayer;
     private MapProperties prop;
@@ -82,7 +82,7 @@ public class GameEngine implements ApplicationListener {
     public void create() {
         world = new World();
         gameData = new GameData();
-        animator = new Animator();
+        animator = new AnimationHandler();
         shrinkTime = 15;
         AssetsJarFileResolver jfhr = new AssetsJarFileResolver();
         assetManager = new AssetManager(jfhr);
@@ -134,23 +134,28 @@ public class GameEngine implements ApplicationListener {
             plugin.start(gameData, world);
             entityPlugins.add(plugin);
         }
-
         loadImages();
 
         spriteBatch = new SpriteBatch();
 
         hud = new HUD(spriteBatch, gameData, world);
+
     }
 
     private void loadImages() {
         for (Image image : ImageManager.images()) {
             String imagePath = image.getImageFilePath();
-
             if (!assetManager.isLoaded(imagePath, Texture.class)) {
                 assetManager.load(imagePath, Texture.class);
                 assetManager.finishLoading();
-                animator.initializeSprite(assetManager.get(imagePath, Texture.class), gameData);
             }
+        }
+        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
+            if (entity.get(Image.class) != null) {
+                String imagePath = entity.get(Image.class).getImageFilePath();
+                animator.initializeCharacters(assetManager.get(imagePath, Texture.class), entity, gameData);
+            }
+
         }
     }
 
@@ -312,22 +317,18 @@ public class GameEngine implements ApplicationListener {
                 if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 5) {
                     lavaTimer += gameData.getDelta();
                     if (lavaTimer >= 1) {
-                        if (e.isType(ENEMY)) {
-                            e.get(AI.class).setState(AiStateMachine.INLAVA);
-                        }
+                        e.get(Position.class).setInLava(true);
                         e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
                         lavaTimer = 0;
                         System.out.println(e.get(Health.class).getHp());
                     }
                     return true;
                 } else {
-                    if (e.isType(ENEMY)) {
-                        e.get(AI.class).setState(AiStateMachine.NOTINLAVA);
-                    }
+                    e.get(Position.class).setInLava(false);
                 }
             }
         }
-            return false;
+        return false;
     }
 
     private void update() {
