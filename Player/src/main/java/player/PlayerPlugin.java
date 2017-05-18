@@ -10,7 +10,9 @@ import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.MovementState;
+import static data.GameKeys.*;
 import data.ImageManager;
+import static data.SpellType.FIREBALL;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
 import data.componentdata.Health;
@@ -45,10 +47,12 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     @Override
     public void process(GameData gameData, World world) {
 
-        for(Entity p : world.getEntities(PLAYER)){
-        setShape();
-        
-        }       
+        for (Entity p : world.getEntities(PLAYER)) {
+            setShape();
+            handleTargetClick(p, gameData);
+            handleShoot(p, gameData);
+        }
+
         if (player.getCharState() == CharacterState.DEAD) {
             stop();
         }
@@ -70,13 +74,44 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         player.add(sb);
         player.add(v);
 
-        
         Body body = new Body(50, 50, Geometry.RECTANGLE);
         player.add(body);
         player.setMoveState(MovementState.STANDING);
         player.setCharState(CharacterState.IDLE);
         world.addEntity(player);
 
+    }
+
+    private void handleTargetClick(Entity e, GameData gameData) {
+        if (gameData.getKeys().isPressed(NUM_1)) {
+            SpellBook sb = e.get(SpellBook.class);
+            sb.setChosenSpell(FIREBALL);
+        }
+        else {
+            return;
+        }
+        if (gameData.getKeys().isPressed(NUM_2)) {
+            //e.setChosenSpell(SpellType.SPELL2);
+            System.out.println("Frostbolt chosen");
+
+        }
+        if (gameData.getKeys().isPressed(NUM_3)) {
+            //Spell 3
+
+        }
+        if (gameData.getKeys().isPressed(NUM_4)) {
+            //Spell 4
+
+        }
+
+    }
+
+    private void handleShoot(Entity e, GameData gameData) {
+        if (gameData.getKeys().isDown(LEFT_MOUSE) && e.get(SpellBook.class).getChosenSpell() != null) {
+            e.setMoveState(MovementState.STANDING);
+            e.setCharState(CharacterState.CASTING);
+
+        }
     }
 
     private void setShape() {
