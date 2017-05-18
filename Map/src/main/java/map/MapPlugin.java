@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import data.AssetManager;
 import data.Entity;
+import data.EntityType;
 import data.GameData;
 import services.IGamePluginService;
 import org.openide.util.lookup.ServiceProviders;
@@ -17,12 +18,12 @@ import org.openide.util.lookup.ServiceProviders;
  *
  * @author jonaspedersen
  */
-//@ServiceProviders(value = {
-//    @ServiceProvider(service = IGamePluginService.class),
-//    @ServiceProvider(service = MapSPI.class)
-//        
-//})
-public class MapPlugin implements IGamePluginService, MapSPI {
+@ServiceProviders(value = {
+    @ServiceProvider(service = IGamePluginService.class),
+
+        
+})
+public class MapPlugin implements IGamePluginService {
 
     private World world;
     private TiledMap map;
@@ -34,14 +35,14 @@ public class MapPlugin implements IGamePluginService, MapSPI {
     String MAP_FINAL_PATH = "";
     
     
-    @Override
+  
     public void unloadMap()
     {
         
     }
 
     
-    @Override
+
     public TiledMap generateMap(World world,GameData gameData, int shrinkTime)
     {
         MAP_FINAL_PATH = MapPlugin.class.getResource(MAP_PATH).getPath().replace("file:", "");
@@ -63,7 +64,7 @@ public class MapPlugin implements IGamePluginService, MapSPI {
     }
 
     
-    @Override
+    
     public void mapShrink(int layerCount)
     {
 
@@ -78,13 +79,13 @@ public class MapPlugin implements IGamePluginService, MapSPI {
         }
     }
     
-    @Override
+    
     public TiledMap getMap(){
         return this.map;
     }
 
     
-    @Override
+    
     public void processMap(World world, GameData gameData)
     {
         this.shrinkTimer += gameData.getDelta();
@@ -99,19 +100,19 @@ public class MapPlugin implements IGamePluginService, MapSPI {
     }
 	@Override
     public void start(GameData gameData, World world) {
-//        this.world = world;
-//        mapBoundary = new Entity();
-//        mapBoundary.setType(MAP);
-//        
-//        
-//        int shortDiagonal = (int) (gameData.getMapHeight() *(Math.sqrt(2+2* Math.cos(60))));
-//        int longDiagonal = (int) (gameData.getMapWidth() *(Math.sqrt(2+2* Math.cos(120))));
-//        
-//        float[] shapeX = new float[] {0, 3200, 6400, 3200};
-//        float[] shapeY = new float[] {16, 1600, 0, -1600};
-//        mapBoundary.setShapeX(shapeX);
-//        mapBoundary.setShapeY(shapeY);
-//        world.addEntity(mapBoundary);
+        this.world = world;
+        mapBoundary = new Entity();
+        mapBoundary.setType(EntityType.MAP);
+        
+        
+        int shortDiagonal = (int) (gameData.getMapHeight() *(Math.sqrt(2+2* Math.cos(60))));
+        int longDiagonal = (int) (gameData.getMapWidth() *(Math.sqrt(2+2* Math.cos(120))));
+        
+        float[] shapeX = new float[] {0, 3200, 6400, 3200};
+        float[] shapeY = new float[] {16, 1600, 0, -1600};
+        mapBoundary.setShapeX(shapeX);
+        mapBoundary.setShapeY(shapeY);
+        world.addEntity(mapBoundary);
     }
 
     @Override

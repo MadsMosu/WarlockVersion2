@@ -103,10 +103,6 @@ public class GameEngine implements ApplicationListener {
         }
         loadImages();
         hud = new HUD(spriteBatch, gameData, world);
-        
-
-        
-
     }
 
     private void loadImages() {
@@ -123,14 +119,6 @@ public class GameEngine implements ApplicationListener {
                 animator.initializeCharacters(assetManager.get(imagePath, Texture.class), entity, gameData);
             }
 
-        }
-    }
-
-    private void loadMap() {
-        if (!assetManager.isLoaded("assets/shrinkingmap.tmx", TiledMap.class)) {
-            assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
-            assetManager.load("assets/shrinkingmap.tmx", TiledMap.class);
-            assetManager.finishLoading();
         }
     }
 
@@ -157,6 +145,8 @@ public class GameEngine implements ApplicationListener {
         spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
         hud.getStage().act(gameData.getDelta());
         hud.getStage().draw();
+        
+        
     }
 
     private void draw() {
