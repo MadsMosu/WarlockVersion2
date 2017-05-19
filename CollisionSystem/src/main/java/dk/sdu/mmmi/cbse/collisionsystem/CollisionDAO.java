@@ -28,7 +28,7 @@ public class CollisionDAO
 
     public CollisionDAO(Entity e){
     
-        if(e.getType() != EntityType.MAP){    
+        if(e.getType() != EntityType.MAP){
         Position pos = e.get(Position.class);
         Body body = e.get(Body.class);
         x = pos.getX();

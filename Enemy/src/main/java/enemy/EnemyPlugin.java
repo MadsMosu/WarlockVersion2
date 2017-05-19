@@ -50,29 +50,30 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         this.world = world;
         enemies = new ArrayList();
 
-        enemies.add(makeEnemy(3000,0));
+        enemies.add(makeEnemy(3000, 0));
         enemies.add(makeEnemy(3600, 0));
 
     }
 
     @Override
     public void process(GameData gameData, World world) {
-        setShape();
-        
-        for(Entity enemy : world.getEntities(ENEMY)){
-            if(enemy.getCharState().equals(CharacterState.DEAD)){
-                world.removeEntity(enemy);
+
+        for (Entity e : world.getEntities(ENEMY)) {
+            if (e.getCharState().equals(CharacterState.DEAD)) {
+                world.removeEntity(e);
             }
-            handleShoot(enemy, gameData);
+            setShape(e);
+
+            handleShoot(e, gameData);
         }
     }
-    
+
     private void handleShoot(Entity e, GameData gameData) {
         if (e.get(SpellBook.class).getChosenSpell() != null) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
         }
-        }
+    }
 
     private Entity makeEnemy(float xPosition, float yPosition) {
         enemy = new Entity();
@@ -84,7 +85,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Owner ow = new Owner(enemy.getID());
         AI ai = new AI();
         Velocity v = new Velocity();
-
+        v.setSpeed(50);
         sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         enemy.add(ow);
         enemy.add(ImageManager.getImage(ENEMY_FINAL_IMAGE_PATH));
@@ -92,47 +93,46 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.add(pos);
         enemy.add(sb);
         enemy.add(ai);
-        v.setSpeed(50);
-        enemy.add(v);
 
+        enemy.add(v);
 
         Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         enemy.add(body);
 
         enemy.setMoveState(MovementState.STANDING);
         enemy.setCharState(CharacterState.IDLE);
+        setShape(enemy);
         world.addEntity(enemy);
         return enemy;
     }
-    
-     private void setShape() {
-        float height = enemy.get(Body.class).getHeight();
-        float width = enemy.get(Body.class).getWidth();
-        float playerX = enemy.get(Position.class).getX();
-        float playerY = enemy.get(Position.class).getY();
 
-        shapex[0] = (float) (playerX);
-        shapey[0] = (float) (playerY);
+    private void setShape(Entity ent) {
+        float height = ent.get(Body.class).getHeight();
+        float width = ent.get(Body.class).getWidth();
+        float enemyX = ent.get(Position.class).getX();
+        float enemyY = ent.get(Position.class).getY();
 
-        shapex[1] = (float) (playerX + width);
-        shapey[1] = (float) (playerY);
+        shapex[0] = (float) (enemyX);
+        shapey[0] = (float) (enemyY);
 
-        shapex[2] = (float) (playerX + width);
-        shapey[2] = (float) (playerY + height);
+        shapex[1] = (float) (enemyX + width);
+        shapey[1] = (float) (enemyY);
 
-        shapex[3] = (float) (playerX);
-        shapey[3] = (float) (playerY + height);
+        shapex[2] = (float) (enemyX + width);
+        shapey[2] = (float) (enemyY + height);
 
-        enemy.setShapeX(shapex);
-        enemy.setShapeY(shapey);
+        shapex[3] = (float) (enemyX);
+        shapey[3] = (float) (enemyY + height);
+
+        ent.setShapeX(shapex);
+        ent.setShapeY(shapey);
     }
-
 
     @Override
     public void stop() {
         // Remove entities
         for (Entity enemy : enemies) {
-            
+
             world.removeEntity(enemy);
         }
     }

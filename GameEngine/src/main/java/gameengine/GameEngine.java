@@ -8,7 +8,6 @@ package gameengine;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -16,8 +15,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import data.Entity;
 import static data.EntityType.ENEMY;
@@ -36,10 +33,10 @@ import services.IGamePluginService;
 import data.componentdata.Image;
 import data.ImageManager;
 import data.componentdata.Body;
-import data.componentdata.Health;
 import data.componentdata.Position;
 import java.util.Collection;
 import managers.AnimationHandler;
+import managers.HealthBarManager;
 import managers.MapManager;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -63,6 +60,7 @@ public class GameEngine implements ApplicationListener {
     private SpriteBatch spriteBatch;
     private AnimationHandler animator;
     private MapManager mapManager;
+    private HealthBarManager healthBarManager;
     private HUD hud;
 
     @Override
@@ -72,6 +70,7 @@ public class GameEngine implements ApplicationListener {
         gameData = new GameData();
         animator = new AnimationHandler();
         mapManager = new MapManager();
+        healthBarManager = new HealthBarManager();
         
         AssetsJarFileResolver jfhr = new AssetsJarFileResolver();
         assetManager = new AssetManager(jfhr);
@@ -175,34 +174,13 @@ public class GameEngine implements ApplicationListener {
             sr.end();
         }
         
-        for(Entity e : world.getEntities(PLAYER, ENEMY)){
-            float x = e.get(Position.class).getX();
-            float y = e.get(Position.class).getY();
-            int eHeight = e.get(Body.class).getHeight();
-            
-            sr.setColor(Color.BLACK);
-            sr.begin(ShapeType.Filled);
-            sr.rect(x, y + eHeight + 9, (float) (e.get(Health.class).getMaxHp() / 2), 12);
-            sr.setProjectionMatrix(camera.combined);
-            sr.end();
-            
-            sr.setColor(Color.RED);
-            sr.begin(ShapeType.Filled);
-            sr.rect(x, y + eHeight + 10, (float) (e.get(Health.class).getMaxHp() / 2), 10);
-            sr.setProjectionMatrix(camera.combined);
-            sr.end();
-            
-            sr.setColor(Color.GREEN);
-            sr.begin(ShapeType.Filled);
-            sr.rect(x, y + eHeight + 10, e.get(Health.class).getHp() / 2, 10);
-            sr.setProjectionMatrix(camera.combined);
-            sr.end();
+        healthBarManager.drawHealthBar(sr, world, camera);
             
             
             
             
             
-        }
+        
 
         for (Entity e : world.getEntities(PLAYER, ENEMY)) {
             Position p = e.get(Position.class);
