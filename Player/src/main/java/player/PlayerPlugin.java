@@ -29,8 +29,6 @@ import data.componentdata.Velocity;
 
 public class PlayerPlugin implements IEntityProcessingService, IGamePluginService {
 
-    private float[] shapex = new float[4];
-    private float[] shapey = new float[4];
     private Entity player;
     public static final String CHARACTER_IMAGE_PATH = "assets/Characters.png";
     public static String CHARACTER_FINAL_IMAGE_PATH = "";
@@ -48,7 +46,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     public void process(GameData gameData, World world) {
 
         for (Entity p : world.getEntities(PLAYER)) {
-            setShape();
             handleTargetClick(p, gameData);
             handleShoot(p, gameData);
         }
@@ -114,27 +111,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         }
     }
 
-    private void setShape() {
-        float height = player.get(Body.class).getHeight();
-        float width = player.get(Body.class).getWidth();
-        float playerX = player.get(Position.class).getX();
-        float playerY = player.get(Position.class).getY();
-
-        shapex[0] = (float) (playerX);
-        shapey[0] = (float) (playerY);
-
-        shapex[1] = (float) (playerX + width);
-        shapey[1] = (float) (playerY);
-
-        shapex[2] = (float) (playerX + width);
-        shapey[2] = (float) (playerY + height);
-
-        shapex[3] = (float) (playerX);
-        shapey[3] = (float) (playerY + height);
-
-        player.setShapeX(shapex);
-        player.setShapeY(shapey);
-    }
 
     @Override
     public void stop() {
