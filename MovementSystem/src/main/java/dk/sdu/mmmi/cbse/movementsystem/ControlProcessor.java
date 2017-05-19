@@ -11,12 +11,15 @@ import States.MovementState;
 import com.badlogic.gdx.math.Vector2;
 import data.Entity;
 import data.EntityType;
+import static data.EntityType.ENEMY;
+import static data.EntityType.PLAYER;
 import data.GameData;
 import static data.GameKeys.*;
 import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.AI;
 import data.componentdata.Body;
+import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
@@ -46,7 +49,14 @@ public class ControlProcessor implements IEntityProcessingService {
             handleAiMovement(gameData, enemy);
         }
         for (Entity spell : world.getEntities(EntityType.SPELL)) {
-            handleSpellMovement(spell, gameData);
+            Position p = spell.get(Position.class);
+            if (spell.get(Owner.class).getOwnerType().equals(PLAYER)) {
+                handleSpellMovement(spell, gameData, p.getX(), p.getY(), gameData.getMousePositionX(), gameData.getMousePositionY());
+            }
+            if (spell.get(Owner.class).getOwnerType().equals(ENEMY)) {
+                Position targetP = spell.get(Owner.class).getOwnerEntity().get(AI.class).getCurrentTarget().get(Position.class);
+                handleSpellMovement(spell, gameData, p.getX(), p.getY(), targetP.getX(), targetP.getY());
+            }
         }
     }
 
@@ -63,7 +73,6 @@ public class ControlProcessor implements IEntityProcessingService {
             v.setDirectionX((entityPosition.x - aiPosition.x) / aiDistance);
             v.setDirectionY((entityPosition.y - aiPosition.y) / aiDistance);
 
-            ai.setCharState(MOVING);
 
             if (p.isInLava()) {
                 float distanceToMiddle = (float) Math.sqrt(Math.pow(gameData.getMapWidth() / 2 - aiPosition.x, 2) + Math.pow(gameData.getMapHeight() / 2 - aiPosition.y, 2));
@@ -77,36 +86,35 @@ public class ControlProcessor implements IEntityProcessingService {
                 p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());
             } else {
                 if (gap >= 100) {
-                    if(gap >= 100 && gap < 101){
-                        ai.setCharState(CharacterState.IDLE);
+                    if (gap >= 100 && gap < 101) {
                         ai.setMoveState(MovementState.STANDING);
-                    } else{
+                    } else {
                         ai.setAngle((float) Math.toDegrees(Math.atan2(entityPosition.y - aiPosition.y, entityPosition.x - aiPosition.x)));
-                        setRunningState(ai.getAngle(), ai);                     
+                        setRunningState(ai.getAngle(), ai);
                         p.setX(p.getX() + v.getDirectionX() * v.getSpeed() * gameData.getDelta());
                         p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());
                     }
-                } 
+                }
             }
         }
     }
 
-    private void handleSpellMovement(Entity spell, GameData gameData) {
+    private void handleSpellMovement(Entity spell, GameData gameData, float startX, float startY, float endX, float endY) {
         Position sp = spell.get(Position.class);
         SpellInfos si = spell.get(SpellInfos.class);
         Velocity v = spell.get(Velocity.class);
         if (!si.isMoving()) {
-            float sStartX = sp.getX();
-            float sStartY = sp.getY();
-            float sEndX = gameData.getMousePositionX();
-            float sEndY = gameData.getMousePositionY();
-            spell.setAngle((float) Math.toDegrees(Math.atan2(sEndY - sStartY, sEndX - sStartX)));
-            float sDistance = (float) Math.sqrt(Math.pow(sEndX - sStartX, 2) + Math.pow(sEndY - sStartY, 2));
+//            startX = sp.getX();
+//            float sStartY = sp.getY();
+//            float sEndX = gameData.getMousePositionX();
+//            float sEndY = gameData.getMousePositionY();
+            spell.setAngle((float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)));
+            float sDistance = (float) Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
 
-            v.setDirectionX((sEndX - sStartX) / sDistance);
-            v.setDirectionY((sEndY - sStartY) / sDistance);
-            sp.setX(sStartX);
-            sp.setY(sStartY);
+            v.setDirectionX((endX - startX) / sDistance);
+            v.setDirectionY((endY - startY) / sDistance);
+            sp.setX(startX);
+            sp.setY(startY);
             si.setIsMoving(true);
         }
         if (si.isMoving()) {

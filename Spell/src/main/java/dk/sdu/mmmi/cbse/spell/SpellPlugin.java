@@ -32,13 +32,12 @@ import data.componentdata.Velocity;
     @ServiceProvider(service = IEntityProcessingService.class)
 })
 
-
 public class SpellPlugin implements IGamePluginService, IEntityProcessingService {
 
     SpellArchive spellArchive;
     String SPELL_IMAGE_PATH = "";
     private World world;
-    
+
     @Override
     public void start(GameData gameData, World world) {
         spellArchive = new SpellArchive(world);
@@ -87,23 +86,31 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 Entity se = new Entity();
                 se.setType(SPELL);
                 Position p = caster.get(Position.class);
-                
+
                 SpellInfos si = new SpellInfos();
                 Body b = new Body(spellArchive.getSpell(spellType).getHeight(), spellArchive.getSpell(spellType).getWidth(), Geometry.CIRCLE);
                 Damage dmg = new Damage(spellArchive.getSpell(spellType).getDamage());
                 Bounce bounce = new Bounce(spellArchive.getSpell(spellType).getBouncePoints());
                 Velocity v = new Velocity();
+                Owner owner = new Owner(caster.getID());
+                if (caster.isType(PLAYER)) {
+                    owner.setOwnerType(PLAYER);
+                } else if (caster.isType(ENEMY)) {
+                    owner.setOwnerType(ENEMY);
+                }
+                owner.setOwnerEntity(caster);
                 v.setSpeed(SpellList.getSpellSpeed(spellType));
                 si.setSpellType(spellType);
                 si.setIsMoving(false);
                 se.add(dmg);
                 se.add(bounce);
                 se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
-                se.add(new Owner(caster.getID()));
-                float x = p.getX() + caster.get(Body.class).getWidth()/2 - spellArchive.getSpell(spellType).getWidth()/2;
-                float y = p.getY() + caster.get(Body.class).getHeight()/2 - spellArchive.getSpell(spellType).getHeight()/2;
-                se.add(new Position (x, y));
-                
+                se.add(owner);
+
+                float x = p.getX() + caster.get(Body.class).getWidth() / 2;
+                float y = p.getY() + caster.get(Body.class).getHeight() / 2;
+                se.add(new Position(x, y));
+
                 se.add(si);
                 se.add(v);
                 se.add(ImageManager.getImage(SPELL_IMAGE_PATH));
@@ -114,13 +121,10 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             }
         }
     }
-    
-    private void setShape(Entity spell){
 
-        
-        
+    private void setShape(Entity spell) {
+
     }
-
 
     @Override
     public void stop() {
