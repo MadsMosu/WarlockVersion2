@@ -19,8 +19,6 @@ import data.World;
 import data.componentdata.Currency;
 import data.componentdata.Health;
 
-import managers.HealthBarManager;
-
 public class HUD {
 
     private Stage stage;
@@ -32,7 +30,6 @@ public class HUD {
     private int roundNumb;
     private int exp;
     private int level;
-    private HealthBarManager healthBarManager;
     private Label goldLabel;
     private Label roundTimerLabel;
     private Label roundNumbLabel;
@@ -74,11 +71,6 @@ public class HUD {
         table.add(roundNumbLabel).expandX().padTop(10);
         table.add(roundTimerLabel).expandX().padTop(10);
 
-        for (Entity entity : world.getEntities(EntityType.PLAYER)) {
-            healthBarManager = new HealthBarManager(entity, 10);
-            stage.addActor(healthBarManager.getHealthBar());
-
-        }
         stage.addActor(table);
     }
 
@@ -90,9 +82,6 @@ public class HUD {
         roundTimer = gameData.getCurrentTime();
         roundTimerLabel.setText(String.format("%.2f", roundTimer));
         healthLabel.setText(player.get(Health.class).getHp() + "");
-        for (Entity entity : world.getEntities(EntityType.PLAYER)) {
-            healthBarManager.getHealthBar().setValue(entity.get(Health.class).getHp());
-        }
     }
 
 //    private ProgressBarStyle setSkin()

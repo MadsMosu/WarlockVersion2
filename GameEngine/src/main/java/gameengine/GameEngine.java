@@ -36,6 +36,7 @@ import services.IGamePluginService;
 import data.componentdata.Image;
 import data.ImageManager;
 import data.componentdata.Body;
+import data.componentdata.Health;
 import data.componentdata.Position;
 import java.util.Collection;
 import managers.AnimationHandler;
@@ -172,6 +173,35 @@ public class GameEngine implements ApplicationListener {
             }
             sr.setProjectionMatrix(camera.combined);
             sr.end();
+        }
+        
+        for(Entity e : world.getEntities(PLAYER, ENEMY)){
+            float x = e.get(Position.class).getX();
+            float y = e.get(Position.class).getY();
+            int eHeight = e.get(Body.class).getHeight();
+            
+            sr.setColor(Color.BLACK);
+            sr.begin(ShapeType.Filled);
+            sr.rect(x, y + eHeight + 9, (float) (e.get(Health.class).getMaxHp() / 2), 12);
+            sr.setProjectionMatrix(camera.combined);
+            sr.end();
+            
+            sr.setColor(Color.RED);
+            sr.begin(ShapeType.Filled);
+            sr.rect(x, y + eHeight + 10, (float) (e.get(Health.class).getMaxHp() / 2), 10);
+            sr.setProjectionMatrix(camera.combined);
+            sr.end();
+            
+            sr.setColor(Color.GREEN);
+            sr.begin(ShapeType.Filled);
+            sr.rect(x, y + eHeight + 10, e.get(Health.class).getHp() / 2, 10);
+            sr.setProjectionMatrix(camera.combined);
+            sr.end();
+            
+            
+            
+            
+            
         }
 
         for (Entity e : world.getEntities(PLAYER, ENEMY)) {
