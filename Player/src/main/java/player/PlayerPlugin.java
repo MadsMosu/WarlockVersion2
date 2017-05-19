@@ -20,6 +20,7 @@ import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.Velocity;
+import data.util.Vector2;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IEntityProcessingService.class)
@@ -46,6 +47,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     public void process(GameData gameData, World world) {
 
         for (Entity p : world.getEntities(PLAYER)) {
+            handleMove(p, gameData);
             handleTargetClick(p, gameData);
             handleShoot(p, gameData);
         }
@@ -79,9 +81,49 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     }
 
+    private void handleMove(Entity e, GameData gameData) {
+        Position p = e.get(Position.class);
+        Body b = e.get(Body.class);
+        Velocity v = e.get(Velocity.class);
+        Vector2 stopVector;
+        
+        if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
+            gameData.getKeys().setKey(RIGHT_MOUSE, false);
+
+            float endX = gameData.getMousePositionX() - (b.getWidth() / 2);
+            float endY = gameData.getMousePositionY() - (b.getHeight() / 2);
+            //stopVector = new Vector2(endX - e.getX()); skal laves som vector fra startx til endx, og så sammenlignes med den anden vector
+            v.setVector(new Vector2(p, new Position(endX, endY)));
+            v.getVector().normalize();
+            System.out.println(v.getVector().getMagnitude());
+            if (v.getVector().getMagnitude() == 0) {
+                
+                e.setCharState(CharacterState.IDLE);
+            }
+            else {
+                e.setAngle(v.getVector().getAngle());
+                e.setCharState(CharacterState.MOVING);
+                e.setRunningState(e.getAngle(), e);
+            }
+        }
+
+
+
+        if (gameData.getKeys()
+                .isPressed(ESCAPE)) {
+            //leGameMenu.plsShowUp();
+
+        }
+        if (gameData.getKeys()
+                .isPressed(Q)) {
+            //lePotion.plsDrink();
+        }
+    }
+
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
-            SpellBook sb = e.get(SpellBook.class);
+            SpellBook sb = e.get(SpellBook.class
+            );
             sb.setChosenSpell(FIREBALL);
         }
         else {
@@ -104,13 +146,13 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     }
 
     private void handleShoot(Entity e, GameData gameData) {
-        if (gameData.getKeys().isDown(LEFT_MOUSE) && e.get(SpellBook.class).getChosenSpell() != null) {
+        if (gameData.getKeys().isDown(LEFT_MOUSE) && e.get(SpellBook.class
+        ).getChosenSpell() != null) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
 
         }
     }
-
 
     @Override
     public void stop() {

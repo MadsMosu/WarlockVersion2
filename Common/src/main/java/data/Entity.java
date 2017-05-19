@@ -202,6 +202,18 @@ public final class Entity implements Serializable {
     public void setNumPoints(int numPoints) {
         this.numPoints = numPoints;
     }
+    
+    public void setRunningState(float angle, Entity e) {
+        if (angle > -45 && angle < 45) {
+            e.setMoveState(MovementState.RUNNINGRIGHT);
+        } else if (angle < 135 && angle > 45) {
+            e.setMoveState(MovementState.RUNNINGUP);
+        } else if (angle > -135 && angle < -45) {
+            e.setMoveState(MovementState.RUNNINGDOWN);
+        } else {
+            e.setMoveState(MovementState.RUNNINGLEFT);
+        }
+    }
   
     
 }
