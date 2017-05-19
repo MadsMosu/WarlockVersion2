@@ -49,6 +49,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         ImageManager.createImage(ENEMY_FINAL_IMAGE_PATH, false);
         this.world = world;
         enemies = new ArrayList();
+        
 
         enemies.add(makeEnemy(3000, 0));
         enemies.add(makeEnemy(3600, 0));

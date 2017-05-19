@@ -71,7 +71,7 @@ public class GameEngine implements ApplicationListener {
         animator = new AnimationHandler();
         mapManager = new MapManager();
         healthBarManager = new HealthBarManager();
-        
+
         AssetsJarFileResolver jfhr = new AssetsJarFileResolver();
         assetManager = new AssetManager(jfhr);
 
@@ -145,42 +145,27 @@ public class GameEngine implements ApplicationListener {
         spriteBatch.setProjectionMatrix(hud.getStage().getCamera().combined);
         hud.getStage().act(gameData.getDelta());
         hud.getStage().draw();
-        
-        
+
     }
 
     private void draw() {
 
-        for (Entity e : world.getEntities(MAP, PLAYER, SPELL, ENEMY)) {
+        for (Entity e : world.getEntities(PLAYER, SPELL, ENEMY)) {
             sr.setColor(Color.MAGENTA);
             sr.begin(ShapeType.Line);
 
-            if(e.getType() == SPELL){
+            if (e.getType() == SPELL) {
                 sr.circle(e.get(Position.class).getX(), e.get(Position.class).getY(), e.get(Body.class).getWidth() / 2);
-            } else {
-                float[] shapex = e.getShapeX();
-            float[] shapey = e.getShapeY();
-
-            for (int i = 0, j = shapex.length - 1;
-                    i < shapex.length;
-                    j = i++) {
-
-                sr.line(shapex[i], shapey[i], shapex[j], shapey[j]);
-
             }
-            
+            else {
+                sr.rect(e.get(Position.class).getX(), e.get(Position.class).getY(), e.get(Body.class).getWidth(), e.get(Body.class).getHeight());
+
             }
             sr.setProjectionMatrix(camera.combined);
             sr.end();
         }
-        
+
         healthBarManager.drawHealthBar(sr, world, camera);
-            
-            
-            
-            
-            
-        
 
         for (Entity e : world.getEntities(PLAYER, ENEMY)) {
             Position p = e.get(Position.class);
