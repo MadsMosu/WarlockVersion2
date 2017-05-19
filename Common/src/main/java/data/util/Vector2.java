@@ -2,10 +2,6 @@ package data.util;
 
 import data.componentdata.Position;
 
-/**
- *
- * @author Dzenita Hasic
- */
 public class Vector2
 {
     private double x;

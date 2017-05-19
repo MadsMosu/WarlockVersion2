@@ -12,5 +12,5 @@ import java.io.Serializable;
  * @author mads1
  */
 public enum CharacterState implements Serializable{
-    IDLE, CASTING, MOVING, DEAD, ALIVE
+    IDLE, CASTING, MOVING, DEAD, ALIVE, BOUNCING
 }

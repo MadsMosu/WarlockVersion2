@@ -141,7 +141,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         AI aiComp = ai.get(AI.class);
         SpellBook sb = ai.get(SpellBook.class);
         if (opponentInDistance(world, ai, 200) && !ai.get(Position.class).isInLava()) {
-            sb.setChosenSpell(FIREBALL);        
+            sb.setChosenSpell(FIREBALL);
             if (checkForSameHP(aiComp.getEntitiesHealthInDist())) {
                 aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
             } else {
@@ -174,9 +174,9 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         clearRadar(ai);
         raderScan(world, ai);
 
-            avoidSpells(world, ai);
-            attack(world, ai);
-        
+        avoidSpells(world, ai);
+        attack(world, ai);
+
     }
 
     @Override

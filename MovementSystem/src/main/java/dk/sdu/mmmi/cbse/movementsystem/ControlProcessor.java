@@ -8,7 +8,6 @@ package dk.sdu.mmmi.cbse.movementsystem;
 import States.CharacterState;
 import static States.CharacterState.MOVING;
 import States.MovementState;
-import com.badlogic.gdx.math.Vector2;
 import data.Entity;
 import data.EntityType;
 import static data.EntityType.ENEMY;
@@ -24,6 +23,7 @@ import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
 import data.componentdata.Velocity;
+import data.util.Vector2;
 import org.openide.util.lookup.ServiceProvider;
 import services.IEntityProcessingService;
 
@@ -54,8 +54,8 @@ public class ControlProcessor implements IEntityProcessingService {
                 handleSpellMovement(spell, gameData, p.getX(), p.getY(), gameData.getMousePositionX(), gameData.getMousePositionY());
             }
             if (spell.get(Owner.class).getOwnerType().equals(ENEMY)) {
-                Position targetP = spell.get(Owner.class).getOwnerEntity().get(AI.class).getCurrentTarget().get(Position.class);
-                handleSpellMovement(spell, gameData, p.getX(), p.getY(), targetP.getX(), targetP.getY());
+                Body target = spell.get(Owner.class).getOwnerEntity().get(AI.class).getCurrentTarget().get(Body.class);
+                handleSpellMovement(spell, gameData, p.getX(), p.getY(), target.getWidth() / 2, target.getHeight() / 2);
             }
         }
     }
@@ -66,27 +66,28 @@ public class ControlProcessor implements IEntityProcessingService {
         Velocity v = ai.get(Velocity.class);
 
         if (aiComp.getCurrentTarget() != null) {
-            Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
-            Vector2 entityPosition = new Vector2(aiComp.getCurrentTarget().get(Position.class).getX(), aiComp.getCurrentTarget().get(Position.class).getY());
-            float gap = aiPosition.dst(entityPosition);
-            float aiDistance = (float) Math.sqrt(Math.pow(entityPosition.x - aiPosition.x, 2) + Math.pow(entityPosition.y - aiPosition.y, 2));
-            v.setDirectionX((entityPosition.x - aiPosition.x) / aiDistance);
-            v.setDirectionY((entityPosition.y - aiPosition.y) / aiDistance);
-
+            Position aiPosition = new Position(ai.get(Position.class).getX(), ai.get(Position.class).getY());
+            Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class).getX(), aiComp.getCurrentTarget().get(Position.class).getY());
+            Vector2 gap = new Vector2(aiPosition,entityPosition);
+            float aiDistance = (float)gap.getMagnitude();
+            gap.normalize();
 
             if (p.isInLava()) {
-                float distanceToMiddle = (float) Math.sqrt(Math.pow(gameData.getMapWidth() / 2 - aiPosition.x, 2) + Math.pow(gameData.getMapHeight() / 2 - aiPosition.y, 2));
-                ai.setAngle((float) Math.toDegrees(Math.atan2(gameData.getMapHeight() / 2 - aiPosition.y, gameData.getMapWidth() / 2 - aiPosition.x)));
+                Position middle = new Position(gameData.getMapWidth()/2, gameData.getMapHeight()/2);
+                Vector2 distanceToMiddle = new Vector2(aiPosition, middle);
+                Vector2 angle = new Vector2(middle, aiPosition);
+                ai.setAngle((float)angle.getAngle());
+       
                 setRunningState(ai.getAngle(), ai);
 
-                v.setDirectionX((gameData.getMapWidth() / 2 - aiPosition.x) / distanceToMiddle);
-                v.setDirectionY((gameData.getMapHeight() / 2 - aiPosition.y) / distanceToMiddle);
+                distanceToMiddle.normalize();
+
 
                 p.setX(p.getX() + v.getDirectionX() * v.getSpeed() * gameData.getDelta());
                 p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());
             } else {
-                if (gap >= 100) {
-                    if (gap >= 100 && gap < 101) {
+                if (gap.getMagnitude() >= 100) {
+                    if (gap.getMagnitude() >= 100 && gap.getMagnitude() < 101) {
                         ai.setMoveState(MovementState.STANDING);
                     } else {
                         ai.setAngle((float) Math.toDegrees(Math.atan2(entityPosition.y - aiPosition.y, entityPosition.x - aiPosition.x)));
@@ -104,10 +105,6 @@ public class ControlProcessor implements IEntityProcessingService {
         SpellInfos si = spell.get(SpellInfos.class);
         Velocity v = spell.get(Velocity.class);
         if (!si.isMoving()) {
-//            startX = sp.getX();
-//            float sStartY = sp.getY();
-//            float sEndX = gameData.getMousePositionX();
-//            float sEndY = gameData.getMousePositionY();
             spell.setAngle((float) Math.toDegrees(Math.atan2(endY - startY, endX - startX)));
             float sDistance = (float) Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
 
@@ -152,7 +149,9 @@ public class ControlProcessor implements IEntityProcessingService {
                 setRunningState(e.getAngle(), e);
             }
         }
-        if (e.getCharState().equals(CharacterState.MOVING)) {
+        if (e.getCharState().equals(CharacterState.BOUNCING)) {
+            
+        } else if (e.getCharState().equals(CharacterState.MOVING)) {
             p.setX(p.getX() + v.getDirectionX() * v.getSpeed() * gameData.getDelta());
             p.setY(p.getY() + v.getDirectionY() * v.getSpeed() * gameData.getDelta());
             if ((float) Math.sqrt(Math.pow(p.getX() - startX, 2) + Math.pow(p.getY() - startY, 2)) >= distance) {

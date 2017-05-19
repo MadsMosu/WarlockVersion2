@@ -30,6 +30,11 @@ public class Velocity {
     public void setDirectionY(float DirectionY) {
         this.directionY = DirectionY;
     }
+    
+    public void setDirection(float directionX, float directionY){
+        this.directionX = directionX;
+        this.directionY = directionY;
+    }
 
     public float getSpeed() {
         return speed;
