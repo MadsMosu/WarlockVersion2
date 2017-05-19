@@ -173,16 +173,13 @@ public class GameEngine implements ApplicationListener {
             if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
 
                 if (!image.isRepeat()) {
-
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
                     spriteBatch.draw(animator.getFrame(e), p.getX(), p.getY());
                     spriteBatch.end();
-
                 }
             }
         }
-
         for (Entity e : world.getEntities(SPELL)) {
             Position p = e.get(Position.class);
             Image image = e.get(Image.class);
