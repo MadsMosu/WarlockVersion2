@@ -5,12 +5,17 @@
  */
 package data.componentdata;
 
+import data.Entity;
+import data.EntityType;
+
 /**
  *
  * @author Aleksander
  */
 public class Owner {
     private String ID;
+    private EntityType ownerType;
+    private Entity ownerEntity;
 
     public Owner(String ownerId)
     {
@@ -26,6 +31,23 @@ public class Owner {
     {
         this.ID = ID;
     }
+
+    public EntityType getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(EntityType ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public Entity getOwnerEntity() {
+        return ownerEntity;
+    }
+
+    public void setOwnerEntity(Entity ownerEntity) {
+        this.ownerEntity = ownerEntity;
+    }
+    
 }
 
 
