@@ -53,7 +53,7 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
         }
 
         gameData.setRoundTime(roundTime);
-        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 0 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
+        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 1 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
             gameData.setGameState(GameState.ROUNDEND);
             for (Entity e : world.getEntities()) {
                 if (!e.isType(EntityType.SPELL)) {
