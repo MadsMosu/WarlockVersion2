@@ -87,13 +87,11 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         sb.addToSpellBook(spellType);
     }
 
-    public void useSpell(SpellType spellType, Entity caster, GameData gameData)
-    {
+    public void useSpell(SpellType spellType, Entity caster, GameData gameData) {
         SpellBook book = caster.get(SpellBook.class);
         for (SpellType spell : book.getSpells()) {
             if (spell == spellType) {
                 book.setCooldownTimeLeft(book.getGlobalCooldownTime());
-
                 createSpellEntity(spellType, caster, gameData);
                 book.setChosenSpell(null);
 
@@ -140,9 +138,9 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         se.add(b);
         world.addEntity(se);
     }
-
-    private Vector2 setSpellDirection(Entity e, Velocity v, GameData gameData)
-    {
+    
+    
+    private Vector2 setSpellDirection(Entity e, Velocity v, GameData gameData) {
         if (e.getType() == ENEMY) {
             AI ai = e.get(AI.class);
             Position aiPosition = e.get(Position.class);
@@ -150,7 +148,8 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             Vector2 direction = new Vector2(aiPosition, targetPosition);
             direction.normalize();
             return direction;
-        } else {
+        }
+        else {
             Position p = e.get(Position.class);
             Position targetPosition = new Position(gameData.getMousePositionX(), gameData.getMousePositionY());
             Vector2 direction = new Vector2(p, targetPosition);
@@ -158,6 +157,9 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             return direction;
         }
     }
+  
+
+  
 
     @Override
     public void stop()

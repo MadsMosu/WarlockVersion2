@@ -93,7 +93,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
             float endX = gameData.getMousePositionX() - (b.getWidth() / 2);
             float endY = gameData.getMousePositionY() - (b.getHeight() / 2);
-            //stopVector = new Vector2(endX - e.getX()); skal laves som vector fra startx til endx, og saa sammenlignes med den anden vector
+            
             v.setVector(new Vector2(p, new Position(endX, endY)));
             v.getVector().normalize();
             System.out.println(v.getVector().getMagnitude());
