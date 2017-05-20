@@ -69,8 +69,8 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     private void resetPosition(Entity player) {
         Random rand = new Random();
-        int randX = rand.nextInt(3700) + 2900;
-        int randY = rand.nextInt(500) + 1;
+        int randX = rand.nextInt(4000) + 2500;
+        int randY = rand.nextInt(700);
         Position p = player.get(Position.class);
         p.setPosition(randX, randY);
     }

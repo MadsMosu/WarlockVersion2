@@ -65,15 +65,14 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         if (gameData.getGameState().equals(GameState.ROUNDEND)) {
             for (Entity e : netherworld.getEntities(ENEMY)) {
                 resetPosition(e);
-
             }
         }
     }
 
     private void resetPosition(Entity enemy) {
         Random rand = new Random();
-        int randX = rand.nextInt(3700) + 2900;
-        int randY = rand.nextInt(500) + 1;
+        int randX = rand.nextInt(4000) + 2500;
+        int randY = rand.nextInt(700);
         Position p = enemy.get(Position.class);
         p.setPosition(randX, randY);
     }
