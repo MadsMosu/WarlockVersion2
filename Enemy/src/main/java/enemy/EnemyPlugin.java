@@ -35,15 +35,11 @@ import java.util.List;
  */
 public class EnemyPlugin implements IEntityProcessingService, IGamePluginService {
 
-    private float directionY;
-    private float directionX;
     public static final String ENEMY_IMAGE_PATH = "assets/enemysprites.png";
     public static String ENEMY_FINAL_IMAGE_PATH = "";
     private World world;
     private List<Entity> enemies;
     private Entity enemy;
-    private float[] shapex = new float[4];
-    private float[] shapey = new float[4];
 
     @Override
     public void start(GameData gameData, World world) {
@@ -72,32 +68,35 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
             Velocity v = e.get(Velocity.class);
 
             if (aiComp.getCurrentTarget() != null) {
-                Position aiPosition = e.get(Position.class);
-                Position entityPosition = aiComp.getCurrentTarget().get(Position.class);
-                Vector2 gap = new Vector2(aiPosition, entityPosition);
-                gap.normalize();
-                v.setVector(gap);
-
+                Position aiPosition = new Position(p);
+                Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
+                Vector2 direction = new Vector2(aiPosition, entityPosition);
+                float gap = direction.getMagnitude();
+                v.setVector(direction);
+                v.getVector().normalize();
+                System.out.println(direction.getMagnitude());
+                
                 if (p.isInLava()) {
                     Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
-                    Vector2 distanceToMiddle = new Vector2(aiPosition, middle);
-
-                    e.setAngle((float) distanceToMiddle.getAngle());
-
+                    Vector2 directionToMiddle = new Vector2(aiPosition, middle);
+                    float distanceToMiddle = directionToMiddle.getMagnitude();
+                    
+                    e.setAngle((float) directionToMiddle.getAngle());
                     e.setRunningState(e.getAngle(), e);
 
-                    distanceToMiddle.normalize();
-
-                    v.setVector(distanceToMiddle);
+                    v.setVector(directionToMiddle);
+                    v.getVector().normalize();
+                    e.setCharState(CharacterState.MOVING);
                 }
                 else {
-                    if (gap.getMagnitude() >= 100) {
-                        if (gap.getMagnitude() >= 100 && gap.getMagnitude() < 101) {
+                    if (gap >= 100) {
+                        if (gap >= 100 && gap < 101) {
                             e.setMoveState(MovementState.STANDING);
                         }
                         else {
-                            e.setAngle( gap.getAngle());
+                            e.setAngle(direction.getAngle());
                             e.setRunningState(e.getAngle(), e);
+                            e.setCharState(CharacterState.MOVING);
 
                         }
                     }
@@ -105,8 +104,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
             }
         }
     }
-    
-    private void resetPosition(Entity player){
+
+    private void resetPosition(Entity player) {
         Position p = player.get(Position.class);
         p.setX(p.getStartingPositionX());
         p.setY(p.getStartingPositionY());
