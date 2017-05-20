@@ -27,13 +27,13 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
     @Override
     public void start(GameData gameData, World world) {
         gameData.setRoundNumber(1);
-        gameData.setRoundTime(60);
+        gameData.setRoundTime(5);
         gameData.setNextRoundCountdown(5);
         gameData.setMaxRounds(5);
     }
 
     private void resetRoundTime(GameData gameData) {
-        gameData.setRoundTime(60);
+        gameData.setRoundTime(5);
     }
 
     private void resetNextRoundTime(GameData gameData) {
@@ -83,8 +83,8 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
                         hp.setHp(hp.getMaxHp());
                         world.addEntity(e);
                         netherworld.removeEntity(e);
+                        resetNextRoundTime(gameData);
                 }
-                resetNextRoundTime(gameData);
                 resetRoundTime(gameData);
                 gameData.setRoundNumber(gameData.getRoundNumber() + 1);
                 gameData.setGameState(GameState.RUN);
