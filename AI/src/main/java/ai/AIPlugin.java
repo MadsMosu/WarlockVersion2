@@ -1,7 +1,6 @@
 package ai;
 
-import static States.CharacterState.CASTING;
-import com.badlogic.gdx.math.Vector2;
+
 import data.Entity;
 import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
@@ -14,7 +13,7 @@ import data.componentdata.AI;
 import data.componentdata.Health;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
-import data.componentdata.Velocity;
+import data.util.Vector2;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.openide.util.lookup.ServiceProvider;
@@ -38,9 +37,8 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     private boolean opponentInDistance(World world, Entity ai, float distanceValue) {
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
-                Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
-                Vector2 entityPosition = new Vector2(entity.get(Position.class).getX(), entity.get(Position.class).getY());
-                float distance = aiPosition.dst(entityPosition);
+                Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
+                float distance = direction.getMagnitude();
                 if (distance <= distanceValue) {
                     return true;
                 }
@@ -52,9 +50,9 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     private boolean SpellInDistance(World world, Entity ai, float distanceValue) {
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
-                Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
-                Vector2 entityPosition = new Vector2(entity.get(Position.class).getX(), entity.get(Position.class).getY());
-                float distance = aiPosition.dst(entityPosition);
+                Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
+                
+                float distance = direction.getMagnitude();
                 if (distance <= distanceValue) {
                     return true;
                 }
@@ -64,18 +62,16 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     }
 
     private float getDistance(Entity ai, Entity opponent) {
-        Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
-        Vector2 entityPosition = new Vector2(opponent.get(Position.class).getX(), opponent.get(Position.class).getY());
-        return aiPosition.dst(entityPosition);
+        Vector2 direction = new Vector2(ai.get(Position.class), opponent.get(Position.class));
+        return direction.getMagnitude();
     }
 
     private void detectEnemies(World world, Entity ai) {
         AI aiComp = ai.get(AI.class);
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
-                Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
-                Vector2 entityPosition = new Vector2(entity.get(Position.class).getX(), entity.get(Position.class).getY());
-                float distance = aiPosition.dst(entityPosition);
+                Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
+                float distance = direction.getMagnitude();
                 aiComp.getAllEntities().put(entity, distance);
             }
         }
@@ -84,9 +80,8 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     public void detectIncommingSpells(World world, Entity ai, float distanceValue) {
         AI aiComp = ai.get(AI.class);
         for (Entity spell : world.getEntities(SPELL)) {
-            Vector2 aiPosition = new Vector2(ai.get(Position.class).getX(), ai.get(Position.class).getY());
-            Vector2 spellPosition = new Vector2(spell.get(Position.class).getX(), spell.get(Position.class).getY());
-            float distance = aiPosition.dst(spellPosition);
+            Vector2 direction = new Vector2(ai.get(Position.class), spell.get(Position.class));
+            float distance = direction.getMagnitude();
             if (distance <= distanceValue) {
                 aiComp.getCloseSpells().put(spell, distance);
             }
@@ -131,7 +126,8 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         for (Object entry : HPmap.values()) {
             if (value == null) {
                 value = entry;
-            } else if (!value.equals(entry)) {
+            }
+            else if (!value.equals(entry)) {
                 return false;
             }
         }
@@ -145,10 +141,12 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
             sb.setChosenSpell(FIREBALL);
             if (checkForSameHP(aiComp.getEntitiesHealthInDist())) {
                 aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
-            } else {
+            }
+            else {
                 aiComp.setCurrentTarget(lowestValue(aiComp.getEntitiesHealthInDist()));
             }
-        } else {
+        }
+        else {
             aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
             if (opponentInDistance(world, ai, 200)) {
                 sb.setChosenSpell(FIREBALL);

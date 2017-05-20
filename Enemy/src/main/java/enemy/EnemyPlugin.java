@@ -36,8 +36,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     private World world;
     private List<Entity> enemies;
     private Entity enemy;
-    private float[] shapex = new float[4];
-    private float[] shapey = new float[4];
 
     @Override
     public void start(GameData gameData, World world) {
@@ -65,40 +63,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
             }
 
             handleShoot(e);
-            AI aiComp = e.get(AI.class);
-            Position p = e.get(Position.class);
-            Velocity v = e.get(Velocity.class);
-
-            if (aiComp.getCurrentTarget() != null) {
-                Position aiPosition = e.get(Position.class);
-                Position entityPosition = aiComp.getCurrentTarget().get(Position.class);
-                Vector2 gap = new Vector2(aiPosition, entityPosition);
-                gap.normalize();
-                v.setVector(gap);
-
-                if (p.isInLava()) {
-                    Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
-                    Vector2 distanceToMiddle = new Vector2(aiPosition, middle);
-
-                    e.setAngle((float) distanceToMiddle.getAngle());
-
-                    e.setRunningState(e.getAngle(), e);
-
-                    distanceToMiddle.normalize();
-
-                    v.setVector(distanceToMiddle);
-                } else {
-                    if (gap.getMagnitude() >= 100) {
-                        if (gap.getMagnitude() >= 100 && gap.getMagnitude() < 101) {
-                            e.setMoveState(MovementState.STANDING);
-                        } else {
-                            e.setAngle(gap.getAngle());
-                            e.setRunningState(e.getAngle(), e);
-
-                        }
-                    }
-                }
-            }
+            handleMovement(e, gameData);
         }
     }
 
@@ -144,6 +109,50 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.setCharState(CharacterState.IDLE);
         world.addEntity(enemy);
         return enemy;
+    }
+
+    private void handleMovement(Entity e, GameData gameData) {
+        AI aiComp = e.get(AI.class);
+        Position p = e.get(Position.class);
+        Velocity v = e.get(Velocity.class);
+        if (aiComp.getCurrentTarget() != null) {
+            Position aiPosition = new Position(p);
+            Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
+            Vector2 direction = new Vector2(aiPosition, entityPosition);
+            float gap = direction.getMagnitude();
+            v.setVector(direction);
+            v.getVector().normalize();
+
+            if (p.isInLava()) {
+                Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
+                Vector2 directionToMiddle = new Vector2(aiPosition, middle);
+                float distanceToMiddle = directionToMiddle.getMagnitude();
+
+                e.setAngle((float) directionToMiddle.getAngle());
+                e.setRunningState(e.getAngle(), e);
+
+                v.setVector(directionToMiddle);
+                v.getVector().normalize();
+                if (e.getCharState().equals(CharacterState.IDLE)) {
+                    e.setCharState(CharacterState.MOVING);
+                }
+            }
+            else {
+                if (gap >= 100) {
+                    if (gap >= 100 && gap < 101) {
+                        e.setMoveState(MovementState.STANDING);
+                    }
+                    else {
+                        e.setAngle(direction.getAngle());
+                        e.setRunningState(e.getAngle(), e);
+                        if (e.getCharState().equals(CharacterState.IDLE)) {
+                            e.setCharState(CharacterState.MOVING);
+                        }
+
+                    }
+                }
+            }
+        }
     }
 
     @Override
