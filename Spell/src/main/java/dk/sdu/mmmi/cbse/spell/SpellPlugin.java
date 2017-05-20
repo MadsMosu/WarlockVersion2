@@ -146,14 +146,18 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         if (e.getType() == ENEMY) {
             AI ai = e.get(AI.class);
             Position aiPosition = e.get(Position.class);
-            Position targetPosition = ai.getCurrentTarget().get(Position.class);
+            float targetX = ai.getCurrentTarget().get(Position.class).getX();
+            float targetY = ai.getCurrentTarget().get(Position.class).getY();
+            Position targetPosition =  new Position(targetX, targetY);
             Vector2 direction = new Vector2(aiPosition, targetPosition);
             direction.normalize();
             return direction;
         }
         else {
             Position p = e.get(Position.class);
-            Position targetPosition = new Position(gameData.getMousePositionX(), gameData.getMousePositionY());
+            float targetX = gameData.getMousePositionX();// - e.get(Body.class).getWidth()/2;
+            float targetY = gameData.getMousePositionY(); //- e.get(Body.class).getHeight()/2;
+            Position targetPosition = new Position(targetX, targetY);
             Vector2 direction = new Vector2(p, targetPosition);
             direction.normalize();
             return direction;
