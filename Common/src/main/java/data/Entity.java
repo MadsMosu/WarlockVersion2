@@ -14,7 +14,7 @@ public final class Entity implements Serializable {
     private EntityType type;
     public float dx;
     public float dy;
-    private double angle;
+    private float angle;
     private float[] shapeX = new float[4];
     private float[] shapeY = new float[4];
     private float speed;
@@ -129,11 +129,11 @@ public final class Entity implements Serializable {
         this.dy = dy;
     }
 
-    public double getAngle() {
+    public float getAngle() {
         return angle;
     }
 
-    public void setAngle(double angle) {
+    public void setAngle(float angle) {
         this.angle = angle;
     }
 

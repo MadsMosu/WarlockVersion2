@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ImageManager
 {
     private static Map<String, Image> images = new ConcurrentHashMap<>();
+    private static Map<SpellType, Image> spellImages = new ConcurrentHashMap<>();
 
     public static Collection<Image> images()
     {

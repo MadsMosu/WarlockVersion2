@@ -1,15 +1,11 @@
 package gameengine;
 
+import States.GameState;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import data.Entity;
@@ -24,7 +20,7 @@ public class HUD {
     private Stage stage;
     private FitViewport viewPort;
 
-    private double health;
+    private float health;
     private int gold;
     private float roundTimer;
     private int roundNumb;
@@ -36,8 +32,14 @@ public class HUD {
     private Label expLabel;
     private Label levelLabel;
     private Label healthLabel;
+    private Label FPSLabel;
+
     private Table table;
+    private Table winnerTable;
     private Entity player;
+
+    private Label winnerLabel;
+    private Label nextRoundCDLabel;
 
     public HUD(SpriteBatch spriteBatch, GameData gameData, World world) {
         roundTimer = gameData.getRoundTime();
@@ -58,20 +60,32 @@ public class HUD {
         table.top();
         table.setFillParent(true);
 
-        goldLabel = new Label(gold + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        roundTimerLabel = new Label(String.format("%.2f", roundTimer), new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        roundNumbLabel = new Label(roundNumb + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        levelLabel = new Label(level + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        expLabel = new Label(exp + "", new Label.LabelStyle(new BitmapFont(), Color.BLACK));
-        healthLabel = new Label(health + "", new Label.LabelStyle(new BitmapFont(), Color.GREEN));
-
-        table.add(levelLabel).expandX().padTop(10);
-        table.add(expLabel).expandX().padTop(10);
+        winnerTable = new Table();
+        winnerTable.center();
+        winnerTable.setFillParent(true);
+        
+        healthLabel = new Label("HP: " + health, new Label.LabelStyle(new BitmapFont(), Color.GREEN));
+        roundNumbLabel = new Label("Round: " + roundNumb, new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        roundTimerLabel = new Label("Time: " + String.format("%.2f", roundTimer), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        FPSLabel = new Label("FPS: " + gameData.getFPS(), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        
         table.add(healthLabel).expandX().padTop(10);
         table.add(roundNumbLabel).expandX().padTop(10);
         table.add(roundTimerLabel).expandX().padTop(10);
+        table.add(FPSLabel).expandX().padTop(10);
 
+        winnerLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        nextRoundCDLabel = new Label("Next round starts in " + String.format("%.2f", gameData.getNextRoundCountdown()), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+
+        winnerTable.add(winnerLabel).center();
+        winnerTable.row().padTop(5).padBottom(5);
+        winnerTable.add(nextRoundCDLabel).center();
+        
+        winnerTable.setVisible(false);
+
+        
         stage.addActor(table);
+        stage.addActor(winnerTable);
     }
 
     public Stage getStage() {
@@ -79,22 +93,17 @@ public class HUD {
     }
 
     public void update(GameData gameData, World world) {
-        roundTimer = gameData.getCurrentTime();
-        roundTimerLabel.setText(String.format("%.2f", roundTimer));
-        healthLabel.setText(player.get(Health.class).getHp() + "");
-    }
+        healthLabel.setText("Health: " + player.get(Health.class).getHp());
+        roundNumbLabel.setText("Round: " + gameData.getRoundNumber());
+        roundTimerLabel.setText("Time: " + String.format("%.2f", gameData.getRoundTime()));
+        FPSLabel.setText("FPS: " + gameData.getFPS());
 
-//    private ProgressBarStyle setSkin()
-//    {
-//        Color bgColor = new Color(100 / 256f, 100 / 256f, 100 / 256f, 1f);
-//        Skin skin;
-//        skin = new Skin();
-//        Pixmap pixmap = new Pixmap(1, 10, Pixmap.Format.RGBA8888);
-//        pixmap.fill();
-//        skin.add("white", new Texture(pixmap));
-//        ProgressBar.ProgressBarStyle barStyle;
-//        barStyle = new ProgressBar.ProgressBarStyle(skin.newDrawable("white", bgColor), skin.newDrawable("white", Color.RED));
-//        barStyle.knobAfter = barStyle.knob;
-//        return barStyle;
-//    }
+        if (gameData.getGameState().equals(GameState.ROUNDEND)) {
+            winnerTable.setVisible(true);          
+            winnerLabel.setText(gameData.getWhoWinsRound());
+            nextRoundCDLabel.setText("Next round starts in " + String.format("%.2f", gameData.getNextRoundCountdown()));
+        } else{
+            winnerTable.setVisible(false);
+        }
+    }
 }

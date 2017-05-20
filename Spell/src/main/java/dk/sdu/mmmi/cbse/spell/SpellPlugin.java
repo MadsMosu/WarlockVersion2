@@ -14,6 +14,7 @@ import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
 import data.ImageManager;
+import data.Netherworld;
 import data.SpellList;
 import data.componentdata.AI;
 import data.componentdata.Body;
@@ -27,10 +28,10 @@ import data.componentdata.SpellBook;
 import data.componentdata.SpellInfos;
 import data.componentdata.Velocity;
 import data.util.Vector2;
+import java.util.Map;
 
 @ServiceProviders(value = {
-    @ServiceProvider(service = IGamePluginService.class)
-    ,
+    @ServiceProvider(service = IGamePluginService.class),
     @ServiceProvider(service = IEntityProcessingService.class)
 })
 
@@ -38,24 +39,30 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
 
     SpellArchive spellArchive;
     String SPELL_IMAGE_PATH = "";
+    private Map<SpellType, String> spriteMap;
     private World world;
 
     @Override
-    public void start(GameData gameData, World world) {
+    public void start(GameData gameData, World world)
+    {
         spellArchive = new SpellArchive(world);
-        SPELL_IMAGE_PATH = SpellPlugin.class.getResource(SpellList.FIREBALL_IMAGE).getPath().replace("file:", "");
-        ImageManager.createImage(SPELL_IMAGE_PATH, true);
+        spriteMap = SpellList.getSpellMap();
+//        SPELL_IMAGE_PATH = SpellPlugin.class.getResource(SpellList.FIREBALL_IMAGE).getPath().replace("file:", "");
+//        ImageManager.createImage(SPELL_IMAGE_PATH, true);
+        ImageManager.createImage(SpellPlugin.class.getResource(SpellList.FIREBALL_IMAGE).getPath().replace("file:", ""), true);
+        ImageManager.createImage(SpellPlugin.class.getResource(SpellList.TELEPORT_IMAGE).getPath().replace("file:", ""), true);
         this.world = world;
 
     }
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             SpellBook book = entity.get(SpellBook.class);
             if (book.getSpells().isEmpty()) {
                 book.addToSpellBook(SpellType.FIREBALL);
+                book.addToSpellBook(SpellType.TELEPORT1);
             }
             book.reduceCooldownTimeLeft(gameData.getDelta());
             if (entity.getCharState() == CASTING && book.getChosenSpell() != null && book.getCooldownTimeLeft() <= 0) {
@@ -65,7 +72,6 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             }
         }
         for (Entity spell : world.getEntities(SPELL)) {
-
             float dt = gameData.getDelta();
             Expiration e = spell.get(Expiration.class);
             e.reduceExpiration(dt);
@@ -75,7 +81,8 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         }
     }
 
-    public void unlockSpell(Entity owner, SpellType spellType) {
+    public void unlockSpell(Entity owner, SpellType spellType)
+    {
         SpellBook sb = owner.get(SpellBook.class);
         sb.addToSpellBook(spellType);
     }
@@ -91,43 +98,48 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             }
         }
     }
-    
-    private void createSpellEntity(SpellType spellType, Entity caster, GameData gameData){
-                Entity se = new Entity();
-                se.setType(SPELL);
-                Position p = caster.get(Position.class);
-                float x = p.getX() + caster.get(Body.class).getWidth() / 2;
-                float y = p.getY() + caster.get(Body.class).getHeight() / 2;
-                SpellInfos si = new SpellInfos();
-                Body b = new Body(spellArchive.getSpell(spellType).getHeight(), spellArchive.getSpell(spellType).getWidth(), Geometry.CIRCLE);
-                Damage dmg = new Damage(spellArchive.getSpell(spellType).getDamage());
-                Bounce bounce = new Bounce(spellArchive.getSpell(spellType).getBouncePoints());
-                Velocity v = new Velocity();
-                v.setVector(setSpellDirection(caster, v, gameData));
-                se.setAngle(v.getVector().getAngle());
-                Owner owner = new Owner(caster.getID());
-                if (caster.isType(PLAYER)) {
-                    owner.setOwnerType(PLAYER);
-                }
-                else if (caster.isType(ENEMY)) {
-                    owner.setOwnerType(ENEMY);
-                }
-                owner.setOwnerEntity(caster);
-                v.setSpeed(SpellList.getSpellSpeed(spellType));
-                si.setSpellType(spellType);
-                si.setIsMoving(false);
-                se.add(dmg);
-                se.add(bounce);
-                se.add(new Expiration(SpellList.FIREBALL_EXPIRATION));
-                se.add(owner);
-                se.add(new Position(x, y));
-                se.add(si);
-                se.add(v);
-                se.add(ImageManager.getImage(SPELL_IMAGE_PATH));
-                se.add(b);
-                world.addEntity(se);
-    }
 
+    private void createSpellEntity(SpellType spellType, Entity caster, GameData gameData)
+    {
+        String spriteString = SpellPlugin.class.getResource(spriteMap.get(spellType)).getPath().replace("file:", "");
+        ImageManager.createImage(spriteString, true);
+
+        Entity se = new Entity();
+
+        se.setType(SPELL);
+        Position p = caster.get(Position.class);
+
+        SpellInfos si = new SpellInfos();
+        Body b = new Body(spellArchive.getSpell(spellType).getHeight(), spellArchive.getSpell(spellType).getWidth(), Geometry.CIRCLE);
+        b.setSpriteSize(spellArchive.getSpell(spellType).getSpriteWidth(), spellArchive.getSpell(spellType).getSpriteHeight());
+        b.setFrames(SpellArchive.getSpell(spellType).getFrames());
+        b.setFrameSpeed(SpellArchive.getSpell(spellType).getFrameSpeed());
+        Damage dmg = new Damage(spellArchive.getSpell(spellType).getDamage());
+        Bounce bounce = new Bounce(spellArchive.getSpell(spellType).getBouncePoints());
+        Velocity v = new Velocity();
+        v.setVector(setSpellDirection(caster, v, gameData));
+        v.setSpeed(spellArchive.getSpell(spellType).getSpeed());
+        se.setAngle(v.getVector().getAngle());
+        si.setSpellType(spellType);
+        Owner owner = new Owner(caster.getID());
+        owner.setOwnerType(caster.getType());
+        si.setIsMoving(false);
+        se.add(dmg);
+        se.add(bounce);
+        se.add(new Expiration(spellArchive.getSpell(spellType).getExpiration()));
+        se.add(owner);
+        float x = p.getX() + caster.get(Body.class).getWidth() / 2 - spellArchive.getSpell(spellType).getWidth() / 2;
+        float y = p.getY() + caster.get(Body.class).getHeight() / 2 - spellArchive.getSpell(spellType).getHeight() / 2;
+        se.add(new Position(x, y));
+
+        se.add(si);
+        se.add(v);
+        se.add(ImageManager.getImage(spriteString));
+        se.add(b);
+        world.addEntity(se);
+    }
+    
+    
     private Vector2 setSpellDirection(Entity e, Velocity v, GameData gameData) {
         if (e.getType() == ENEMY) {
             AI ai = e.get(AI.class);
@@ -145,9 +157,13 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             return direction;
         }
     }
+  
+
+  
 
     @Override
-    public void stop() {
+    public void stop()
+    {
         for (Entity spell : world.getEntities(SPELL)) {
             world.removeEntity(spell);
         }

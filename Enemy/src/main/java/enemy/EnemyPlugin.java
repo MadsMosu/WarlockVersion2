@@ -12,6 +12,7 @@ import States.MovementState;
 import static data.EntityType.ENEMY;
 import static data.GameKeys.LEFT_MOUSE;
 import data.ImageManager;
+import data.Netherworld;
 import data.componentdata.AI;
 import data.componentdata.Body;
 import data.componentdata.Health;
@@ -57,11 +58,13 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     }
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity e : world.getEntities(ENEMY)) {
             if (e.getCharState().equals(CharacterState.DEAD)) {
                 world.removeEntity(e);
+                resetPosition(e);
+                netherworld.addEntity(enemy);
             }
             handleShoot(e, gameData);
             AI aiComp = e.get(AI.class);
@@ -103,6 +106,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         }
     }
     
+    private void resetPosition(Entity player){
+        Position p = player.get(Position.class);
+        p.setX(p.getStartingPositionX());
+        p.setY(p.getStartingPositionY());
+    }
 
     private void handleShoot(Entity e, GameData gameData) {
         if (e.get(SpellBook.class).getChosenSpell() != null) {
@@ -116,6 +124,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.setType(ENEMY);
 
         Position pos = new Position(xPosition, yPosition);
+        pos.setStartingPosition(pos);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
         Owner ow = new Owner(enemy.getID());
@@ -145,7 +154,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public void stop() {
         // Remove entities
         for (Entity enemy : enemies) {
-
             world.removeEntity(enemy);
         }
     }

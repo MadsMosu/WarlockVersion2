@@ -10,6 +10,7 @@ import data.Entity;
 import data.EntityType;
 import static data.EntityType.*;
 import data.GameData;
+import data.Netherworld;
 import data.World;
 import data.componentdata.Body;
 import data.componentdata.Damage;
@@ -35,8 +36,7 @@ import services.IEntityProcessingService;
 public class CollisionPlugin implements IEntityProcessingService {
 
     @Override
-    public void process(GameData gameData, World world)
-    {
+    public void process(GameData gameData, World world, Netherworld netherworld) {
         Collection<Entity> entities = world.getEntities();
 
         for (Entity handled : entities) {
@@ -51,14 +51,10 @@ public class CollisionPlugin implements IEntityProcessingService {
         }
     }
 
-    private void handleCollision(Entity handled, Entity collideWith, World world, GameData gameData)
-    {
+    private void handleCollision(Entity handled, Entity collideWith, World world, GameData gameData) {
         if (handled != null && collideWith != null) {
 
-            if (handled.getType() == MAP && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
-
-                collideWith.get(Position.class).setX(1800);
-            } else if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+            if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
 
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     Damage dmg = new Damage(handled.get(Damage.class).getDamage());
@@ -77,20 +73,18 @@ public class CollisionPlugin implements IEntityProcessingService {
             } else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     collideWith.get(Health.class).addDamageTaken(new DamageTaken(new Damage(handled.get(Damage.class).getDamage()), new Owner(collideWith.getID())));
-                    
+
                     world.removeEntity(handled);
 
                 }
             } else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
 
-                    
                 }
 
             } else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
 
-                    
                 }
 
             }

@@ -14,6 +14,7 @@ import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import data.GameData;
 import static data.GameKeys.*;
+import data.Netherworld;
 import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.AI;
@@ -39,7 +40,7 @@ public class ControlProcessor implements IEntityProcessingService {
     private float distance;
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity entity : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
             handleMovement(entity, gameData);
