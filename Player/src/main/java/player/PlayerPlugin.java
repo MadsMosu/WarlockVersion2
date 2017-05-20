@@ -61,7 +61,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             netherworld.addEntity(player);
         }
         
-        if(netherworld.getEntities().contains(player)){
+        if(netherworld.getEntities().contains(player) && gameData.getGameState().equals(GameState.ROUNDEND)){
             resetPosition(player);
         }
     }
