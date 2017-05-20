@@ -23,6 +23,7 @@ import data.componentdata.Velocity;
 import data.util.Vector2;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IEntityProcessingService.class)
@@ -55,14 +56,14 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         for (Entity e : world.getEntities(ENEMY)) {
             if (e.getCharState().equals(CharacterState.DEAD)) {
                 world.removeEntity(e);
-                netherworld.addEntity(enemy);
+                netherworld.addEntity(e);
             }
 
             handleShoot(e);
             handleMovement(e, gameData);
         }
-        if (netherworld.getEntities().contains(enemy) || gameData.getGameState().equals(GameState.ROUNDEND)) {
-            for (Entity e : world.getEntities(ENEMY)) {
+        if (gameData.getGameState().equals(GameState.ROUNDEND)) {
+            for (Entity e : netherworld.getEntities(ENEMY)) {
                 resetPosition(e);
 
             }
@@ -70,9 +71,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     }
 
     private void resetPosition(Entity enemy) {
+        Random rand = new Random();
+        int randX = rand.nextInt(3700) + 2900;
+        int randY = rand.nextInt(500) + 1;
         Position p = enemy.get(Position.class);
-        p.setX(p.getStartingPositionX());
-        p.setY(p.getStartingPositionY());
+        p.setPosition(randX, randY);
     }
 
     private void handleShoot(Entity e) {
@@ -87,7 +90,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.setType(ENEMY);
 
         Position pos = new Position(xPosition, yPosition);
-        pos.setStartingPosition(pos);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
         Owner ow = new Owner(enemy.getID());
