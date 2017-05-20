@@ -9,6 +9,7 @@ import States.GameState;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -42,6 +43,7 @@ import data.componentdata.SpellInfos;
 import java.util.Collection;
 import managers.AnimationHandler;
 import managers.HealthBarManager;
+import managers.Jukebox;
 import managers.MapManager;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -68,9 +70,9 @@ public class GameEngine implements ApplicationListener {
     private MapManager mapManager;
     private HealthBarManager healthBarManager;
     private HUD hud;
+    private Music backgroundMusic;
 
-    private Sound backgroundMusic;
-    public static final String BACKGROUNDMUSIC_PATH = "assets/Characters.png";
+    public static final String BACKGROUNDMUSIC_PATH = "assets/sounds/Soundtrack.ogg";
     public static String BACKGROUNDMUSIC_FINAL_PATH = "";
 
     @Override
@@ -115,10 +117,14 @@ public class GameEngine implements ApplicationListener {
         hud = new HUD(spriteBatch, gameData, world);
 
         gameData.setGameState(GameState.RUN);
-
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/backgroundmusic.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.5f);
+        backgroundMusic.play();
 //        BACKGROUNDMUSIC_FINAL_PATH = GameEngine.class.getResource(BACKGROUNDMUSIC_PATH).getPath().replace("file:", "");
 //        ImageManager.createImage(BACKGROUNDMUSIC_FINAL_PATH, false);
 //        backgroundMusic.loop();
+
     }
 
     private void loadImages() {

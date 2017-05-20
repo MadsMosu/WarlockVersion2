@@ -52,6 +52,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
 //        ImageManager.createImage(SPELL_IMAGE_PATH, true);
         ImageManager.createImage(SpellPlugin.class.getResource(SpellList.FIREBALL_IMAGE).getPath().replace("file:", ""), true);
         ImageManager.createImage(SpellPlugin.class.getResource(SpellList.TELEPORT_IMAGE).getPath().replace("file:", ""), true);
+        ImageManager.createImage(SpellPlugin.class.getResource(SpellList.FROSTBOLT_IMAGE).getPath().replace("file:", ""), true);
         this.world = world;
 
     }
@@ -64,6 +65,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             if (book.getSpells().isEmpty()) {
                 book.addToSpellBook(SpellType.FIREBALL);
                 book.addToSpellBook(SpellType.TELEPORT1);
+                book.addToSpellBook(SpellType.FROSTBOLT);
             }
             book.reduceCooldownTimeLeft(gameData.getDelta());
             if (entity.getCharState() == CASTING && book.getChosenSpell() != null && book.getCooldownTimeLeft() <= 0) {

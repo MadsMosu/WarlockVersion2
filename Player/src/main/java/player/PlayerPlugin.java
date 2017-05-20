@@ -15,6 +15,7 @@ import static data.GameKeys.*;
 import data.ImageManager;
 import data.Netherworld;
 import static data.SpellType.FIREBALL;
+import static data.SpellType.FROSTBOLT;
 import static data.SpellType.TELEPORT1;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
@@ -149,17 +150,16 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(FIREBALL);
         } else if (gameData.getKeys().isPressed(NUM_2)) {
-            //e.setChosenSpell(SpellType.SPELL2);
+
+            SpellBook sb = e.get(SpellBook.class);
+            sb.setChosenSpell(FROSTBOLT);
+        } else if (gameData.getKeys().isPressed(NUM_3)) {
+            //Spell 3
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(TELEPORT1);
-            System.out.println("Teleport chosen");
 
         } else {
             return;
-        }
-        if (gameData.getKeys().isPressed(NUM_3)) {
-            //Spell 3
-
         }
         if (gameData.getKeys().isPressed(NUM_4)) {
             //Spell 4
