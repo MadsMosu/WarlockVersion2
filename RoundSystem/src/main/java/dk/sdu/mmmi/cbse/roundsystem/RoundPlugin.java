@@ -51,16 +51,13 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
         for (Entity e : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
             numbOfCharacters++;
         }
+        System.out.println(numbOfCharacters + "start");
 
         gameData.setRoundTime(roundTime);
         if (gameData.getRoundTime() <= 0 || numbOfCharacters == 0 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
             gameData.setGameState(GameState.ROUNDEND);
-            for (Entity e : world.getEntities()) {
-                if (!e.isType(EntityType.SPELL)) {
-                    netherworld.addEntity(e);
-                }
-                world.removeEntity(e);
-            }
+            
+            System.out.println(numbOfCharacters);
 
             if (numbOfCharacters == 1) {
                 for (Entity e : world.getEntities()) {
@@ -73,6 +70,12 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
                 }
             } else {
                 gameData.setWhoWinsRound("THE ROUND IS A DRAW!");
+            }
+            for (Entity e : world.getEntities()) {
+                if (!e.isType(EntityType.SPELL)) {
+                    netherworld.addEntity(e);
+                }
+                world.removeEntity(e);
             }
             if (gameData.getNextRoundCountdown() <= 0) {
                 for (Entity e : netherworld.getEntities()) {
