@@ -27,13 +27,13 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
     @Override
     public void start(GameData gameData, World world) {
         gameData.setRoundNumber(1);
-        gameData.setRoundTime(5);
+        gameData.setRoundTime(60);
         gameData.setNextRoundCountdown(5);
         gameData.setMaxRounds(5);
     }
 
     private void resetRoundTime(GameData gameData) {
-        gameData.setRoundTime(5);
+        gameData.setRoundTime(60);
     }
 
     private void resetNextRoundTime(GameData gameData) {

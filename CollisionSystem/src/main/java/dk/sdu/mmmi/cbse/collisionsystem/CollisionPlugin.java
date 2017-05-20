@@ -71,7 +71,6 @@ public class CollisionPlugin implements IEntityProcessingService {
                     collideWith.get(Health.class).addDamageTaken(new DamageTaken(new Damage(handled.get(Damage.class).getDamage()), new Owner(collideWith.getID())));
 
                     world.removeEntity(handled);
-
                 }
             }
             else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
@@ -86,7 +85,7 @@ public class CollisionPlugin implements IEntityProcessingService {
                 }
 
             } else if (handled.getType() == SPELL && collideWith.getType() == SPELL && CollisionHandler.isColliding(handled, collideWith)) {
-                if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+                if (!handled.get(Owner.class).getID().equals(collideWith.get(Owner.class).getID())) {
                     world.removeEntity(handled);
                     world.removeEntity(collideWith);
                 }
