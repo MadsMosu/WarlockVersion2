@@ -70,8 +70,9 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             book.reduceCooldownTimeLeft(gameData.getDelta());
             if (entity.getCharState() == CASTING && book.getChosenSpell() != null && book.getCooldownTimeLeft() <= 0) {
                 useSpell(book.getChosenSpell(), entity, gameData);
-
+                
                 entity.setCharState(IDLE);
+                
             }
         }
         for (Entity spell : world.getEntities(SPELL)) {
