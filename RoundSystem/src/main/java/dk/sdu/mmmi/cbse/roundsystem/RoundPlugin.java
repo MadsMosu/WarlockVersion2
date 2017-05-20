@@ -42,21 +42,26 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
 
     @Override
     public void process(GameData gameData, World world, Netherworld netherworld) {
-        
 
         float dt = gameData.getDelta();
         if (gameData.getRoundTime() > 0 && gameData.getRoundNumber() <= gameData.getMaxRounds() && gameData.getGameState() != GameState.ROUNDEND) {
             roundTime = gameData.getRoundTime() - dt;
         }
-        
-        for(Entity e : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)){
+
+        for (Entity e : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
             numbOfCharacters++;
         }
 
         gameData.setRoundTime(roundTime);
         if (gameData.getRoundTime() <= 0 || numbOfCharacters == 0 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
             gameData.setGameState(GameState.ROUNDEND);
-                  
+            for (Entity e : world.getEntities()) {
+                if (!e.isType(EntityType.SPELL)) {
+                    netherworld.addEntity(e);
+                }
+                world.removeEntity(e);
+            }
+
             if (numbOfCharacters == 1) {
                 for (Entity e : world.getEntities()) {
                     e.setCharState(CharacterState.IDLE);
@@ -71,21 +76,20 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
             }
             if (gameData.getNextRoundCountdown() <= 0) {
                 for (Entity e : netherworld.getEntities()) {
-                    if (!e.getType().equals(EntityType.SPELL)) {
-                        world.addEntity(e);
                         Health hp = e.get(Health.class);
                         hp.setHp(hp.getMaxHp());
-                    }
+                        world.addEntity(e);
+                        netherworld.removeEntity(e);
                 }
                 resetNextRoundTime(gameData);
                 resetRoundTime(gameData);
                 gameData.setRoundNumber(gameData.getRoundNumber() + 1);
                 gameData.setGameState(GameState.RUN);
             }
-            if(gameData.getRoundNumber() < gameData.getMaxRounds()){
-                gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);              
-            }    
-        } else if (gameData.getRoundNumber() == gameData.getMaxRounds()) {
+            if (gameData.getRoundNumber() < gameData.getMaxRounds()) {
+                gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);
+            }
+        } else if (gameData.getRoundNumber() == gameData.getMaxRounds()+1) {
             for (Entity e : world.getEntities()) {
                 world.removeEntity(e);
             }

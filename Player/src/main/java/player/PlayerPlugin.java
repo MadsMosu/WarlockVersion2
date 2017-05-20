@@ -55,14 +55,17 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             handleShoot(p, gameData);
         }
 
-        if (player.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
-            resetPosition(player);
+        if (player.getCharState() == CharacterState.DEAD) {
             world.removeEntity(player);
             netherworld.addEntity(player);
         }
+        
+        if(netherworld.getEntities().contains(player)){
+            resetPosition(player);
+        }
     }
-    
-    private void resetPosition(Entity player){
+
+    private void resetPosition(Entity player) {
         Position p = player.get(Position.class);
         p.setX(p.getStartingPositionX());
         p.setY(p.getStartingPositionY());
@@ -111,8 +114,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             if (v.getVector().getMagnitude() == 0) {
 
                 e.setCharState(CharacterState.IDLE);
-            }
-            else {
+            } else {
                 e.setAngle(v.getVector().getAngle());
                 e.setCharState(CharacterState.MOVING);
                 e.setRunningState(e.getAngle(), e);
@@ -144,9 +146,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         if (gameData.getKeys().isPressed(NUM_1)) {
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(FIREBALL);
-        }
-        
-        else if (gameData.getKeys().isPressed(NUM_2)) {
+        } else if (gameData.getKeys().isPressed(NUM_2)) {
             //e.setChosenSpell(SpellType.SPELL2);
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(TELEPORT1);

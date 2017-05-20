@@ -11,7 +11,6 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.MovementState;
 import static data.EntityType.ENEMY;
-import static data.GameKeys.LEFT_MOUSE;
 import data.ImageManager;
 import data.Netherworld;
 import data.componentdata.AI;
@@ -30,14 +29,8 @@ import java.util.List;
     ,
     @ServiceProvider(service = IGamePluginService.class)
 })
-/**
- *
- * @author jcs
- */
 public class EnemyPlugin implements IEntityProcessingService, IGamePluginService {
 
-    private float directionY;
-    private float directionX;
     public static final String ENEMY_IMAGE_PATH = "assets/enemysprites.png";
     public static String ENEMY_FINAL_IMAGE_PATH = "";
     private World world;
@@ -62,12 +55,16 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity e : world.getEntities(ENEMY)) {
-            if (e.getCharState().equals(CharacterState.DEAD) || gameData.getGameState().equals(GameState.ROUNDEND)) {
+            if (e.getCharState().equals(CharacterState.DEAD)) {
                 resetPosition(e);
                 world.removeEntity(e);
                 netherworld.addEntity(enemy);
             }
-            handleShoot(e, gameData);
+            if (netherworld.getEntities().contains(enemy)) {
+                resetPosition(enemy);
+            }
+
+            handleShoot(e);
             AI aiComp = e.get(AI.class);
             Position p = e.get(Position.class);
             Velocity v = e.get(Velocity.class);
@@ -90,14 +87,12 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
                     distanceToMiddle.normalize();
 
                     v.setVector(distanceToMiddle);
-                }
-                else {
+                } else {
                     if (gap.getMagnitude() >= 100) {
                         if (gap.getMagnitude() >= 100 && gap.getMagnitude() < 101) {
                             e.setMoveState(MovementState.STANDING);
-                        }
-                        else {
-                            e.setAngle( gap.getAngle());
+                        } else {
+                            e.setAngle(gap.getAngle());
                             e.setRunningState(e.getAngle(), e);
 
                         }
@@ -106,14 +101,14 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
             }
         }
     }
-    
-    private void resetPosition(Entity player){
+
+    private void resetPosition(Entity player) {
         Position p = player.get(Position.class);
         p.setX(p.getStartingPositionX());
         p.setY(p.getStartingPositionY());
     }
 
-    private void handleShoot(Entity e, GameData gameData) {
+    private void handleShoot(Entity e) {
         if (e.get(SpellBook.class).getChosenSpell() != null) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
