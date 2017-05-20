@@ -15,6 +15,7 @@ public class Position implements Serializable {
 
     private float x;
     private float y;
+    private Position startPosition;
     private boolean inLava = false;
     private float startX;
     private float startY;
@@ -71,6 +72,14 @@ public class Position implements Serializable {
         this.y = y;
     }
 
+    public Position getStartPosition() {
+        return startPosition;
+    }
+
+    public void setStartPosition(Position startPosition) {
+        this.startPosition = startPosition;
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

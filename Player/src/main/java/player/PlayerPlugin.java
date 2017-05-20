@@ -97,19 +97,19 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         Position p = e.get(Position.class);
         Body b = e.get(Body.class);
         Velocity v = e.get(Velocity.class);
-        Vector2 stopVector;
-        
+
         if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
             gameData.getKeys().setKey(RIGHT_MOUSE, false);
 
             float endX = gameData.getMousePositionX() - (b.getWidth() / 2);
             float endY = gameData.getMousePositionY() - (b.getHeight() / 2);
-            
-            v.setVector(new Vector2(p, new Position(endX, endY)));
+            p.setStartPosition(new Position(p));
+            Vector2 vector = new Vector2(p, new Position(endX, endY));
+            v.setVector(vector);
+            v.setTravelDist(vector.getMagnitude());
             v.getVector().normalize();
-            System.out.println(v.getVector().getMagnitude());
             if (v.getVector().getMagnitude() == 0) {
-                
+
                 e.setCharState(CharacterState.IDLE);
             }
             else {
@@ -119,7 +119,15 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             }
         }
 
+        if (v.getTravelDist() != 0 && p.getStartPosition() != null) {
+            Vector2 stopCheck = new Vector2(p, p.getStartPosition());
 
+            if (v.getTravelDist() <= stopCheck.getMagnitude()) {
+
+                e.setCharState(CharacterState.IDLE);
+                e.setMoveState(MovementState.STANDING);
+            }
+        }
 
         if (gameData.getKeys()
                 .isPressed(ESCAPE)) {
@@ -134,8 +142,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
-            SpellBook sb = e.get(SpellBook.class
-            );
+            SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(FIREBALL);
         }
         

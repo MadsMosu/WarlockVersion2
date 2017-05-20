@@ -48,13 +48,8 @@ public class ControlProcessor implements IEntityProcessingService {
         }
 
         for (Entity spell : world.getEntities(EntityType.SPELL)) {
+                handleSpellMovement(spell, gameData);
 
-            if (spell.get(Owner.class).getOwnerType().equals(PLAYER)) {
-                handleSpellMovement(spell, gameData);
-            }
-            if (spell.get(Owner.class).getOwnerType().equals(ENEMY)) {
-                handleSpellMovement(spell, gameData);
-            }
         }
     }
 

@@ -203,7 +203,7 @@ public final class Entity implements Serializable {
         this.numPoints = numPoints;
     }
     
-    public void setRunningState(float angle, Entity e) {
+    public void setRunningState(double angle, Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.RUNNINGRIGHT);
         } else if (angle < 135 && angle > 45) {
