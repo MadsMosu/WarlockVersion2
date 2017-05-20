@@ -5,33 +5,45 @@
  */
 package data.componentdata;
 
+import data.util.Vector2;
+
 /**
  *
  * @author Aleksander
  */
-public class Velocity {
-    private float directionX;
-    private float directionY;
+public class Velocity { 
+    private Vector2 vector;
     private float speed;
 
     
-    public float getDirectionX() {
-        return directionX;
+     public Velocity(float x, float y)
+    {
+        this.vector = new Vector2(x, y);
     }
 
-    public void setDirectionX(float DirectionX) {
-        this.directionX = DirectionX;
+    public Velocity(Vector2 vec)
+    {
+        vector = vec;
     }
 
-    public float getDirectionY() {
-        return directionY;
+    public Velocity()
+    {
+        vector = new Vector2(0, 0);
     }
 
-    public void setDirectionY(float DirectionY) {
-        this.directionY = DirectionY;
+    public Vector2 getVector()
+    {
+        return vector;
     }
 
-    public float getSpeed() {
+
+
+    public void setVector(Vector2 vector)
+    {
+        this.vector = vector;
+    }
+    
+        public float getSpeed() {
         return speed;
     }
 
@@ -39,6 +51,9 @@ public class Velocity {
         this.speed = speed;
     }
     
-    
-    
+
 }
+    
+    
+    
+

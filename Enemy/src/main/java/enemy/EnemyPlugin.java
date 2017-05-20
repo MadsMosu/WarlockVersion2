@@ -19,6 +19,7 @@ import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.Velocity;
+import data.util.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,29 +51,65 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         this.world = world;
         enemies = new ArrayList();
 
-        enemies.add(makeEnemy(3000,0));
+        enemies.add(makeEnemy(3000, 0));
         enemies.add(makeEnemy(3600, 0));
 
     }
 
     @Override
     public void process(GameData gameData, World world) {
-        setShape();
-        
-        for(Entity enemy : world.getEntities(ENEMY)){
-            if(enemy.getCharState().equals(CharacterState.DEAD)){
-                world.removeEntity(enemy);
+
+        for (Entity e : world.getEntities(ENEMY)) {
+            if (e.getCharState().equals(CharacterState.DEAD)) {
+                world.removeEntity(e);
             }
-            handleShoot(enemy, gameData);
+            handleShoot(e, gameData);
+            AI aiComp = e.get(AI.class);
+            Position p = e.get(Position.class);
+            Velocity v = e.get(Velocity.class);
+
+            if (aiComp.getCurrentTarget() != null) {
+                Position aiPosition = e.get(Position.class);
+                Position entityPosition = aiComp.getCurrentTarget().get(Position.class);
+                Vector2 gap = new Vector2(aiPosition, entityPosition);
+                gap.normalize();
+                v.setVector(gap);
+
+                if (p.isInLava()) {
+                    Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
+                    Vector2 distanceToMiddle = new Vector2(aiPosition, middle);
+
+                    e.setAngle((float) distanceToMiddle.getAngle());
+
+                    e.setRunningState(e.getAngle(), e);
+
+                    distanceToMiddle.normalize();
+
+                    v.setVector(distanceToMiddle);
+                }
+                else {
+                    if (gap.getMagnitude() >= 100) {
+                        if (gap.getMagnitude() >= 100 && gap.getMagnitude() < 101) {
+                            e.setMoveState(MovementState.STANDING);
+                        }
+                        else {
+                            e.setAngle((float) gap.getAngle());
+                            e.setRunningState(e.getAngle(), e);
+
+                        }
+                    }
+                }
+            }
         }
     }
     
+
     private void handleShoot(Entity e, GameData gameData) {
         if (e.get(SpellBook.class).getChosenSpell() != null) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
         }
-        }
+    }
 
     private Entity makeEnemy(float xPosition, float yPosition) {
         enemy = new Entity();
@@ -84,7 +121,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Owner ow = new Owner(enemy.getID());
         AI ai = new AI();
         Velocity v = new Velocity();
-
+        v.setSpeed(50);
         sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         enemy.add(ow);
         enemy.add(ImageManager.getImage(ENEMY_FINAL_IMAGE_PATH));
@@ -92,9 +129,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.add(pos);
         enemy.add(sb);
         enemy.add(ai);
-        v.setSpeed(50);
-        enemy.add(v);
 
+        enemy.add(v);
 
         Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         enemy.add(body);
@@ -104,35 +140,12 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         world.addEntity(enemy);
         return enemy;
     }
-    
-     private void setShape() {
-        float height = enemy.get(Body.class).getHeight();
-        float width = enemy.get(Body.class).getWidth();
-        float playerX = enemy.get(Position.class).getX();
-        float playerY = enemy.get(Position.class).getY();
-
-        shapex[0] = (float) (playerX);
-        shapey[0] = (float) (playerY);
-
-        shapex[1] = (float) (playerX + width);
-        shapey[1] = (float) (playerY);
-
-        shapex[2] = (float) (playerX + width);
-        shapey[2] = (float) (playerY + height);
-
-        shapex[3] = (float) (playerX);
-        shapey[3] = (float) (playerY + height);
-
-        enemy.setShapeX(shapex);
-        enemy.setShapeY(shapey);
-    }
-
 
     @Override
     public void stop() {
         // Remove entities
         for (Entity enemy : enemies) {
-            
+
             world.removeEntity(enemy);
         }
     }

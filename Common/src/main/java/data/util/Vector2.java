@@ -2,14 +2,10 @@ package data.util;
 
 import data.componentdata.Position;
 
-/**
- *
- * @author Dzenita Hasic
- */
 public class Vector2
 {
-    private double x;
-    private double y;
+    private float x;
+    private float y;
 
     /**
      * Constructs vector from pos1 to pos2
@@ -40,7 +36,7 @@ public class Vector2
      * @param x The offset x
      * @param y The offset y
      */
-    public Vector2(double x, double y)
+    public Vector2(float x, float y)
     {
         this.x = x;
         this.y = y;
@@ -51,7 +47,7 @@ public class Vector2
      *
      * @param x The offset x.
      */
-    public void setX(double x)
+    public void setX(float x)
     {
         this.x = x;
     }
@@ -62,11 +58,11 @@ public class Vector2
      * @param degrees The degrees to rotate the vector.
      * @return This vector, making it possible to chain calls.
      */
-    public Vector2 rotateDegrees(double degrees)
+    public Vector2 rotateDegrees(float degrees)
     {
-        double radians = Math.toRadians(degrees);
-        double px = x * Math.cos(radians) - y * Math.sin(radians);
-        double py = x * Math.sin(radians) + y * Math.cos(radians);
+        float radians = (float) Math.toRadians(degrees);
+        float px = x * (float)Math.cos(radians) - y * (float)Math.sin(radians);
+        float py = x * (float)Math.sin(radians) + y * (float)Math.cos(radians);
         x = px;
         y = py;
         return this;
@@ -77,7 +73,7 @@ public class Vector2
      *
      * @param y The offset y.
      */
-    public void setY(double y)
+    public void setY(float y)
     {
         this.y = y;
     }
@@ -87,7 +83,7 @@ public class Vector2
      *
      * @return The offsetx.
      */
-    public double getX()
+    public float getX()
     {
         return this.x;
     }
@@ -97,7 +93,7 @@ public class Vector2
      *
      * @return The offset y.
      */
-    public double getY()
+    public float getY()
     {
         return this.y;
     }
@@ -107,9 +103,9 @@ public class Vector2
      *
      * @return The magnitude/length of the vector.
      */
-    public double getMagnitude()
+    public float getMagnitude()
     {
-        return Math.sqrt(Math.pow(getX(), 2) + Math.pow(getY(), 2));
+        return (float)Math.sqrt(Math.pow(getX(), 2) + Math.pow(getY(), 2));
     }
 
     /**
@@ -119,9 +115,9 @@ public class Vector2
      * @return The angle of the vector in degrees. For example 90 would mean the vector is pointing NORTH, and 0 would mean the vector is
      * pointing EAST.
      */
-    public double getAngle()
+    public float getAngle()
     {
-        return Math.toDegrees(Math.atan2(y, x));
+        return (float)Math.toDegrees(Math.atan2(y, x));
     }
 
     /**
@@ -130,7 +126,7 @@ public class Vector2
      * @param multiplier The vector that multiplies this vector.
      * @return The scalar product of the 2 vectors.
      */
-    public double scalarProduct(Vector2 multiplier)
+    public float scalarProduct(Vector2 multiplier)
     {
 
         return this.x * multiplier.getX() + this.y * multiplier.getY();
@@ -142,7 +138,7 @@ public class Vector2
      * @param multiplier The amount to multiply the vector with.
      * @return This vector, making it possible to chain calls.
      */
-    public Vector2 scalarMultiply(double multiplier)
+    public Vector2 scalarMultiply(float multiplier)
     {
         this.x *= multiplier;
         this.y *= multiplier;
@@ -176,14 +172,14 @@ public class Vector2
     }
 
     /**
-     * Adds another vector described by the given doubles
+     * Adds another vector described by the given floats
      * x and y to this vector.
      *
      * @param x
      * @param y
      * @return This vector, making it possible to chain calls.
      */
-    public Vector2 addVector(double x, double y)
+    public Vector2 addVector(float x, float y)
     {
         this.x += x;
         this.y += y;
@@ -221,7 +217,7 @@ public class Vector2
      */
     public Vector2 normalize()
     {
-        double length = this.getMagnitude();
+        float length = this.getMagnitude();
         if (!(x == 0 && y == 0))
         {
             x /= length;
@@ -238,7 +234,7 @@ public class Vector2
      */
     public static Vector2 normalize(Vector2 vector)
     {
-        double length = vector.getMagnitude();
+        float length = vector.getMagnitude();
         return new Vector2(vector.getX() / length, vector.getY() / length);
 
     }
@@ -297,8 +293,8 @@ public class Vector2
      */
     public static Vector2 averageVector(Vector2[] array)
     {
-        double xTotal = 0;
-        double yTotal = 0;
+        float xTotal = 0;
+        float yTotal = 0;
         for (Vector2 vector : array)
         {
             xTotal += vector.getX();
@@ -319,14 +315,14 @@ public class Vector2
      * @param i The magnitude to be set to this vector.
      * @return This vector, making it possible to chain calls.
      */
-    public Vector2 setMagnitude(double i)
+    public Vector2 setMagnitude(float i)
     {
         this.normalize();
         this.scalarMultiply(i);
         return this;
     }
 
-    public double projectionOn(Vector2 axis)
+    public float projectionOn(Vector2 axis)
     {
         return scalarProduct(Vector2.normalize(axis));
     }

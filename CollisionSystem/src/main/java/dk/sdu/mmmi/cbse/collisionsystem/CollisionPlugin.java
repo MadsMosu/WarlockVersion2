@@ -5,6 +5,7 @@
  */
 package dk.sdu.mmmi.cbse.collisionsystem;
 
+import States.CharacterState;
 import data.Entity;
 import data.EntityType;
 import static data.EntityType.*;
@@ -16,6 +17,7 @@ import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
+import data.componentdata.Velocity;
 import events.Event;
 import events.EventType;
 import java.util.Collection;
@@ -60,12 +62,15 @@ public class CollisionPlugin implements IEntityProcessingService {
 
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     Damage dmg = new Damage(handled.get(Damage.class).getDamage());
-                    System.out.println("Damage: " + dmg.getDamage());
-                    Owner owner = new Owner(collideWith.getID());
+                    //System.out.println("Damage: " + dmg.getDamage());
+                    Owner owner = (handled.get(Owner.class));
                     DamageTaken dmgTaken = new DamageTaken(dmg, owner);
-                    System.out.println("dmgTaken: " + dmgTaken.getDamage());
+                    //System.out.println("dmgTaken: " + dmgTaken.getDamage());
                     collideWith.get(Health.class).addDamageTaken(dmgTaken);
-                    System.out.println(collideWith.get(Health.class).getHp());
+                    //System.out.println(collideWith.get(Health.class).getHp());
+                    collideWith.setCharState(CharacterState.BOUNCING);
+                    Velocity v = handled.get(Velocity.class);
+                    collideWith.get(Velocity.class).setVector(v.getVector());
                     world.removeEntity(handled);
 
                 }
