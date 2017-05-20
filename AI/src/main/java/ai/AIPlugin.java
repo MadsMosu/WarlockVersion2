@@ -99,12 +99,15 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
     private Entity lowestValue(Map<Entity, Float> map) {
         Entry<Entity, Float> min = null;
+        if(!map.isEmpty()){
         for (Entry<Entity, Float> entry : map.entrySet()) {
             if (min == null || min.getValue() > entry.getValue()) {
                 min = entry;
             }
         }
         return min.getKey();
+        }
+        return null;
     }
 
     private void avoidSpells(World world, Entity ai) {
