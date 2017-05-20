@@ -15,7 +15,7 @@ import data.componentdata.Expiration;
 public class Spell {
 
     private SpellType spellType;
-    private final int damage;
+    private int damage;
     private boolean isStatic;
     private Entity spellEntity;
     private float speed;
@@ -25,14 +25,13 @@ public class Spell {
     private String SPELL_IMAGE_PATH = "";
     private int width;
     private int height;
+    private int spriteHeight;
+    private int spriteWidth;
+    private int frames;
+    private float frameSpeed;
+    private float expiration;
 
-    public Spell(World world, SpellType spellType, int damage, String path, boolean isStatic, float expiration, float speed, float acceleration, float cooldown, int bouncePoints, int width, int height) {
-        SPELL_IMAGE_PATH = Spell.class.getResource(path).getPath().replace("file:", "");
-        ImageManager.createImage(SPELL_IMAGE_PATH, false);
-
-        spellEntity = new Entity();
-        spellEntity.add(new Expiration(expiration));
-        spellEntity.setView(ImageManager.getImage(SPELL_IMAGE_PATH));
+    public Spell(World world, SpellType spellType, int damage, String path, boolean isStatic, float expiration, float speed, float acceleration, float cooldown, int bouncePoints, int width, int height, int spriteWidth, int spriteHeight, int frames, float frameSpeed) {
 
         this.spellType = spellType;
         this.damage = damage;
@@ -43,8 +42,43 @@ public class Spell {
         this.bouncePoints = bouncePoints;
         this.width = width;
         this.height = height;
+        this.spriteHeight = spriteHeight;
+        this.spriteWidth = spriteWidth;
+        this.frames = frames;
+        this.frameSpeed = frameSpeed;
+        this.expiration = expiration;
     }
 
+    public Spell(World world, SpellType spellType, String path, float expiration, float cooldown, int width, int height, int spriteWidth, int spriteHeight, int frames, float frameSpeed){
+ 
+        this.spellType = spellType;
+        this.cooldown = cooldown;
+        this.width = width;
+        this.height = height;
+        this.spriteHeight = spriteHeight;
+        this.spriteWidth = spriteWidth;
+        this.frames = frames;
+        this.frameSpeed = frameSpeed;
+        this.expiration = expiration;
+    }
+    
+    public float getExpiration(){
+        return expiration;
+    }
+    public float getFrameSpeed(){
+        return frameSpeed;
+    }
+    public int getFrames(){
+        return frames;
+    }
+    
+    public int getSpriteHeight(){
+        return spriteHeight;
+    }
+    
+    public int getSpriteWidth(){
+        return spriteWidth;
+    }
     public int getBouncePoints() {
         return bouncePoints;
     }

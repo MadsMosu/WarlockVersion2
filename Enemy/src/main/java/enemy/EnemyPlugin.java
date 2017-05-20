@@ -20,6 +20,7 @@ import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.Velocity;
+import data.util.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         ImageManager.createImage(ENEMY_FINAL_IMAGE_PATH, false);
         this.world = world;
         enemies = new ArrayList();
-        
 
         enemies.add(makeEnemy(3000, 0));
         enemies.add(makeEnemy(3600, 0));
@@ -67,6 +67,42 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
                 netherworld.addEntity(enemy);
             }
             handleShoot(e, gameData);
+            AI aiComp = e.get(AI.class);
+            Position p = e.get(Position.class);
+            Velocity v = e.get(Velocity.class);
+
+            if (aiComp.getCurrentTarget() != null) {
+                Position aiPosition = e.get(Position.class);
+                Position entityPosition = aiComp.getCurrentTarget().get(Position.class);
+                Vector2 gap = new Vector2(aiPosition, entityPosition);
+                gap.normalize();
+                v.setVector(gap);
+
+                if (p.isInLava()) {
+                    Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
+                    Vector2 distanceToMiddle = new Vector2(aiPosition, middle);
+
+                    e.setAngle((float) distanceToMiddle.getAngle());
+
+                    e.setRunningState(e.getAngle(), e);
+
+                    distanceToMiddle.normalize();
+
+                    v.setVector(distanceToMiddle);
+                }
+                else {
+                    if (gap.getMagnitude() >= 100) {
+                        if (gap.getMagnitude() >= 100 && gap.getMagnitude() < 101) {
+                            e.setMoveState(MovementState.STANDING);
+                        }
+                        else {
+                            e.setAngle((float) gap.getAngle());
+                            e.setRunningState(e.getAngle(), e);
+
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -113,7 +149,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         world.addEntity(enemy);
         return enemy;
     }
-
 
     @Override
     public void stop() {

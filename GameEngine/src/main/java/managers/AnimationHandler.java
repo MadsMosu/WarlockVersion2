@@ -12,6 +12,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import data.Entity;
 import data.GameData;
+import data.SpellType;
+import data.componentdata.Body;
+import data.componentdata.SpellInfos;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +26,7 @@ public class AnimationHandler {
 
     private Texture texture;
     private Animation spellAnimation;
+    private Map<SpellType, Animation> spellAnimations;
     private float stateTime;
     private Map<Entity, Animation> anRunningRight;
     private Map<Entity, Animation> anRunningLeft;
@@ -38,6 +42,7 @@ public class AnimationHandler {
         anRunningUp = new ConcurrentHashMap<>();
         anRunningDown = new ConcurrentHashMap<>();
         standing = new ConcurrentHashMap<>();
+        spellAnimations = new ConcurrentHashMap<>();
         frames = new Array<>();
     }
 
@@ -52,21 +57,21 @@ public class AnimationHandler {
         for (int i = 0; i < 8; i++) {
             frames.add(new TextureRegion(texture, 700 + i * 50, 0, 50, 50));
         }
-        anRunningRight.put(e, new Animation(0.18f, frames));
+        anRunningRight.put(e, new Animation(0.1f, frames));
         frames.clear();
 
         //run left
         for (int i = 0; i < 8; i++) {
             frames.add(new TextureRegion(texture, 300 + i * 50, 0, 50, 50));
         }
-        anRunningLeft.put(e, new Animation(0.18f, frames));
+        anRunningLeft.put(e, new Animation(0.1f, frames));
         frames.clear();
 
         //run down
         for (int i = 0; i < 6; i++) {
             frames.add(new TextureRegion(texture, i * 50, 0, 50, 50));
         }
-        anRunningDown.put(e, new Animation(0.18f, frames));
+        anRunningDown.put(e, new Animation(0.1f, frames));
         standing.put(e, frames.first());
         frames.clear();
 
@@ -74,7 +79,7 @@ public class AnimationHandler {
         for (int i = 0; i < 6; i++) {
             frames.add(new TextureRegion(texture, 1100 + i * 50, 0, 50, 50));
         }
-        anRunningUp.put(e, new Animation(0.18f, frames));
+        anRunningUp.put(e, new Animation(0.1f, frames));
         frames.clear();
 
     }
@@ -83,16 +88,19 @@ public class AnimationHandler {
         return texture;
     }
 
-    public void initializeSpell(Texture imageFile) {
-                for (int i = 0; i < 6; i++) {
-            frames.add(new TextureRegion(imageFile, i * 63, 0, 63, 19));
+    public void initializeSpell(Texture imageFile, Entity e) {
+        Body b = e.get(Body.class);
+        int spriteFrames = b.getFrames();
+        float frameSpeed = b.getFrameSpeed();
+                for (int i = 0; i < spriteFrames; i++) {
+            frames.add(new TextureRegion(imageFile, i * b.getSpriteWidth(), 0, b.getSpriteWidth(), b.getSpriteHeight()));
         }
-        spellAnimation = new Animation(0.18f, frames);
+        spellAnimations.put(e.get(SpellInfos.class).getSpellType(), new Animation(frameSpeed, frames));
         frames.clear();
     }
 
-    public TextureRegion getSpellAnimation() {
-        return (TextureRegion) spellAnimation.getKeyFrame(stateTime, true);
+    public TextureRegion getSpellAnimation(Entity entity) {
+        return (TextureRegion) spellAnimations.get(entity.get(SpellInfos.class).getSpellType()).getKeyFrame(stateTime, true);
     }
 
     public TextureRegion getFrame(Entity entity) {

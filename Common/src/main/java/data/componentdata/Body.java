@@ -10,6 +10,10 @@ public class Body
 {
     private int height;
     private int width;
+    private int spriteHeight;
+    private int spriteWidth;
+    private int frames;
+    private float frameSpeed;
     private Geometry geometry;
 
     public enum Geometry
@@ -28,6 +32,28 @@ public class Body
     {
         return geometry;
     }
+
+    public float getFrameSpeed()
+    {
+        return frameSpeed;
+    }
+
+    public void setFrameSpeed(float frameSpeed)
+    {
+        this.frameSpeed = frameSpeed;
+    }
+
+    
+    public int getFrames()
+    {
+        return frames;
+    }
+
+    public void setFrames(int frames)
+    {
+        this.frames = frames;
+    }
+    
 
     public void setGeometry(Geometry geometry)
     {
@@ -53,4 +79,31 @@ public class Body
     {
         this.width = width;
     }
+
+    public int getSpriteHeight()
+    {
+        return spriteHeight;
+    }
+
+    public void setSpriteHeight(int spriteHeight)
+    {
+        this.spriteHeight = spriteHeight;
+    }
+    
+    public void setSpriteSize(int width, int height){
+        this.spriteWidth = width;
+        this.spriteHeight = height;
+    }
+
+    public int getSpriteWidth()
+    {
+        return spriteWidth;
+    }
+
+    public void setSpriteWidth(int spriteWidth)
+    {
+        this.spriteWidth = spriteWidth;
+    }
+    
+    
 }
