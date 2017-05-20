@@ -24,7 +24,7 @@ public class SpellBook {
     public SpellBook(Owner owner){
         this.owner = owner;
         spells = new ArrayList<>();
-        globalCooldownTime = 1.5f;
+        globalCooldownTime = 0.5f;
     }
     
     public float getGlobalCooldownTime() {

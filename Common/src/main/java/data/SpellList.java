@@ -27,10 +27,25 @@ public class SpellList {
     public static final boolean FIREBALL_STATIC = false;
     public static final int FIREBALL_WIDTH = 15;
     public static final int FIREBALL_HEIGHT = 15;
-    public static final int FIREBALL_SPRITE_WIDTH = 63;
-    public static final int FIREBALL_SPRITE_HEIGHT = 19;
+    public static final int FIREBALL_SPRITE_WIDTH = 51;
+    public static final int FIREBALL_SPRITE_HEIGHT = 15;
     public static final int FIREBALL_FRAMES = 8;
     public static final float FIREBALL_FRAME_SPEED = 0.1f;
+    
+    public static final String FROSTBOLT_IMAGE = "assets/frostboltsprite.png";
+    public static final int FROSTBOLT_DMG = 5;
+    public static final int FROSTBOLT_BOUNCE = 4;
+    public static final float FROSTBOLT_SPEED = 150f;
+    public static final float FROSTBOLT_EXPIRATION = 4f;
+    public static final float FROSTBOLT_ACCELERATION = 20f;
+    public static final float FROSTBOLT_COOLDOWN = 4f;
+    public static final boolean FROSTBOLT_STATIC = false;
+    public static final int FROSTBOLT_WIDTH = 15;
+    public static final int FROSTBOLT_HEIGHT = 15;
+    public static final int FROSTBOLT_SPRITE_WIDTH = 51;
+    public static final int FROSTBOLT_SPRITE_HEIGHT = 15;
+    public static final int FROSTBOLT_FRAMES = 8;
+    public static final float FROSTBOLT_FRAME_SPEED = 0.1f;
     
     public static final String TELEPORT_IMAGE = "assets/teleportsprite1.png";
     public static final float TELEPORT_COOLDOWN = 10f;
@@ -50,6 +65,7 @@ public class SpellList {
     
     public static Map getSpellMap(){
         spellSpriteMap.put(SpellType.FIREBALL, FIREBALL_IMAGE);
+        spellSpriteMap.put(SpellType.FROSTBOLT, FROSTBOLT_IMAGE);
         spellSpriteMap.put(SpellType.TELEPORT1, TELEPORT_IMAGE);
         spellSpriteMap.put(SpellType.TELEPORT2, TELEPORT_IMAGE);
         
