@@ -68,7 +68,10 @@ public class GameEngine implements ApplicationListener {
     private MapManager mapManager;
     private HealthBarManager healthBarManager;
     private HUD hud;
+    
     private Sound backgroundMusic;
+    public static final String BACKGROUNDMUSIC_PATH = "assets/Characters.png";
+    public static String BACKGROUNDMUSIC_FINAL_PATH = "";
 
     @Override
     public void create() {
@@ -114,7 +117,10 @@ public class GameEngine implements ApplicationListener {
 
         gameData.setGameState(GameState.RUN);
         
-        //backgroundMusic.loop();
+        
+//        BACKGROUNDMUSIC_FINAL_PATH = GameEngine.class.getResource(BACKGROUNDMUSIC_PATH).getPath().replace("file:", "");
+//        ImageManager.createImage(BACKGROUNDMUSIC_FINAL_PATH, false);
+//        backgroundMusic.loop();
     }
 
     private void loadImages() {
@@ -220,8 +226,10 @@ public class GameEngine implements ApplicationListener {
         gameData.setMousePosition(Gdx.input.getX() + (int) (camera.position.x - camera.viewportWidth / 2),
                 -Gdx.input.getY() + Gdx.graphics.getHeight() + (int) (camera.position.y - camera.viewportHeight / 2));
 
-        for (IEntityProcessingService processor : getEntityProcessingServices()) {
-            processor.process(gameData, world, netherworld);
+        if(gameData.getRoundNumber() <= gameData.getMaxRounds()){
+            for (IEntityProcessingService processor : getEntityProcessingServices()) {
+                processor.process(gameData, world, netherworld);
+            }           
         }
 
         camera.update();

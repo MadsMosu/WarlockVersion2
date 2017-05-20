@@ -35,7 +35,7 @@ public class Health
     }
 
 
-    public double getMaxHp()
+    public float getMaxHp()
     {
         return maxHp;
     }

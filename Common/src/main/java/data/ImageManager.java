@@ -5,6 +5,7 @@
  */
 package data;
 
+import com.badlogic.gdx.audio.Sound;
 import data.componentdata.Image;
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,7 @@ public class ImageManager
 {
     private static Map<String, Image> images = new ConcurrentHashMap<>();
     private static Map<SpellType, Image> spellImages = new ConcurrentHashMap<>();
+    private static Map<String, Sound> sounds = new ConcurrentHashMap<>();
 
     public static Collection<Image> images()
     {
@@ -36,6 +38,20 @@ public class ImageManager
             System.exit(1);
         }
     }
+    
+//    public static void createSound(String path){
+//        Sound sound = null;
+//         try
+//        {
+//            sound = (new File(path).getCanonicalPath().replace("\\", "/"));
+//            sounds.put(path, sound);
+//        }
+//        catch (IOException ex)
+//        {
+//            ex.printStackTrace();
+//            System.exit(1);
+//        }
+//    }
 
     public static Image getImage(String path)
     {

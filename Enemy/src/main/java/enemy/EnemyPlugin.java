@@ -1,6 +1,7 @@
 package enemy;
 
 import States.CharacterState;
+import States.GameState;
 import data.Entity;
 import data.GameData;
 import data.World;
@@ -61,9 +62,9 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity e : world.getEntities(ENEMY)) {
-            if (e.getCharState().equals(CharacterState.DEAD)) {
-                world.removeEntity(e);
+            if (e.getCharState().equals(CharacterState.DEAD) || gameData.getGameState().equals(GameState.ROUNDEND)) {
                 resetPosition(e);
+                world.removeEntity(e);
                 netherworld.addEntity(enemy);
             }
             handleShoot(e, gameData);

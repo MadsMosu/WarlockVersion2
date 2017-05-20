@@ -1,6 +1,7 @@
 package player;
 
 import States.CharacterState;
+import States.GameState;
 import data.Entity;
 import static data.EntityType.PLAYER;
 import data.GameData;
@@ -54,9 +55,9 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             handleShoot(p, gameData);
         }
 
-        if (player.getCharState() == CharacterState.DEAD) {
-            world.removeEntity(player);
+        if (player.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
             resetPosition(player);
+            world.removeEntity(player);
             netherworld.addEntity(player);
         }
     }
