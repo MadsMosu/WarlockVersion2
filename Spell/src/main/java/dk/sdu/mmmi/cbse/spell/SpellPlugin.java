@@ -130,8 +130,9 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         se.add(bounce);
         se.add(new Expiration(spellArchive.getSpell(spellType).getExpiration()));
         se.add(owner);
-        float x = p.getX() + caster.get(Body.class).getWidth() / 2 - spellArchive.getSpell(spellType).getWidth() / 2;
-        float y = p.getY() + caster.get(Body.class).getHeight() / 2 - spellArchive.getSpell(spellType).getHeight() / 2;
+        float x = p.getX() + caster.get(Body.class).getWidth() / 2;
+        float y = p.getY() + caster.get(Body.class).getHeight() / 2;
+       
         se.add(new Position(x, y));
 
         se.add(si);
@@ -155,8 +156,8 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         }
         else {
             Position p = e.get(Position.class);
-            float targetX = gameData.getMousePositionX();// - e.get(Body.class).getWidth()/2;
-            float targetY = gameData.getMousePositionY(); //- e.get(Body.class).getHeight()/2;
+            float targetX = gameData.getMousePositionX() - e.get(Body.class).getWidth()/2;
+            float targetY = gameData.getMousePositionY() - e.get(Body.class).getHeight()/2;
             Position targetPosition = new Position(targetX, targetY);
             Vector2 direction = new Vector2(p, targetPosition);
             direction.normalize();

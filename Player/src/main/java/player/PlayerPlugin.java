@@ -53,12 +53,13 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             handleMove(p, gameData);
             handleTargetClick(p, gameData);
             handleShoot(p, gameData);
+                    if (p.getCharState() == CharacterState.DEAD) {
+            world.removeEntity(p);
+            netherworld.addEntity(p);
+        }
         }
 
-        if (player.getCharState() == CharacterState.DEAD) {
-            world.removeEntity(player);
-            netherworld.addEntity(player);
-        }
+
         
         if(netherworld.getEntities().contains(player)){
             resetPosition(player);
