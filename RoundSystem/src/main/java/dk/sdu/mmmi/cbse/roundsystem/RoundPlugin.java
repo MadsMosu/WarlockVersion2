@@ -11,6 +11,7 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.GameState;
 import data.Netherworld;
+import data.componentdata.Health;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IGamePluginService.class)
@@ -21,12 +22,13 @@ import data.Netherworld;
 public class RoundPlugin implements IGamePluginService, IEntityProcessingService {
 
     private float roundTime;
+    private float numbOfCharacters;
 
     @Override
     public void start(GameData gameData, World world) {
         gameData.setRoundNumber(1);
         gameData.setRoundTime(60);
-        gameData.setNextRoundCountdown(10);
+        gameData.setNextRoundCountdown(5);
         gameData.setMaxRounds(5);
     }
 
@@ -35,7 +37,7 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
     }
 
     private void resetNextRoundTime(GameData gameData) {
-        gameData.setNextRoundCountdown(10);
+        gameData.setNextRoundCountdown(5);
     }
 
     @Override
@@ -46,14 +48,21 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
             roundTime = gameData.getRoundTime() - dt;
         }
 
+        for (Entity e : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
+            numbOfCharacters++;
+        }
+
         gameData.setRoundTime(roundTime);
-        if (gameData.getRoundTime() <= 0 || world.getEntities().size() == 1 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
+        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 0 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
             gameData.setGameState(GameState.ROUNDEND);
             for (Entity e : world.getEntities()) {
-                netherworld.addEntity(e);
+                if (!e.isType(EntityType.SPELL)) {
+                    netherworld.addEntity(e);
+                }
                 world.removeEntity(e);
             }
-            if (world.getEntities().size() == 1) {
+
+            if (numbOfCharacters == 1) {
                 for (Entity e : world.getEntities()) {
                     e.setCharState(CharacterState.IDLE);
                     if (e.isType(EntityType.ENEMY)) {
@@ -67,21 +76,25 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
             }
             if (gameData.getNextRoundCountdown() <= 0) {
                 for (Entity e : netherworld.getEntities()) {
-                    if (!e.getType().equals(EntityType.SPELL)) {
+                        Health hp = e.get(Health.class);
+                        hp.setHp(hp.getMaxHp());
                         world.addEntity(e);
-                    }
+                        netherworld.removeEntity(e);
                 }
                 resetNextRoundTime(gameData);
                 resetRoundTime(gameData);
                 gameData.setRoundNumber(gameData.getRoundNumber() + 1);
                 gameData.setGameState(GameState.RUN);
             }
+            if (gameData.getRoundNumber() < gameData.getMaxRounds()) {
                 gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);
-        } else if (gameData.getRoundNumber() == gameData.getMaxRounds()) {
+            }
+        } else if (gameData.getRoundNumber() == gameData.getMaxRounds()+1) {
             for (Entity e : world.getEntities()) {
                 world.removeEntity(e);
             }
         }
+        numbOfCharacters = 0;
     }
 
     @Override

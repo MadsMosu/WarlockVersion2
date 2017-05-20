@@ -10,6 +10,7 @@ import services.IGamePluginService;
 import data.SpellType;
 import static States.CharacterState.CASTING;
 import static States.CharacterState.IDLE;
+import States.GameState;
 import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
@@ -67,15 +68,16 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
             book.reduceCooldownTimeLeft(gameData.getDelta());
             if (entity.getCharState() == CASTING && book.getChosenSpell() != null && book.getCooldownTimeLeft() <= 0) {
                 useSpell(book.getChosenSpell(), entity, gameData);
-
+                
                 entity.setCharState(IDLE);
+                
             }
         }
         for (Entity spell : world.getEntities(SPELL)) {
             float dt = gameData.getDelta();
             Expiration e = spell.get(Expiration.class);
             e.reduceExpiration(dt);
-            if (e.getExpiration() <= 0) {
+            if (e.getExpiration() <= 0 || gameData.getGameState().equals(GameState.ROUNDEND)) {
                 world.removeEntity(spell);
             }
         }

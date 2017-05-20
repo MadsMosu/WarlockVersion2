@@ -68,7 +68,10 @@ public class GameEngine implements ApplicationListener {
     private MapManager mapManager;
     private HealthBarManager healthBarManager;
     private HUD hud;
+
     private Sound backgroundMusic;
+    public static final String BACKGROUNDMUSIC_PATH = "assets/Characters.png";
+    public static String BACKGROUNDMUSIC_FINAL_PATH = "";
 
     @Override
     public void create() {
@@ -97,11 +100,10 @@ public class GameEngine implements ApplicationListener {
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
 
-
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         camera.position.set(mapManager.getMapWidth() / 2, 0, 0);
-        
+
         pluginResult = lookup.lookupResult(IGamePluginService.class);
         pluginResult.addLookupListener(lookupListener);
         pluginResult.allItems();
@@ -113,8 +115,10 @@ public class GameEngine implements ApplicationListener {
         hud = new HUD(spriteBatch, gameData, world);
 
         gameData.setGameState(GameState.RUN);
-        
-        //backgroundMusic.loop();
+
+//        BACKGROUNDMUSIC_FINAL_PATH = GameEngine.class.getResource(BACKGROUNDMUSIC_PATH).getPath().replace("file:", "");
+//        ImageManager.createImage(BACKGROUNDMUSIC_FINAL_PATH, false);
+//        backgroundMusic.loop();
     }
 
     private void loadImages() {
@@ -201,12 +205,12 @@ public class GameEngine implements ApplicationListener {
                 if (image.isRepeat()) {
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
-                    if(e.get(SpellInfos.class).getSpellType() != TELEPORT1 && e.get(SpellInfos.class).getSpellType() != TELEPORT2){
+                    if (e.get(SpellInfos.class).getSpellType() != TELEPORT1 && e.get(SpellInfos.class).getSpellType() != TELEPORT2) {
                         spriteBatch.draw(animator.getSpellAnimation(e), p.getX(), p.getY(), 0, animator.getSpellAnimation(e).getRegionHeight() / 2, animator.getSpellAnimation(e).getRegionWidth(), animator.getSpellAnimation(e).getRegionHeight(), 1, 1, e.getAngle());
                     } else {
                         spriteBatch.draw(animator.getSpellAnimation(e), p.getX(), p.getY());
                     }
-                    
+
                     spriteBatch.end();
                 }
             }
@@ -220,14 +224,16 @@ public class GameEngine implements ApplicationListener {
         gameData.setMousePosition(Gdx.input.getX() + (int) (camera.position.x - camera.viewportWidth / 2),
                 -Gdx.input.getY() + Gdx.graphics.getHeight() + (int) (camera.position.y - camera.viewportHeight / 2));
 
-        for (IEntityProcessingService processor : getEntityProcessingServices()) {
-            processor.process(gameData, world, netherworld);
+        if (gameData.getRoundNumber() <= gameData.getMaxRounds()) {
+            for (IEntityProcessingService processor : getEntityProcessingServices()) {
+                processor.process(gameData, world, netherworld);
+            }
         }
 
         camera.update();
-        if(!gameData.getGameState().equals(GameState.ROUNDEND)){
+        if (!gameData.getGameState().equals(GameState.ROUNDEND)) {
             mapManager.ShrinkMap(gameData);
-            mapManager.OnLava(world, gameData);           
+            mapManager.OnLava(world, gameData);
         }
         hud.update(gameData, world);
     }

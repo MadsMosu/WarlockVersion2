@@ -1,6 +1,7 @@
 package enemy;
 
 import States.CharacterState;
+import States.GameState;
 import data.Entity;
 import data.GameData;
 import data.World;
@@ -10,7 +11,6 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.MovementState;
 import static data.EntityType.ENEMY;
-import static data.GameKeys.LEFT_MOUSE;
 import data.ImageManager;
 import data.Netherworld;
 import data.componentdata.AI;
@@ -29,10 +29,6 @@ import java.util.List;
     ,
     @ServiceProvider(service = IGamePluginService.class)
 })
-/**
- *
- * @author jcs
- */
 public class EnemyPlugin implements IEntityProcessingService, IGamePluginService {
 
     public static final String ENEMY_IMAGE_PATH = "assets/enemysprites.png";
@@ -58,50 +54,16 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
         for (Entity e : world.getEntities(ENEMY)) {
             if (e.getCharState().equals(CharacterState.DEAD)) {
-                world.removeEntity(e);
                 resetPosition(e);
+                world.removeEntity(e);
                 netherworld.addEntity(enemy);
             }
-            handleShoot(e, gameData);
-            AI aiComp = e.get(AI.class);
-            Position p = e.get(Position.class);
-            Velocity v = e.get(Velocity.class);
-
-            if (aiComp.getCurrentTarget() != null) {
-                Position aiPosition = new Position(p);
-                Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
-                Vector2 direction = new Vector2(aiPosition, entityPosition);
-                float gap = direction.getMagnitude();
-                v.setVector(direction);
-                v.getVector().normalize();
-                System.out.println(direction.getMagnitude());
-                
-                if (p.isInLava()) {
-                    Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
-                    Vector2 directionToMiddle = new Vector2(aiPosition, middle);
-                    float distanceToMiddle = directionToMiddle.getMagnitude();
-                    
-                    e.setAngle((float) directionToMiddle.getAngle());
-                    e.setRunningState(e.getAngle(), e);
-
-                    v.setVector(directionToMiddle);
-                    v.getVector().normalize();
-                    e.setCharState(CharacterState.MOVING);
-                }
-                else {
-                    if (gap >= 100) {
-                        if (gap >= 100 && gap < 101) {
-                            e.setMoveState(MovementState.STANDING);
-                        }
-                        else {
-                            e.setAngle(direction.getAngle());
-                            e.setRunningState(e.getAngle(), e);
-                            e.setCharState(CharacterState.MOVING);
-
-                        }
-                    }
-                }
+            if (netherworld.getEntities().contains(enemy)) {
+                resetPosition(enemy);
             }
+
+            handleShoot(e);
+            handleMovement(e, gameData);
         }
     }
 
@@ -111,7 +73,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         p.setY(p.getStartingPositionY());
     }
 
-    private void handleShoot(Entity e, GameData gameData) {
+    private void handleShoot(Entity e) {
         if (e.get(SpellBook.class).getChosenSpell() != null) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
@@ -147,6 +109,50 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.setCharState(CharacterState.IDLE);
         world.addEntity(enemy);
         return enemy;
+    }
+
+    private void handleMovement(Entity e, GameData gameData) {
+        AI aiComp = e.get(AI.class);
+        Position p = e.get(Position.class);
+        Velocity v = e.get(Velocity.class);
+        if (aiComp.getCurrentTarget() != null) {
+            Position aiPosition = new Position(p);
+            Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
+            Vector2 direction = new Vector2(aiPosition, entityPosition);
+            float gap = direction.getMagnitude();
+            v.setVector(direction);
+            v.getVector().normalize();
+
+            if (p.isInLava()) {
+                Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
+                Vector2 directionToMiddle = new Vector2(aiPosition, middle);
+                float distanceToMiddle = directionToMiddle.getMagnitude();
+
+                e.setAngle((float) directionToMiddle.getAngle());
+                e.setRunningState(e.getAngle(), e);
+
+                v.setVector(directionToMiddle);
+                v.getVector().normalize();
+                if (e.getCharState().equals(CharacterState.IDLE)) {
+                    e.setCharState(CharacterState.MOVING);
+                }
+            }
+            else {
+                if (gap >= 100) {
+                    if (gap >= 100 && gap < 101) {
+                        e.setMoveState(MovementState.STANDING);
+                    }
+                    else {
+                        e.setAngle(direction.getAngle());
+                        e.setRunningState(e.getAngle(), e);
+                        if (e.getCharState().equals(CharacterState.IDLE)) {
+                            e.setCharState(CharacterState.MOVING);
+                        }
+
+                    }
+                }
+            }
+        }
     }
 
     @Override
