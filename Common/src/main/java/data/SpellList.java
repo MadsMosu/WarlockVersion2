@@ -52,7 +52,7 @@ public class SpellList {
     public static final int TELEPORT_WIDTH = 50;
     public static final int TELEPORT_HEIGHT = 90;
     public static final float TELEPORT_SPEED = 150f;
-    public static final float TELEPORT_EXPIRATION = 0.19f;
+    public static final float TELEPORT_EXPIRATION = 0.5f;
     public static final float TELEPORT_ACCELERATION = 20f;
     public static final int TELEPORT_DMG = 10;
     public static final int TELEPORT_SPRITE_WIDTH = 50;
