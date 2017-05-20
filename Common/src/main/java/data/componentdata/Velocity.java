@@ -11,49 +11,48 @@ import data.util.Vector2;
  *
  * @author Aleksander
  */
-public class Velocity { 
+public class Velocity {
+
     private Vector2 vector;
+    private float travelDist;
     private float speed;
 
-    
-     public Velocity(float x, float y)
-    {
+    public Velocity(float x, float y) {
         this.vector = new Vector2(x, y);
     }
 
-    public Velocity(Vector2 vec)
-    {
+    public Velocity(Vector2 vec) {
         vector = vec;
     }
 
-    public Velocity()
-    {
+    public Velocity() {
         vector = new Vector2(0, 0);
     }
 
-    public Vector2 getVector()
-    {
+    public Vector2 getVector() {
         return vector;
     }
 
-
-
-    public void setVector(Vector2 vector)
-    {
+    public void setVector(Vector2 vector) {
         this.vector = vector;
     }
-    
-        public float getSpeed() {
+
+    public float getTravelDist() {
+        return travelDist;
+    }
+
+    public void setTravelDist(float travelDist) {
+        this.travelDist = travelDist;
+    }
+
+
+
+    public float getSpeed() {
         return speed;
     }
 
     public void setSpeed(float speed) {
         this.speed = speed;
     }
-    
 
 }
-    
-    
-    
-

@@ -93,7 +93,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
                             e.setMoveState(MovementState.STANDING);
                         }
                         else {
-                            e.setAngle((float) gap.getAngle());
+                            e.setAngle( gap.getAngle());
                             e.setRunningState(e.getAngle(), e);
 
                         }

@@ -14,7 +14,7 @@ public final class Entity implements Serializable {
     private EntityType type;
     public float dx;
     public float dy;
-    private float angle;
+    private double angle;
     private float[] shapeX = new float[4];
     private float[] shapeY = new float[4];
     private float speed;
@@ -129,11 +129,11 @@ public final class Entity implements Serializable {
         this.dy = dy;
     }
 
-    public float getAngle() {
+    public double getAngle() {
         return angle;
     }
 
-    public void setAngle(float angle) {
+    public void setAngle(double angle) {
         this.angle = angle;
     }
 
@@ -203,7 +203,7 @@ public final class Entity implements Serializable {
         this.numPoints = numPoints;
     }
     
-    public void setRunningState(float angle, Entity e) {
+    public void setRunningState(double angle, Entity e) {
         if (angle > -45 && angle < 45) {
             e.setMoveState(MovementState.RUNNINGRIGHT);
         } else if (angle < 135 && angle > 45) {
