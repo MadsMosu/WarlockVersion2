@@ -8,6 +8,7 @@ package dk.sdu.mmmi.cbse.levelsystem;
 import data.Entity;
 import data.EntityType;
 import data.GameData;
+import data.Netherworld;
 import data.World;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
@@ -29,7 +30,7 @@ public class LevelPlugin implements IGamePluginService, IEntityProcessingService
     }
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(GameData gameData, World world, Netherworld netherworld) {
         float dt = gameData.getDelta();
         
         //---------- UDKOMMERTERET PAAGRUND AF NULLPOINTER DA INGEN ANDRE ENTITIES END PLAYER ------------

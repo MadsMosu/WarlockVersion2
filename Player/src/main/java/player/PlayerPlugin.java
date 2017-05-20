@@ -12,6 +12,7 @@ import services.IGamePluginService;
 import States.MovementState;
 import static data.GameKeys.*;
 import data.ImageManager;
+import data.Netherworld;
 import static data.SpellType.FIREBALL;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
@@ -43,7 +44,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     }
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity p : world.getEntities(PLAYER)) {
             handleTargetClick(p, gameData);
@@ -51,14 +52,23 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         }
 
         if (player.getCharState() == CharacterState.DEAD) {
-            stop();
+            world.removeEntity(player);
+            resetPosition(player);
+            netherworld.addEntity(player);
         }
+    }
+    
+    private void resetPosition(Entity player){
+        Position p = player.get(Position.class);
+        p.setX(p.getStartingPositionX());
+        p.setY(p.getStartingPositionY());
     }
 
     private void createPlayer() {
         player = new Entity();
         player.setType(PLAYER);
         Position pos = new Position(3200, 0);
+        pos.setStartingPosition(pos);
         Health health = new Health(100);
         Owner ow = new Owner(player.getID());
         SpellBook sb = new SpellBook(new Owner(player.getID()));

@@ -5,6 +5,7 @@ import data.Entity;
 import data.EntityType;
 import static data.EntityType.*;
 import data.GameData;
+import data.Netherworld;
 import data.SpellType;
 import data.World;
 import data.SpellList;
@@ -34,7 +35,7 @@ public class HealthPlugin implements IGamePluginService, IEntityProcessingServic
     }
 
     @Override
-    public void process(GameData data, World world)
+    public void process(GameData data, World world, Netherworld netherworld)
     {
         for (Entity e : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
             Health health = e.get(Health.class);

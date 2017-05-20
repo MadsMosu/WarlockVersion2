@@ -7,6 +7,7 @@ import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
 import data.GameData;
+import data.Netherworld;
 import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.AI;
@@ -180,7 +181,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     }
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(GameData gameData, World world, Netherworld netherWorld) {
         for (Entity ai : world.getEntities(ENEMY)) {
             behaviour(world, ai);
         }

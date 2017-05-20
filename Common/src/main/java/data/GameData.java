@@ -12,6 +12,7 @@ public class GameData {
     private int layerCount;
     private int shrinkTime;
     private float delta;
+    private int FPS;
     private int displayWidth;
     private int displayHeight;
     private final GameKeys keys = new GameKeys();
@@ -20,14 +21,47 @@ public class GameData {
     private int screenY;
     private GameState gameState;
     private float roundTime;
+    private float nextRoundCountdown;
     private int roundNumber;
-    private float currentTime;
     private int mapHeight;
     private int mapWidth;
-    
+    private String whoWinsRound = "";
+    private int maxRounds;
     
     private int mousePositionX;
     private int mousePositionY;
+
+    public int getFPS() {
+        return FPS;
+    }
+
+    public void setFPS(int FPS) {
+        this.FPS = FPS;
+    }
+    
+    public int getMaxRounds() {
+        return maxRounds;
+    }
+
+    public void setMaxRounds(int maxRounds) {
+        this.maxRounds = maxRounds;
+    }
+    
+    public String getWhoWinsRound() {
+        return whoWinsRound;
+    }
+
+    public void setWhoWinsRound(String whoWinsRound) {
+        this.whoWinsRound = whoWinsRound;
+    }
+
+    public float getNextRoundCountdown() {
+        return nextRoundCountdown;
+    }
+
+    public void setNextRoundCountdown(float nextRoundCountdown) {
+        this.nextRoundCountdown = nextRoundCountdown;
+    }
     
     public int getMousePositionX()
     {
@@ -43,14 +77,6 @@ public class GameData {
     {
         mousePositionX = x;
         mousePositionY = y;
-    }
-
-    public float getCurrentTime() {
-        return currentTime;
-    }
-
-    public void setCurrentTime(float currentTime) {
-        this.currentTime = currentTime;
     }
 
     public int getRoundNumber() {

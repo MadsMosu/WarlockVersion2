@@ -5,9 +5,11 @@
  */
 package gameengine;
 
+import States.GameState;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,7 +20,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import data.Entity;
 import static data.EntityType.ENEMY;
-import static data.EntityType.MAP;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
 import data.GameData;
@@ -32,6 +33,7 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 import data.componentdata.Image;
 import data.ImageManager;
+import data.Netherworld;
 import data.componentdata.Body;
 import data.componentdata.Position;
 import java.util.Collection;
@@ -49,6 +51,7 @@ public class GameEngine implements ApplicationListener {
 
     private GameData gameData;
     private World world;
+    private Netherworld netherworld;
     private final Lookup lookup = Lookup.getDefault();
     private Lookup.Result<IGamePluginService> pluginResult;
     private List<IGamePluginService> entityPlugins;
@@ -62,10 +65,12 @@ public class GameEngine implements ApplicationListener {
     private MapManager mapManager;
     private HealthBarManager healthBarManager;
     private HUD hud;
+    private Sound backgroundMusic;
 
     @Override
     public void create() {
         world = new World();
+        netherworld = new Netherworld();
         spriteBatch = new SpriteBatch();
         gameData = new GameData();
         animator = new AnimationHandler();
@@ -89,11 +94,11 @@ public class GameEngine implements ApplicationListener {
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
         camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
 
+
         gameData.setDisplayWidth(Gdx.graphics.getWidth());
         gameData.setDisplayHeight(Gdx.graphics.getHeight());
-        //camera.setToOrtho(false, gameData.getMapWidth(), gameData.getMapHeight());
         camera.position.set(mapManager.getMapWidth() / 2, 0, 0);
-
+        
         pluginResult = lookup.lookupResult(IGamePluginService.class);
         pluginResult.addLookupListener(lookupListener);
         pluginResult.allItems();
@@ -103,6 +108,10 @@ public class GameEngine implements ApplicationListener {
         }
         loadImages();
         hud = new HUD(spriteBatch, gameData, world);
+
+        gameData.setGameState(GameState.RUN);
+        
+        backgroundMusic.loop();
     }
 
     private void loadImages() {
@@ -132,6 +141,7 @@ public class GameEngine implements ApplicationListener {
     @Override
     public void render() {
         gameData.setDelta(Gdx.graphics.getDeltaTime());
+        gameData.setFPS(Gdx.graphics.getFramesPerSecond());
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -156,8 +166,7 @@ public class GameEngine implements ApplicationListener {
 
             if (e.getType() == SPELL) {
                 sr.circle(e.get(Position.class).getX(), e.get(Position.class).getY(), e.get(Body.class).getWidth() / 2);
-            }
-            else {
+            } else {
                 sr.rect(e.get(Position.class).getX(), e.get(Position.class).getY(), e.get(Body.class).getWidth(), e.get(Body.class).getHeight());
 
             }
@@ -207,12 +216,14 @@ public class GameEngine implements ApplicationListener {
                 -Gdx.input.getY() + Gdx.graphics.getHeight() + (int) (camera.position.y - camera.viewportHeight / 2));
 
         for (IEntityProcessingService processor : getEntityProcessingServices()) {
-            processor.process(gameData, world);
+            processor.process(gameData, world, netherworld);
         }
 
         camera.update();
-        mapManager.ShrinkMap(gameData);
-        mapManager.OnLava(world, gameData);
+        if(!gameData.getGameState().equals(GameState.ROUNDEND)){
+            mapManager.ShrinkMap(gameData);
+            mapManager.OnLava(world, gameData);           
+        }
         hud.update(gameData, world);
     }
 

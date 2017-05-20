@@ -14,6 +14,7 @@ import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import static data.EntityType.SPELL;
 import data.ImageManager;
+import data.Netherworld;
 import data.SpellList;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
@@ -48,7 +49,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     }
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             SpellBook book = entity.get(SpellBook.class);

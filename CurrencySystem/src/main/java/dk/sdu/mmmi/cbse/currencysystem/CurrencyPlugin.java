@@ -3,6 +3,7 @@ package dk.sdu.mmmi.cbse.currencysystem;
 import data.Entity;
 import data.EntityType;
 import data.GameData;
+import data.Netherworld;
 import data.World;
 import data.componentdata.Currency;
 import data.componentdata.Score;
@@ -29,7 +30,7 @@ public class CurrencyPlugin implements IGamePluginService, IEntityProcessingServ
     }
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(GameData gameData, World world, Netherworld netheworld) {
         for(Entity entity : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)){
             Score score = entity.get(Score.class);
             Currency c = entity.get(Currency.class);

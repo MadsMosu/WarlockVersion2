@@ -101,18 +101,18 @@ public class MapPlugin implements IGamePluginService {
 	@Override
     public void start(GameData gameData, World world) {
         this.world = world;
-        mapBoundary = new Entity();
-        mapBoundary.setType(EntityType.MAP);
-        
-        
-        int shortDiagonal = (int) (gameData.getMapHeight() *(Math.sqrt(2+2* Math.cos(60))));
-        int longDiagonal = (int) (gameData.getMapWidth() *(Math.sqrt(2+2* Math.cos(120))));
-        
-        float[] shapeX = new float[] {0, 3200, 6400, 3200};
-        float[] shapeY = new float[] {16, 1600, 0, -1600};
-        mapBoundary.setShapeX(shapeX);
-        mapBoundary.setShapeY(shapeY);
-        world.addEntity(mapBoundary);
+//        mapBoundary = new Entity();
+//        mapBoundary.setType(EntityType.MAP);
+//        
+//        
+//        int shortDiagonal = (int) (gameData.getMapHeight() *(Math.sqrt(2+2* Math.cos(60))));
+//        int longDiagonal = (int) (gameData.getMapWidth() *(Math.sqrt(2+2* Math.cos(120))));
+//        
+//        float[] shapeX = new float[] {0, 3200, 6400, 3200};
+//        float[] shapeY = new float[] {16, 1600, 0, -1600};
+//        mapBoundary.setShapeX(shapeX);
+//        mapBoundary.setShapeY(shapeY);
+//        world.addEntity(mapBoundary);
     }
 
     @Override
