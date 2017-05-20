@@ -25,6 +25,7 @@ import data.componentdata.Position;
 import data.componentdata.SpellBook;
 import data.componentdata.Velocity;
 import data.util.Vector2;
+import java.util.Random;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IEntityProcessingService.class)
@@ -33,8 +34,6 @@ import data.util.Vector2;
 })
 
 public class PlayerPlugin implements IEntityProcessingService, IGamePluginService {
-
-    private Entity player;
     public static final String CHARACTER_IMAGE_PATH = "assets/Characters.png";
     public static String CHARACTER_FINAL_IMAGE_PATH = "";
     private World world;
@@ -54,30 +53,30 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             handleMove(p, gameData);
             handleTargetClick(p, gameData);
             handleShoot(p, gameData);
-                    if (p.getCharState() == CharacterState.DEAD) {
-            world.removeEntity(p);
-            netherworld.addEntity(p);
+            if (p.getCharState() == CharacterState.DEAD) {
+                netherworld.addEntity(p);
+                world.removeEntity(p);
+
+            }
+                    if (netherworld.getEntities().contains(p) && gameData.getGameState().equals(GameState.ROUNDEND)) {
+            resetPosition(p);
         }
         }
 
-
-        
-        if(netherworld.getEntities().contains(player) && gameData.getGameState().equals(GameState.ROUNDEND)){
-            resetPosition(player);
-        }
-    }
+     }
 
     private void resetPosition(Entity player) {
+        Random rand = new Random();
+        int randX = rand.nextInt(4000) + 2500;
+        int randY = rand.nextInt(700);
         Position p = player.get(Position.class);
-        p.setX(p.getStartingPositionX());
-        p.setY(p.getStartingPositionY());
+        p.setPosition(randX, randY);
     }
 
     private void createPlayer() {
-        player = new Entity();
+        Entity player = new Entity();
         player.setType(PLAYER);
         Position pos = new Position(3200, 0);
-        pos.setStartingPosition(pos);
         Health health = new Health(100);
         Owner ow = new Owner(player.getID());
         SpellBook sb = new SpellBook(new Owner(player.getID()));
@@ -116,7 +115,8 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             if (v.getVector().getMagnitude() == 0) {
 
                 e.setCharState(CharacterState.IDLE);
-            } else {
+            }
+            else {
                 e.setAngle(v.getVector().getAngle());
                 e.setCharState(CharacterState.MOVING);
                 e.setRunningState(e.getAngle(), e);
@@ -148,16 +148,19 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         if (gameData.getKeys().isPressed(NUM_1)) {
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(FIREBALL);
-        } else if (gameData.getKeys().isPressed(NUM_2)) {
+        }
+        else if (gameData.getKeys().isPressed(NUM_2)) {
 
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(FROSTBOLT);
-        } else if (gameData.getKeys().isPressed(NUM_3)) {
+        }
+        else if (gameData.getKeys().isPressed(NUM_3)) {
             //Spell 3
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(TELEPORT1);
 
-        } else {
+        }
+        else {
             return;
         }
         if (gameData.getKeys().isPressed(NUM_4)) {
@@ -178,8 +181,8 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     @Override
     public void stop() {
-        // Remove entities
-        world.removeEntity(player);
-    }
+        for (Entity p : world.getEntities(PLAYER)) {
+        world.removeEntity(p);
+    }}
 
 }

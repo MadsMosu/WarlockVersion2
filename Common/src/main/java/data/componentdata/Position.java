@@ -19,19 +19,6 @@ public class Position implements Serializable {
     private boolean inLava = false;
     private float startX;
     private float startY;
-    
-    public void setStartingPosition(Position pos){
-        startX = pos.getX();
-        startY = pos.getY();
-    }
-    
-    public float getStartingPositionX(){
-        return startX;
-    }
-    
-    public float getStartingPositionY(){
-        return startY;
-    }
 
     public boolean isInLava() {
         return inLava;
