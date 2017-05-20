@@ -85,6 +85,12 @@ public class CollisionPlugin implements IEntityProcessingService {
 
                 }
 
+            } else if (handled.getType() == SPELL && collideWith.getType() == SPELL && CollisionHandler.isColliding(handled, collideWith)) {
+                if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+                    world.removeEntity(handled);
+                    world.removeEntity(collideWith);
+                }
+
             }
 
         }

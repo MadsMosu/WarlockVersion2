@@ -54,21 +54,23 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
         for (Entity e : world.getEntities(ENEMY)) {
             if (e.getCharState().equals(CharacterState.DEAD)) {
-                resetPosition(e);
                 world.removeEntity(e);
                 netherworld.addEntity(enemy);
-            }
-            if (netherworld.getEntities().contains(enemy)) {
-                resetPosition(enemy);
             }
 
             handleShoot(e);
             handleMovement(e, gameData);
         }
+        if (netherworld.getEntities().contains(enemy) || gameData.getGameState().equals(GameState.ROUNDEND)) {
+            for (Entity e : world.getEntities(ENEMY)) {
+                resetPosition(e);
+
+            }
+        }
     }
 
-    private void resetPosition(Entity player) {
-        Position p = player.get(Position.class);
+    private void resetPosition(Entity enemy) {
+        Position p = enemy.get(Position.class);
         p.setX(p.getStartingPositionX());
         p.setY(p.getStartingPositionY());
     }
@@ -136,13 +138,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
                 if (e.getCharState().equals(CharacterState.IDLE)) {
                     e.setCharState(CharacterState.MOVING);
                 }
-            }
-            else {
+            } else {
                 if (gap >= 100) {
                     if (gap >= 100 && gap < 101) {
                         e.setMoveState(MovementState.STANDING);
-                    }
-                    else {
+                    } else {
                         e.setAngle(direction.getAngle());
                         e.setRunningState(e.getAngle(), e);
                         if (e.getCharState().equals(CharacterState.IDLE)) {
