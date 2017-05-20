@@ -23,7 +23,7 @@ public class SpellArchive {
         return spellArchive;
     }
 
-    public static Spell getSpell(SpellType st){
+    public Spell getSpell(SpellType st){
         return (Spell) spellArchive.get(st);
     }
 

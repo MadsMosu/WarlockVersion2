@@ -116,8 +116,8 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         SpellInfos si = new SpellInfos();
         Body b = new Body(spellArchive.getSpell(spellType).getHeight(), spellArchive.getSpell(spellType).getWidth(), Geometry.CIRCLE);
         b.setSpriteSize(spellArchive.getSpell(spellType).getSpriteWidth(), spellArchive.getSpell(spellType).getSpriteHeight());
-        b.setFrames(SpellArchive.getSpell(spellType).getFrames());
-        b.setFrameSpeed(SpellArchive.getSpell(spellType).getFrameSpeed());
+        b.setFrames(spellArchive.getSpell(spellType).getFrames());
+        b.setFrameSpeed(spellArchive.getSpell(spellType).getFrameSpeed());
         Damage dmg = new Damage(spellArchive.getSpell(spellType).getDamage());
         Bounce bounce = new Bounce(spellArchive.getSpell(spellType).getBouncePoints());
         Velocity v = new Velocity();
