@@ -13,6 +13,7 @@ import States.MovementState;
 import static data.GameKeys.*;
 import data.ImageManager;
 import static data.SpellType.FIREBALL;
+import static data.SpellType.TELEPORT1;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
 import data.componentdata.Health;
@@ -87,13 +88,15 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(FIREBALL);
         }
-        else {
-            return;
-        }
-        if (gameData.getKeys().isPressed(NUM_2)) {
+        
+        else if (gameData.getKeys().isPressed(NUM_2)) {
             //e.setChosenSpell(SpellType.SPELL2);
-            System.out.println("Frostbolt chosen");
+            SpellBook sb = e.get(SpellBook.class);
+            sb.setChosenSpell(TELEPORT1);
+            System.out.println("Teleport chosen");
 
+        } else {
+            return;
         }
         if (gameData.getKeys().isPressed(NUM_3)) {
             //Spell 3

@@ -35,9 +35,12 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 import data.componentdata.Image;
 import data.ImageManager;
+import static data.SpellType.TELEPORT1;
+import static data.SpellType.TELEPORT2;
 import data.componentdata.Body;
 import data.componentdata.Health;
 import data.componentdata.Position;
+import data.componentdata.SpellInfos;
 import java.util.Collection;
 import managers.AnimationHandler;
 import managers.MapManager;
@@ -225,11 +228,16 @@ public class GameEngine implements ApplicationListener {
             Image image = e.get(Image.class);
             if (assetManager.isLoaded(image.getImageFilePath(), Texture.class)) {
 
-                animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class));
+                animator.initializeSpell(assetManager.get(image.getImageFilePath(), Texture.class), e);
                 if (image.isRepeat()) {
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
-                    spriteBatch.draw(animator.getSpellAnimation(), p.getX(), p.getY(), 0, animator.getSpellAnimation().getRegionHeight() / 2, animator.getSpellAnimation().getRegionWidth(), animator.getSpellAnimation().getRegionHeight(), 1, 1, e.getAngle());
+                    if(e.get(SpellInfos.class).getSpellType() != TELEPORT1 && e.get(SpellInfos.class).getSpellType() != TELEPORT2){
+                        spriteBatch.draw(animator.getSpellAnimation(e), p.getX(), p.getY(), 0, animator.getSpellAnimation(e).getRegionHeight() / 2, animator.getSpellAnimation(e).getRegionWidth(), animator.getSpellAnimation(e).getRegionHeight(), 1, 1, e.getAngle());
+                    } else {
+                        spriteBatch.draw(animator.getSpellAnimation(e), p.getX(), p.getY());
+                    }
+                    
                     spriteBatch.end();
                 }
             }
