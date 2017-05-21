@@ -51,21 +51,21 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity p : world.getEntities(PLAYER)) {
-            if (p.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
+            if (p.getCharState() == CharacterState.DEAD) {
                 netherworld.addEntity(p);
                 world.removeEntity(p);
+                
             }
             handleMove(p, gameData);
             handleTargetClick(p, gameData);
             handleShoot(p, gameData);
 
         }
-        if (gameData.getGameState().equals(GameState.PAUSE)) {
+        if (gameData.getGameState().equals(GameState.ROUNDEND)) {
             for (Entity p : netherworld.getEntities(PLAYER)) {
                 resetPosition(p, gameData);
                 p.get(Health.class).setHp(p.get(Health.class).getMaxHp());
-                world.addEntity(p);
-                netherworld.removeEntity(p);
+
             }
 
         }

@@ -10,8 +10,11 @@ import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.GameState;
+import static data.EntityType.ENEMY;
+import static data.EntityType.PLAYER;
 import data.Netherworld;
 import data.componentdata.Health;
+import data.componentdata.Position;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IGamePluginService.class)
@@ -21,7 +24,7 @@ import data.componentdata.Health;
 
 public class RoundPlugin implements IGamePluginService, IEntityProcessingService {
 
-    private boolean isPause;
+    private float roundTime;
     private float numbOfCharacters;
 
     @Override
@@ -42,73 +45,67 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
 
     @Override
     public void process(GameData gameData, World world, Netherworld netherworld) {
-        
-        if (gameData.getRoundNumber() > gameData.getMaxRounds()) {
-            gameData.setGameState(GameState.ROUNDEND);
-            for (Entity e : world.getEntities()) {
-                world.removeEntity(e);
-
-            }
-        }
 
         float dt = gameData.getDelta();
-        if (gameData.getRoundTime() > 0 && !gameData.getGameState().equals(GameState.ROUNDEND)) {
-            gameData.setRoundTime(gameData.getRoundTime() - dt);
-            
+        if (gameData.getRoundTime() > 0 && gameData.getRoundNumber() <= gameData.getMaxRounds() && !gameData.getGameState().equals(GameState.ROUNDEND)) {
+            roundTime = gameData.getRoundTime() - dt;
         }
-        for(Entity e : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)){
-            numbOfCharacters++;
-        }
-//        numbOfCharacters = world.getEntities(EntityType.PLAYER, EntityType.ENEMY).size();
 
-        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 1) {
+        numbOfCharacters = world.getEntities(EntityType.ENEMY, EntityType.PLAYER).size();
+        System.out.println(numbOfCharacters);
+        gameData.setRoundTime(roundTime);
+        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 1  || numbOfCharacters == 0 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
+            gameData.setGameState(GameState.ROUNDEND);
 
             if (numbOfCharacters == 1) {
-                for (Entity e : world.getEntities()) {
+                for (Entity e : world.getEntities(EntityType.ENEMY, EntityType.PLAYER)) {
+                    System.out.println("many people xD");
                     e.setCharState(CharacterState.IDLE);
                     if (e.isType(EntityType.ENEMY)) {
                         gameData.setWhoWinsRound("ENEMY WINS THE ROUND!");
-                    }
-                    else if (e.isType(EntityType.PLAYER)) {
+                    } else if (e.isType(EntityType.PLAYER)) {
+                        System.out.println("hi");
                         gameData.setWhoWinsRound("PLAYER WINS THE ROUND!");
                     }
                 }
-            }
-            
-            else {
+            } else {
                 gameData.setWhoWinsRound("THE ROUND IS A DRAW!");
             }
-            gameData.setGameState(GameState.ROUNDEND);
-            gameData.setRoundTime(0);
 
+            for (Entity e : world.getEntities()) {
+                if (!e.isType(EntityType.SPELL)) {
+                    netherworld.addEntity(e);
+                }
+                world.removeEntity(e);
+            
+            }
+            
             if (gameData.getNextRoundCountdown() <= 0) {
-                
+                System.out.println("should be in nether: " + netherworld.getEntities().size());
+                for (Entity e : netherworld.getEntities()) {
+
+                        world.addEntity(e);
+                        netherworld.removeEntity(e);
+                }
+                System.out.println("actual entities in world: " + world.getEntities().size());
+                resetNextRoundTime(gameData);
                 resetRoundTime(gameData);
                 gameData.setRoundNumber(gameData.getRoundNumber() + 1);
-                gameData.setGameState(GameState.PAUSE);
-                resetNextRoundTime(gameData);
+                gameData.setGameState(GameState.RUN);
             }
-            
-            else {
+            if (gameData.getRoundNumber() < gameData.getMaxRounds() && gameData.getGameState().equals(GameState.ROUNDEND)) {
                 gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);
-                
             }
-             if(netherworld.getEntities().isEmpty()){
-              gameData.setGameState(GameState.RUN);
+        } else if (gameData.getRoundNumber() == gameData.getMaxRounds()+1) {
+            for (Entity e : world.getEntities()) {
+                world.removeEntity(e);
             }
-
-            
         }
-        numbOfCharacters = 0;
+        
     }
 
-        @Override
-        public void stop
-        
-        
-    
-
-() {
+    @Override
+    public void stop() {
     }
 
 }
