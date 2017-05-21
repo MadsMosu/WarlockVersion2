@@ -2,10 +2,11 @@ package data.util;
 
 import data.componentdata.Position;
 
-public class Vector2
-{
+public class Vector2 {
+
     private float x;
     private float y;
+    static public final float FLOAT_ROUNDING_ERROR = 0.000001f;
 
     /**
      * Constructs vector from pos1 to pos2
@@ -61,8 +62,8 @@ public class Vector2
     public Vector2 rotateDegrees(float degrees)
     {
         float radians = (float) Math.toRadians(degrees);
-        float px = x * (float)Math.cos(radians) - y * (float)Math.sin(radians);
-        float py = x * (float)Math.sin(radians) + y * (float)Math.cos(radians);
+        float px = x * (float) Math.cos(radians) - y * (float) Math.sin(radians);
+        float py = x * (float) Math.sin(radians) + y * (float) Math.cos(radians);
         x = px;
         y = py;
         return this;
@@ -105,19 +106,19 @@ public class Vector2
      */
     public float getMagnitude()
     {
-        return (float)Math.sqrt(Math.pow(getX(), 2) + Math.pow(getY(), 2));
+        return (float) Math.sqrt(Math.pow(getX(), 2) + Math.pow(getY(), 2));
     }
 
     /**
-     * Gets the angle of the vector in degrees. For example 90 would mean the vector is pointing NORTH, and 0 would mean the vector is
-     * pointing EAST.
+     * Gets the angle of the vector in degrees. For example 90 would mean the
+     * vector is pointing NORTH, and 0 would mean the vector is pointing EAST.
      *
-     * @return The angle of the vector in degrees. For example 90 would mean the vector is pointing NORTH, and 0 would mean the vector is
-     * pointing EAST.
+     * @return The angle of the vector in degrees. For example 90 would mean the
+     * vector is pointing NORTH, and 0 would mean the vector is pointing EAST.
      */
     public float getAngle()
     {
-        return (float)Math.toDegrees(Math.atan2(y, x));
+        return (float) Math.toDegrees(Math.atan2(y, x));
     }
 
     /**
@@ -172,8 +173,7 @@ public class Vector2
     }
 
     /**
-     * Adds another vector described by the given floats
-     * x and y to this vector.
+     * Adds another vector described by the given floats x and y to this vector.
      *
      * @param x
      * @param y
@@ -211,15 +211,15 @@ public class Vector2
     }
 
     /**
-     * Normalizes this vector. i.e (2,1) would result in (1, 0.5) and (1,1) would result in (1,1).
+     * Normalizes this vector. i.e (2,1) would result in (1, 0.5) and (1,1)
+     * would result in (1,1).
      *
      * @return This vector, making it possible to chain calls.
      */
     public Vector2 normalize()
     {
         float length = this.getMagnitude();
-        if (!(x == 0 && y == 0))
-        {
+        if (!(x == 0 && y == 0)) {
             x /= length;
             y /= length;
         }
@@ -227,7 +227,8 @@ public class Vector2
     }
 
     /**
-     * Normalizes a vector. i.e (2,1) would result in (1, 0.5) and (1,1) would result in (1,1).
+     * Normalizes a vector. i.e (2,1) would result in (1, 0.5) and (1,1) would
+     * result in (1,1).
      *
      * @param vector The vector to be normalized
      * @return The vector that was normalized
@@ -252,34 +253,35 @@ public class Vector2
         int result = 1;
         long temp;
         temp = Double.doubleToLongBits(x);
-        result = prime * result + (int)(temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(y);
-        result = prime * result + (int)(temp ^ (temp >>> 32));
+        result = prime * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
+
+    public boolean isOnLine(Vector2 other)
+    {
+        return isZero(x * other.y - y * other.x);
+    }
+
 
     @Override
     public boolean equals(Object obj)
     {
-        if (this == obj)
-        {
+        if (this == obj) {
             return true;
         }
-        if (obj == null)
-        {
+        if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass())
-        {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        Vector2 other = (Vector2)obj;
-        if (!(Math.abs(x - other.x) < 0.00001f))
-        {
+        Vector2 other = (Vector2) obj;
+        if (!(Math.abs(x - other.x) < 0.00001f)) {
             return false;
         }
-        if (!(Math.abs(y - other.y) < 0.00001f))
-        {
+        if (!(Math.abs(y - other.y) < 0.00001f)) {
             return false;
         }
         return true;
@@ -295,13 +297,11 @@ public class Vector2
     {
         float xTotal = 0;
         float yTotal = 0;
-        for (Vector2 vector : array)
-        {
+        for (Vector2 vector : array) {
             xTotal += vector.getX();
             yTotal += vector.getY();
         }
-        if (!(xTotal == 0 && yTotal == 0))
-        {
+        if (!(xTotal == 0 && yTotal == 0)) {
             xTotal /= array.length;
             yTotal /= array.length;
         }
@@ -327,4 +327,8 @@ public class Vector2
         return scalarProduct(Vector2.normalize(axis));
     }
 
+    static public boolean isZero(float value)
+    {
+        return Math.abs(value) <= FLOAT_ROUNDING_ERROR;
+    }
 }

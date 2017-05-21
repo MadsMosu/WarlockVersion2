@@ -1,22 +1,28 @@
 package data.componentdata;
 
 import data.Entity;
+import data.util.Vector2;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AI {
 
     private Entity currentTarget;
-    private Entity spellToAvoid;
+    private Entity[] spellToAvoid;
     private boolean avoidSpell = false;
     private Map<Entity, Float> allEntities = new HashMap();
     private Map<Entity, Float> EntitiesHealthInDist = new HashMap();
-    private Map<Entity, Float> closeSpells = new HashMap();
+    private Map<Entity, List<Entity>> closeSpells = new HashMap();
     
-    public Map<Entity, Float> getCloseSpells() {
+    public Map<Entity, List<Entity>> getCloseSpells() {
         return closeSpells;
     }
 
+    public void setCloseSpells(Map<Entity,List<Entity>> closeSpellMap){
+        this.closeSpells =  closeSpellMap;
+    }
+    
     public boolean getAvoidSpell() {
         return avoidSpell;
     }
@@ -25,11 +31,11 @@ public class AI {
         this.avoidSpell = avoidSpell;
     }
 
-    public Entity getSpellToAvoid() {
+    public Entity[] getSpellToAvoid() {
         return spellToAvoid;
     }
 
-    public void setSpellToAvoid(Entity spellToAvoid) {
+    public void setSpellToAvoid(Entity[] spellToAvoid) {
         this.spellToAvoid = spellToAvoid;
     }
 
