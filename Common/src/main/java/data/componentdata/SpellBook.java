@@ -8,6 +8,8 @@ package data.componentdata;
 import data.SpellType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -19,14 +21,38 @@ public class SpellBook {
     private float globalCooldownTime;
     private float cooldownTimeLeft;
     private ArrayList<SpellType> spells;
+    private Map<SpellType, Float> spellCooldowns;
     private Owner owner;
 
     public SpellBook(Owner owner){
         this.owner = owner;
         spells = new ArrayList<>();
+        spellCooldowns = new ConcurrentHashMap();
         globalCooldownTime = 0.5f;
+        
+    }
+
+    public Map<SpellType, Float> getSpellCooldowns()
+    {
+        return spellCooldowns;
+    }
+
+    public void setSpellCooldowns(Map<SpellType, Float> spellCooldowns)
+    {
+        this.spellCooldowns = spellCooldowns;
     }
     
+    public void fillCooldownMap(){
+
+        for(SpellType spell : spells){
+            spellCooldowns.put(spell, 0f);
+        }
+    }
+    
+    public void reduceCooldown(SpellType spellType, float delta){
+        spellCooldowns.put(spellType, spellCooldowns.get(spellType) - delta);
+    }
+        
     public float getGlobalCooldownTime() {
         return globalCooldownTime;
     }
