@@ -15,6 +15,7 @@ import data.ImageManager;
 import data.Netherworld;
 import data.componentdata.AI;
 import data.componentdata.Body;
+import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
@@ -139,7 +140,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
                 if (e.getCharState().equals(CharacterState.IDLE)) {
                     e.setCharState(CharacterState.MOVING);
                 }
-            } else {
+            }  else {
                 if (gap >= 100) {
                     if (gap >= 100 && gap < 101) {
                         e.setMoveState(MovementState.STANDING);
@@ -158,7 +159,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     @Override
     public void stop() {
-        // Remove entities
         for (Entity enemy : enemies) {
             world.removeEntity(enemy);
         }

@@ -19,6 +19,7 @@ import static data.SpellType.FROSTBOLT;
 import static data.SpellType.TELEPORT1;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
+import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
@@ -115,7 +116,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             v.setTravelDist(vector.getMagnitude());
             v.getVector().normalize();
             if (v.getVector().getMagnitude() == 0) {
-
                 e.setCharState(CharacterState.IDLE);
             } else {
                 e.setAngle(v.getVector().getAngle());
@@ -123,7 +123,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
                 e.setRunningState(e.getAngle(), e);
             }
         }
-
         if (v.getTravelDist() != 0 && p.getStartPosition() != null) {
             Vector2 stopCheck = new Vector2(p, p.getStartPosition());
 
@@ -133,7 +132,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
                 e.setMoveState(MovementState.STANDING);
             }
         }
-
         if (gameData.getKeys()
                 .isPressed(ESCAPE)) {
             //leGameMenu.plsShowUp();

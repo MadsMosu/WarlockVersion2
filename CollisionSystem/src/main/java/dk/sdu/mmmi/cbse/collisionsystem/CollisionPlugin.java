@@ -59,29 +59,35 @@ public class CollisionPlugin implements IEntityProcessingService {
                     //System.out.println("dmgTaken: " + dmgTaken.getDamage());
                     collideWith.get(Health.class).addDamageTaken(dmgTaken);
                     //System.out.println(collideWith.get(Health.class).getHp());
-                    collideWith.setCharState(CharacterState.BOUNCING);
                     Velocity v = handled.get(Velocity.class);
-                    collideWith.get(Velocity.class).setVector(v.getVector());
+                    v.setVector(v.getVector());
+                    v.getVector().setMagnitude(300);
+                    v.setTravelDist(v.getVector().getMagnitude());
+                    collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
-
                 }
             }
             else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     collideWith.get(Health.class).addDamageTaken(new DamageTaken(new Damage(handled.get(Damage.class).getDamage()), new Owner(collideWith.getID())));
-
+                    
+                    Velocity v = collideWith.get(Velocity.class);
+                    v.setVector(handled.get(Velocity.class).getVector());
+                    v.getVector().setMagnitude(300);
+                    v.setTravelDist(v.getVector().getMagnitude());
+                    collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
                 }
             }
             else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-
+                    
                 }
 
             }
             else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-
+                    
                 }
 
             } else if (handled.getType() == SPELL && collideWith.getType() == SPELL && CollisionHandler.isColliding(handled, collideWith)) {
