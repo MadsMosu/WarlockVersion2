@@ -15,6 +15,7 @@ import data.ImageManager;
 import data.Netherworld;
 import data.componentdata.AI;
 import data.componentdata.Body;
+import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
@@ -36,7 +37,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public static String ENEMY_FINAL_IMAGE_PATH = "";
     private World world;
     private List<Entity> enemies;
-    private Entity enemy;
 
     @Override
     public void start(GameData gameData, World world) {
@@ -54,25 +54,31 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity e : world.getEntities(ENEMY)) {
-            if (e.getCharState().equals(CharacterState.DEAD)) {
-                world.removeEntity(e);
+            if (e.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
                 netherworld.addEntity(e);
+                world.removeEntity(e);
+
             }
 
             handleShoot(e);
             handleMovement(e, gameData);
         }
-        if (gameData.getGameState().equals(GameState.ROUNDEND)) {
-            for (Entity e : netherworld.getEntities(ENEMY)) {
-                resetPosition(e);
+        for (Entity e : netherworld.getEntities(ENEMY)) {
+            if (gameData.getGameState().equals(GameState.PAUSE)) {
+                resetPosition(e, gameData);
+                e.get(Health.class).setHp(e.get(Health.class).getMaxHp());
+            } else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 55) {
+                world.addEntity(e);
+                netherworld.removeEntity(e);
             }
+
         }
     }
 
-    private void resetPosition(Entity enemy) {
+    private void resetPosition(Entity enemy, GameData gameData) {
         Random rand = new Random();
-        int randX = rand.nextInt(4000) + 2500;
-        int randY = rand.nextInt(700);
+        int randX = rand.nextInt(500) + gameData.getMapWidth() / 2;
+        int randY = rand.nextInt(500);
         Position p = enemy.get(Position.class);
         p.setPosition(randX, randY);
     }
@@ -85,7 +91,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     }
 
     private Entity makeEnemy(float xPosition, float yPosition) {
-        enemy = new Entity();
+        Entity enemy = new Entity();
         enemy.setType(ENEMY);
 
         Position pos = new Position(xPosition, yPosition);
@@ -94,6 +100,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Owner ow = new Owner(enemy.getID());
         AI ai = new AI();
         Velocity v = new Velocity();
+        Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         v.setSpeed(50);
         sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         enemy.add(ow);
@@ -102,10 +109,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.add(pos);
         enemy.add(sb);
         enemy.add(ai);
-
         enemy.add(v);
-
-        Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         enemy.add(body);
 
         enemy.setMoveState(MovementState.STANDING);
@@ -118,7 +122,15 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         AI aiComp = e.get(AI.class);
         Position p = e.get(Position.class);
         Velocity v = e.get(Velocity.class);
-        if (aiComp.getCurrentTarget() != null) {
+
+        if (e.getCharState().equals(CharacterState.BOUNCING)) {
+            Vector2 stopCheck = new Vector2(p, p.getStartPosition());
+            if (v.getTravelDist() <= stopCheck.getMagnitude()) {
+
+                e.setCharState(CharacterState.IDLE);
+                e.setMoveState(MovementState.STANDING);
+            }
+        } else if (aiComp.getCurrentTarget() != null) {
             Position aiPosition = new Position(p);
             Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
             Vector2 direction = new Vector2(aiPosition, entityPosition);
@@ -158,7 +170,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
     @Override
     public void stop() {
-        // Remove entities
         for (Entity enemy : enemies) {
             world.removeEntity(enemy);
         }

@@ -15,6 +15,7 @@ import data.componentdata.Damage;
 import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
+import data.componentdata.Position;
 import data.componentdata.Velocity;
 import java.util.Collection;
 import org.openide.util.lookup.ServiceProvider;
@@ -59,35 +60,46 @@ public class CollisionPlugin implements IEntityProcessingService {
                     //System.out.println("dmgTaken: " + dmgTaken.getDamage());
                     collideWith.get(Health.class).addDamageTaken(dmgTaken);
                     //System.out.println(collideWith.get(Health.class).getHp());
+                    Velocity v = collideWith.get(Velocity.class);
+                    v.setVector(handled.get(Velocity.class).getVector());
+                    v.getVector().setMagnitude(300);
+                    System.out.println(v.getVector().getMagnitude());
+                    v.setTravelDist(v.getVector().getMagnitude());
+                    v.getVector().normalize();
+                    Position p = collideWith.get(Position.class);
+                    p.setStartPosition(new Position(p));
                     collideWith.setCharState(CharacterState.BOUNCING);
-                    Velocity v = handled.get(Velocity.class);
-                    collideWith.get(Velocity.class).setVector(v.getVector());
                     world.removeEntity(handled);
-
                 }
             }
             else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     collideWith.get(Health.class).addDamageTaken(new DamageTaken(new Damage(handled.get(Damage.class).getDamage()), new Owner(collideWith.getID())));
-
+                    
+                    Velocity v = collideWith.get(Velocity.class);
+                    v.setVector(handled.get(Velocity.class).getVector());
+                    v.getVector().setMagnitude(300);
+                    v.setTravelDist(v.getVector().getMagnitude());
+                    v.getVector().normalize();
+                    collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
                 }
             }
             else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-
+                    
                 }
 
             }
             else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-
+                    
                 }
 
             } else if (handled.getType() == SPELL && collideWith.getType() == SPELL && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.get(Owner.class).getID())) {
-                    world.removeEntity(handled);
-                    world.removeEntity(collideWith);
+//                    world.removeEntity(handled);
+//                    world.removeEntity(collideWith);
                 }
 
             }

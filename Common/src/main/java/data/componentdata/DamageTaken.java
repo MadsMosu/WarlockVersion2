@@ -5,6 +5,8 @@
  */
 package data.componentdata;
 
+import data.Entity;
+
 /**
  *
  * @author Aleksander
@@ -30,5 +32,8 @@ public class DamageTaken
     {
         return owner;
     }
+
+    
+    
 
 }

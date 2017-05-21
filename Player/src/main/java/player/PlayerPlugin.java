@@ -19,6 +19,7 @@ import static data.SpellType.FROSTBOLT;
 import static data.SpellType.TELEPORT1;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
+import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
@@ -35,7 +36,6 @@ import java.util.Random;
 
 public class PlayerPlugin implements IEntityProcessingService, IGamePluginService {
 
-    private Entity player;
     public static final String CHARACTER_IMAGE_PATH = "assets/Characters.png";
     public static String CHARACTER_FINAL_IMAGE_PATH = "";
     private World world;
@@ -52,31 +52,42 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity p : world.getEntities(PLAYER)) {
+            if (p.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
+                netherworld.addEntity(p);
+                world.removeEntity(p);
+
+            }
             handleMove(p, gameData);
             handleTargetClick(p, gameData);
             handleShoot(p, gameData);
 
-            if (p.getCharState() == CharacterState.DEAD) {
-                world.removeEntity(p);
-                netherworld.addEntity(p);
-            }
+        }
+        for (Entity p : netherworld.getEntities(PLAYER)) {
+            if (gameData.getGameState().equals(GameState.PAUSE)) {
 
-            if (gameData.getGameState().equals(GameState.ROUNDEND)) {
-                resetPosition(p);
+                resetPosition(p, gameData);
+                p.get(Health.class).setHp(p.get(Health.class).getMaxHp());
+            }
+            else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
+                world.addEntity(p);
+
+                netherworld.removeEntity(p);
             }
         }
+
     }
 
-    private void resetPosition(Entity player) {
+    private void resetPosition(Entity player, GameData gameData) {
         Random rand = new Random();
-        int randX = rand.nextInt(4000) + 2500;
-        int randY = rand.nextInt(700);
-        Position p = player.get(Position.class);
+        int randX = rand.nextInt(500) + gameData.getMapWidth() / 2;
+        int randY = rand.nextInt(500);
+        Position p = player.get(Position.class
+        );
         p.setPosition(randX, randY);
     }
 
     private void createPlayer() {
-        player = new Entity();
+        Entity player = new Entity();
         player.setType(PLAYER);
         Position pos = new Position(3200, 0);
         Health health = new Health(100);
@@ -100,11 +111,14 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     }
 
     private void handleMove(Entity e, GameData gameData) {
-        Position p = e.get(Position.class);
-        Body b = e.get(Body.class);
-        Velocity v = e.get(Velocity.class);
+        Position p = e.get(Position.class
+        );
+        Body b = e.get(Body.class
+        );
+        Velocity v = e.get(Velocity.class
+        );
 
-        if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
+        if (gameData.getKeys().isPressed(RIGHT_MOUSE) && !e.getCharState().equals(CharacterState.BOUNCING)) {
             gameData.getKeys().setKey(RIGHT_MOUSE, false);
 
             float endX = gameData.getMousePositionX() - (b.getWidth() / 2);
@@ -115,15 +129,14 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             v.setTravelDist(vector.getMagnitude());
             v.getVector().normalize();
             if (v.getVector().getMagnitude() == 0) {
-
                 e.setCharState(CharacterState.IDLE);
-            } else {
+            }
+            else {
                 e.setAngle(v.getVector().getAngle());
                 e.setCharState(CharacterState.MOVING);
                 e.setRunningState(e.getAngle(), e);
             }
         }
-
         if (v.getTravelDist() != 0 && p.getStartPosition() != null) {
             Vector2 stopCheck = new Vector2(p, p.getStartPosition());
 
@@ -131,9 +144,9 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
                 e.setCharState(CharacterState.IDLE);
                 e.setMoveState(MovementState.STANDING);
+
             }
         }
-
         if (gameData.getKeys()
                 .isPressed(ESCAPE)) {
             //leGameMenu.plsShowUp();
@@ -147,19 +160,28 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
-            SpellBook sb = e.get(SpellBook.class);
+            SpellBook sb = e.get(SpellBook.class
+            );
             sb.setChosenSpell(FIREBALL);
-        } else if (gameData.getKeys().isPressed(NUM_2)) {
 
-            SpellBook sb = e.get(SpellBook.class);
+        }
+        else if (gameData.getKeys().isPressed(NUM_2)) {
+
+            SpellBook sb = e.get(SpellBook.class
+            );
             sb.setChosenSpell(FROSTBOLT);
-        } else if (gameData.getKeys().isPressed(NUM_3)) {
+
+        }
+        else if (gameData.getKeys().isPressed(NUM_3)) {
             //Spell 3
-            SpellBook sb = e.get(SpellBook.class);
+            SpellBook sb = e.get(SpellBook.class
+            );
             sb.setChosenSpell(TELEPORT1);
 
-        } else {
+        }
+        else {
             return;
+
         }
         if (gameData.getKeys().isPressed(NUM_4)) {
             //Spell 4
@@ -173,14 +195,14 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         ).getChosenSpell() != null) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
-
         }
     }
 
     @Override
     public void stop() {
-        // Remove entities
-        world.removeEntity(player);
+        for (Entity p : world.getEntities(PLAYER)) {
+            world.removeEntity(p);
+        }
     }
 
 }

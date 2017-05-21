@@ -6,25 +6,13 @@
 package dk.sdu.mmmi.cbse.movementsystem;
 
 import States.CharacterState;
-import static States.CharacterState.MOVING;
-import States.MovementState;
 import data.Entity;
 import data.EntityType;
-import static data.EntityType.ENEMY;
-import static data.EntityType.PLAYER;
 import data.GameData;
-import static data.GameKeys.*;
 import data.Netherworld;
-import static data.SpellType.FIREBALL;
 import data.World;
-import data.componentdata.AI;
-import data.componentdata.Body;
-import data.componentdata.Owner;
 import data.componentdata.Position;
-import data.componentdata.SpellBook;
-import data.componentdata.SpellInfos;
 import data.componentdata.Velocity;
-import data.util.Vector2;
 import org.openide.util.lookup.ServiceProvider;
 import services.IEntityProcessingService;
 
@@ -35,21 +23,14 @@ import services.IEntityProcessingService;
  */
 public class ControlProcessor implements IEntityProcessingService {
 
-    private float startX, startY;
-    private float endX, endY;
-    private float distance;
-
     @Override
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity entity : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
             handleMovement(entity, gameData);
-
         }
-
         for (Entity spell : world.getEntities(EntityType.SPELL)) {
                 handleSpellMovement(spell, gameData);
-
         }
     }
 
@@ -68,13 +49,12 @@ public class ControlProcessor implements IEntityProcessingService {
         Position p = e.get(Position.class);
         Velocity v = e.get(Velocity.class);
 
-        if (e.getCharState().equals(CharacterState.BOUNCING)) {
-
-        }
-        else if (e.getCharState().equals(CharacterState.MOVING)) {
+        if (e.getCharState().equals(CharacterState.MOVING)) {
             p.setX(p.getX() + v.getVector().getX() * v.getSpeed() * gameData.getDelta());
             p.setY(p.getY() + v.getVector().getY() * v.getSpeed() * gameData.getDelta());
+        } else if(e.getCharState().equals(CharacterState.BOUNCING)){
+            p.setX(p.getX() + v.getVector().getX() * v.getSpeed()* 2.5f * gameData.getDelta());
+            p.setY(p.getY() + v.getVector().getY() * v.getSpeed()* 2.5f * gameData.getDelta());
         }
-
     }
 }
