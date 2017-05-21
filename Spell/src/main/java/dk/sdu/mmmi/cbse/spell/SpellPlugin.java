@@ -66,6 +66,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 book.addToSpellBook(SpellType.FIREBALL);
                 book.addToSpellBook(SpellType.TELEPORT1);
                 book.addToSpellBook(SpellType.FROSTBOLT);
+                book.fillCooldownMap();
             }
             book.reduceCooldownTimeLeft(gameData.getDelta());
             if (entity.getCharState() == CASTING && book.getChosenSpell() != null && book.getCooldownTimeLeft() <= 0) {
@@ -73,6 +74,21 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 
                 entity.setCharState(IDLE);
                 
+            }
+            
+            if(entity.get(SpellBook.class) != null){
+            Map<SpellType, Float> decreaseCDMap = entity.get(SpellBook.class).getSpellCooldowns();
+            if(decreaseCDMap.get(SpellType.FIREBALL) > 0){
+                book.reduceCooldown(SpellType.FIREBALL, gameData.getDelta());
+            }
+            
+            if(decreaseCDMap.get(SpellType.TELEPORT1) > 0){
+                book.reduceCooldown(SpellType.TELEPORT1, gameData.getDelta());
+            }
+            
+            if(decreaseCDMap.get(SpellType.FROSTBOLT) > 0){
+                book.reduceCooldown(SpellType.FROSTBOLT, gameData.getDelta());
+            }
             }
         }
         for (Entity spell : world.getEntities(SPELL)) {
@@ -83,6 +99,8 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
                 world.removeEntity(spell);
             }
         }
+        
+        
     }
 
     public void unlockSpell(Entity owner, SpellType spellType)
@@ -93,11 +111,16 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
 
     public void useSpell(SpellType spellType, Entity caster, GameData gameData) {
         SpellBook book = caster.get(SpellBook.class);
+        Map <SpellType, Float> cooldowns = book.getSpellCooldowns();
         for (SpellType spell : book.getSpells()) {
             if (spell == spellType) {
-                book.setCooldownTimeLeft(book.getGlobalCooldownTime());
-                createSpellEntity(spellType, caster, gameData);
-                book.setChosenSpell(null);
+                if(cooldowns.get(spell) <= 0 && book.getCooldownTimeLeft() <= 0){
+                    createSpellEntity(spellType, caster, gameData);
+                    cooldowns.put(spell, spellArchive.getSpell(spell).getCooldown());
+                    book.setSpellCooldowns(cooldowns);
+                    book.setCooldownTimeLeft(book.getGlobalCooldownTime());
+                    book.setChosenSpell(null);
+                } 
 
             }
         }
