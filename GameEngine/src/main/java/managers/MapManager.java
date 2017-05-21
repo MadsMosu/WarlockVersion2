@@ -104,6 +104,7 @@ public class MapManager {
         }
     }
 
+    
     public boolean OnLava(World world, GameData gameData) {
 
         for (Entity e : world.getEntities(PLAYER, ENEMY)) {
@@ -113,14 +114,18 @@ public class MapManager {
 
             int tileRow = (int) (entityX / currentLayer.getTileWidth() - (entityY / currentLayer.getTileHeight()));
             int tileCol = (int) Math.abs((tileRow * currentLayer.getTileHeight() / 2 + entityY) / (currentLayer.getTileHeight() / 2));
-            if (currentLayer.getCell(tileCol, tileCol) != null) {
+            if(currentLayer.getCell(tileRow, tileCol-1) == null){
+                e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(100), new Owner(e.getID())));
+                System.out.println("Outside map");
+            }
+            if (currentLayer.getCell(tileRow, tileCol) != null) {
                 if (currentLayer.getCell(tileRow, tileCol).getTile().getId() == 5) {
                     e.get(Position.class).setInLava(true);
                     lavaTimer += gameData.getDelta();
                     if (lavaTimer >= 1) {
                         e.get(Health.class).addDamageTaken(new DamageTaken(new Damage(5), new Owner(e.getID())));
                         lavaTimer = 0;
-                        System.out.println(e.get(Health.class).getHp());
+                        
                     }
                     return true;
                 }

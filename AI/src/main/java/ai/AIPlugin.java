@@ -1,6 +1,6 @@
 package ai;
 
-
+import States.CharacterState;
 import data.Entity;
 import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
@@ -11,30 +11,39 @@ import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.AI;
 import data.componentdata.Health;
+import data.componentdata.Owner;
 import data.componentdata.Position;
 import data.componentdata.SpellBook;
+import data.componentdata.Velocity;
 import data.util.Vector2;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
 import services.IGamePluginService;
 
 @ServiceProviders(value = {
-    @ServiceProvider(service = IEntityProcessingService.class)
-    ,
+    @ServiceProvider(service = IEntityProcessingService.class),
     @ServiceProvider(service = IGamePluginService.class)
 })
 
 public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
+    Map<Entity, List<Entity>> incomingSpells;
+
     @Override
-    public void start(GameData gameData, World world) {
-
+    public void start(GameData gameData, World world)
+    {
+        incomingSpells = new HashMap();
     }
 
-    private boolean opponentInDistance(World world, Entity ai, float distanceValue) {
+    private boolean opponentInDistance(World world, Entity ai, float distanceValue)
+    {
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
                 Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
@@ -47,11 +56,12 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return false;
     }
 
-    private boolean SpellInDistance(World world, Entity ai, float distanceValue) {
+    private boolean SpellInDistance(World world, Entity ai, float distanceValue)
+    {
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
                 Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
-                
+
                 float distance = direction.getMagnitude();
                 if (distance <= distanceValue) {
                     return true;
@@ -61,12 +71,14 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return false;
     }
 
-    private float getDistance(Entity ai, Entity opponent) {
+    private float getDistance(Entity ai, Entity opponent)
+    {
         Vector2 direction = new Vector2(ai.get(Position.class), opponent.get(Position.class));
         return direction.getMagnitude();
     }
 
-    private void detectEnemies(World world, Entity ai) {
+    private void detectEnemies(World world, Entity ai)
+    {
         AI aiComp = ai.get(AI.class);
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
@@ -77,18 +89,29 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
-    public void detectIncommingSpells(World world, Entity ai, float distanceValue) {
-        AI aiComp = ai.get(AI.class);
-        for (Entity spell : world.getEntities(SPELL)) {
-            Vector2 direction = new Vector2(ai.get(Position.class), spell.get(Position.class));
-            float distance = direction.getMagnitude();
-            if (distance <= distanceValue) {
-                aiComp.getCloseSpells().put(spell, distance);
+    public void detectIncommingSpells(World world, Entity ai, float distanceValue)
+    {
+
+        for (Entity AI : world.getEntities(ENEMY)) {
+            List<Entity> spellsToAvoid = new ArrayList();
+
+            for (Entity spell : world.getEntities(SPELL)) {
+
+                Vector2 spellDirection = new Vector2(spell.get(Velocity.class).getVector());
+
+                if (!spell.get(Owner.class).getID().equals(ai.getID())) {
+                    if (spellDirection.isOnLine(ai.get(Velocity.class).getVector())) {
+                        spellsToAvoid.add(spell);
+                    }
+                }
+
             }
+            incomingSpells.put(AI, spellsToAvoid);
         }
     }
 
-    private void detectEnemiesHealthInDist(World world, Entity ai, float distanceValue) {
+    private void detectEnemiesHealthInDist(World world, Entity ai, float distanceValue)
+    {
         AI aiComp = ai.get(AI.class);
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai) && opponentInDistance(world, ai, distanceValue)) {
@@ -97,59 +120,69 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
-    private Entity lowestValue(Map<Entity, Float> map) {
+    private Entity lowestValue(Map<Entity, Float> map)
+    {
         Entry<Entity, Float> min = null;
-        if(!map.isEmpty()){
-        for (Entry<Entity, Float> entry : map.entrySet()) {
-            if (min == null || min.getValue() > entry.getValue()) {
-                min = entry;
+        if (!map.isEmpty()) {
+            for (Entry<Entity, Float> entry : map.entrySet()) {
+                if (min == null || min.getValue() > entry.getValue()) {
+                    min = entry;
+                }
             }
-        }
-        return min.getKey();
+            return min.getKey();
         }
         return null;
     }
 
-    private void avoidSpells(World world, Entity ai) {
-        AI aiComp = ai.get(AI.class);
-        if (SpellInDistance(world, ai, 150)) {
+    private void avoidSpells(Entity ai)
+    {
+        List<Entity> collidingSpells = incomingSpells.get(ai);
+        
 
+        for (Entity spell : collidingSpells) {
+            Vector2 spellDirection = new Vector2(spell.get(Velocity.class).getVector());
+            ai.get(Velocity.class).setVector(spellDirection.rotateDegrees(80).setMagnitude(100f));
+            ai.setCharState(CharacterState.MOVING);
         }
-        aiComp.setAvoidSpell(true);
-//        for (Entry<Entity, Float> entry : aiComp.getCloseSpells().entrySet()) {
-//            if(entry.getKey().get(Velocity.class).getDirectionX()){
-//                aiComp.setSpellToAvoid(lowestDistance(aiComp.getCloseSpells()));               
-//            }
+
+//        AI aiComp = ai.get(AI.class);
+//        if (SpellInDistance(world, ai, 400)) {
+//
 //        }
-        aiComp.setSpellToAvoid(null);
+//        aiComp.setAvoidSpell(true);
+////        for (Entry<Entity, Float> entry : aiComp.getCloseSpells().entrySet()) {
+////            if(entry.getKey().get(Velocity.class).getDirectionX()){
+////                aiComp.setSpellToAvoid(lowestDistance(aiComp.getCloseSpells()));               
+////            }
+////        }
+//        aiComp.setSpellToAvoid(null);
     }
 
-    private boolean checkForSameHP(Map<Entity, Float> HPmap) {
+    private boolean checkForSameHP(Map<Entity, Float> HPmap)
+    {
         Object value = null;
         for (Object entry : HPmap.values()) {
             if (value == null) {
                 value = entry;
-            }
-            else if (!value.equals(entry)) {
+            } else if (!value.equals(entry)) {
                 return false;
             }
         }
         return true;
     }
 
-    private void attack(World world, Entity ai) {
+    private void attack(World world, Entity ai)
+    {
         AI aiComp = ai.get(AI.class);
         SpellBook sb = ai.get(SpellBook.class);
-        if (opponentInDistance(world, ai, 200) && !ai.get(Position.class).isInLava()) {
+        if (opponentInDistance(world, ai, 400) && !ai.get(Position.class).isInLava()) {
             sb.setChosenSpell(FIREBALL);
             if (checkForSameHP(aiComp.getEntitiesHealthInDist())) {
                 aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
-            }
-            else {
+            } else {
                 aiComp.setCurrentTarget(lowestValue(aiComp.getEntitiesHealthInDist()));
             }
-        }
-        else {
+        } else {
             aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
             if (opponentInDistance(world, ai, 200)) {
                 sb.setChosenSpell(FIREBALL);
@@ -157,7 +190,8 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
-    private void clearRadar(Entity ai) {
+    private void clearRadar(Entity ai)
+    {
         AI aiComp = ai.get(AI.class
         );
         aiComp.getAllEntities().clear();
@@ -165,24 +199,27 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         aiComp.getEntitiesHealthInDist().clear();
     }
 
-    private void raderScan(World world, Entity ai) {
+    private void radarScan(World world, Entity ai)
+    {
         detectEnemies(world, ai);
-        detectIncommingSpells(world, ai, 150);
+        detectIncommingSpells(world, ai, 400);
         detectEnemiesHealthInDist(world, ai, 200);
 
     }
 
-    private void behaviour(World world, Entity ai) {
+    private void behaviour(World world, Entity ai)
+    {
         clearRadar(ai);
-        raderScan(world, ai);
+        radarScan(world, ai);
 
-        avoidSpells(world, ai);
+        avoidSpells(ai);
         attack(world, ai);
 
     }
 
     @Override
-    public void process(GameData gameData, World world, Netherworld netherWorld) {
+    public void process(GameData gameData, World world, Netherworld netherWorld)
+    {
         for (Entity ai : world.getEntities(ENEMY)) {
             behaviour(world, ai);
         }
@@ -190,7 +227,8 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     }
 
     @Override
-    public void stop() {
+    public void stop()
+    {
 
     }
 
