@@ -67,7 +67,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
             if (gameData.getGameState().equals(GameState.PAUSE)) {
                 resetPosition(e, gameData);
                 e.get(Health.class).setHp(e.get(Health.class).getMaxHp());
-            } else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 55) {
+            } else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
                 world.addEntity(e);
                 netherworld.removeEntity(e);
             }
