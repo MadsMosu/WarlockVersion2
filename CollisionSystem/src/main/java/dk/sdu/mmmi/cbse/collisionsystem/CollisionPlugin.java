@@ -61,9 +61,9 @@ public class CollisionPlugin implements IEntityProcessingService {
                     collideWith.get(Health.class).addDamageTaken(dmgTaken);
                     //System.out.println(collideWith.get(Health.class).getHp());
                     Velocity v = collideWith.get(Velocity.class);
+                    
                     v.setVector(handled.get(Velocity.class).getVector());
-                    v.getVector().setMagnitude(300);
-                    System.out.println(v.getVector().getMagnitude());
+                    v.getVector().setMagnitude(200);
                     v.setTravelDist(v.getVector().getMagnitude());
                     v.getVector().normalize();
                     Position p = collideWith.get(Position.class);
@@ -78,7 +78,7 @@ public class CollisionPlugin implements IEntityProcessingService {
                     
                     Velocity v = collideWith.get(Velocity.class);
                     v.setVector(handled.get(Velocity.class).getVector());
-                    v.getVector().setMagnitude(300);
+                    v.getVector().setMagnitude(200);
                     v.setTravelDist(v.getVector().getMagnitude());
                     v.getVector().normalize();
                     collideWith.setCharState(CharacterState.BOUNCING);
