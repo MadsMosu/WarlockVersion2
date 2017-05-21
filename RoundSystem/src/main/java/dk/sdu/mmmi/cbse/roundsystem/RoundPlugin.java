@@ -52,51 +52,47 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
             gameData.setRoundTime(gameData.getRoundTime() - dt);
 
         }
+        numbOfCharacters = world.getEntities(EntityType.ENEMY, EntityType.PLAYER).size();
+        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 1 && gameData.getGameState().equals(GameState.RUN) && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
 
-        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 1 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
-            gameData.setGameState(GameState.ROUNDEND);
-            numbOfCharacters = world.getEntities(EntityType.ENEMY, EntityType.PLAYER).size();
-            System.out.println(numbOfCharacters);
-            if (gameData.getRoundTime() <= 0 || numbOfCharacters == 1 && gameData.getGameState().equals(GameState.RUN) && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
-
-                if (numbOfCharacters == 1) {
-                    for (Entity e : world.getEntities()) {
-                        e.setCharState(CharacterState.IDLE);
-                        if (e.isType(EntityType.ENEMY)) {
-                            gameData.setWhoWinsRound("ENEMY WINS THE ROUND!");
-                        }
-                        else if (e.isType(EntityType.PLAYER)) {
-                            gameData.setWhoWinsRound("PLAYER WINS THE ROUND!");
-                        }
+            if (numbOfCharacters == 1) {
+                for (Entity e : world.getEntities()) {
+                    e.setCharState(CharacterState.IDLE);
+                    if (e.isType(EntityType.ENEMY)) {
+                        gameData.setWhoWinsRound("ENEMY WINS THE ROUND!");
+                    }
+                    else if (e.isType(EntityType.PLAYER)) {
+                        gameData.setWhoWinsRound("PLAYER WINS THE ROUND!");
                     }
                 }
-                else {
-                    gameData.setWhoWinsRound("THE ROUND IS A DRAW!");
-                }
-                gameData.setGameState(GameState.ROUNDEND);
-                resetRoundTime(gameData);
             }
-
-            if (gameData.getGameState().equals(GameState.ROUNDEND) && world.getEntities().isEmpty()) {
-                gameData.setGameState(GameState.PAUSE);
+            else {
+                gameData.setWhoWinsRound("THE ROUND IS A DRAW!");
             }
-
-            if (gameData.getGameState().equals(GameState.PAUSE)) {
-                if (gameData.getNextRoundCountdown() <= 0) {
-                    resetNextRoundTime(gameData);
-                    gameData.setRoundNumber(gameData.getRoundNumber() + 1);
-                    gameData.setGameState(GameState.RUN);
-                }
-                else {
-                    gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);
-                }
-            }
-
+            gameData.setGameState(GameState.ROUNDEND);
+            resetRoundTime(gameData);
         }
-    }
 
-    @Override
-    public void stop() {
+        if (gameData.getGameState().equals(GameState.ROUNDEND) && world.getEntities().isEmpty()) {
+            gameData.setGameState(GameState.PAUSE);
+        }
+
+        if (gameData.getGameState().equals(GameState.PAUSE)) {
+            if (gameData.getNextRoundCountdown() <= 0) {
+                resetNextRoundTime(gameData);
+                gameData.setRoundNumber(gameData.getRoundNumber() + 1);
+                gameData.setGameState(GameState.RUN);
+            }
+            else {
+                gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);
+            }
+        }
+
+    
+}
+
+@Override
+        public void stop() {
     }
 
 }

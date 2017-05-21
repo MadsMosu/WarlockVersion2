@@ -70,7 +70,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             }
             else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
                 world.addEntity(p);
-
                 netherworld.removeEntity(p);
             }
         }
