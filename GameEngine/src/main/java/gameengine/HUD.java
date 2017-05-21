@@ -98,7 +98,7 @@ public class HUD {
         roundTimerLabel.setText("Time: " + String.format("%.2f", gameData.getRoundTime()));
         FPSLabel.setText("FPS: " + gameData.getFPS());
 
-        if (gameData.getGameState().equals(GameState.ROUNDEND) && gameData.getRoundNumber() <= gameData.getMaxRounds() + 1) {
+        if (gameData.getGameState().equals(GameState.PAUSE)) {
             winnerTable.setVisible(true);          
             winnerLabel.setText(gameData.getWhoWinsRound());
             if(gameData.getRoundNumber() < gameData.getMaxRounds()){

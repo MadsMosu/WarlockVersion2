@@ -51,31 +51,37 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity p : world.getEntities(PLAYER)) {
-            if (p.getCharState() == CharacterState.DEAD) {
+            if (p.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
                 netherworld.addEntity(p);
                 world.removeEntity(p);
-                
+
             }
             handleMove(p, gameData);
             handleTargetClick(p, gameData);
             handleShoot(p, gameData);
 
         }
-        if (gameData.getGameState().equals(GameState.ROUNDEND)) {
-            for (Entity p : netherworld.getEntities(PLAYER)) {
+        for (Entity p : netherworld.getEntities(PLAYER)) {
+            if (gameData.getGameState().equals(GameState.PAUSE)) {
+
                 resetPosition(p, gameData);
                 p.get(Health.class).setHp(p.get(Health.class).getMaxHp());
-
             }
+            else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
+                world.addEntity(p);
 
+                netherworld.removeEntity(p);
+            }
         }
+
     }
 
     private void resetPosition(Entity player, GameData gameData) {
         Random rand = new Random();
         int randX = rand.nextInt(500) + gameData.getMapWidth() / 2;
         int randY = rand.nextInt(500);
-        Position p = player.get(Position.class);
+        Position p = player.get(Position.class
+        );
         p.setPosition(randX, randY);
     }
 
@@ -104,9 +110,12 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     }
 
     private void handleMove(Entity e, GameData gameData) {
-        Position p = e.get(Position.class);
-        Body b = e.get(Body.class);
-        Velocity v = e.get(Velocity.class);
+        Position p = e.get(Position.class
+        );
+        Body b = e.get(Body.class
+        );
+        Velocity v = e.get(Velocity.class
+        );
 
         if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
             gameData.getKeys().setKey(RIGHT_MOUSE, false);
@@ -136,6 +145,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
                 e.setCharState(CharacterState.IDLE);
                 e.setMoveState(MovementState.STANDING);
+
             }
         }
 
@@ -152,22 +162,28 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
-            SpellBook sb = e.get(SpellBook.class);
+            SpellBook sb = e.get(SpellBook.class
+            );
             sb.setChosenSpell(FIREBALL);
+
         }
         else if (gameData.getKeys().isPressed(NUM_2)) {
 
-            SpellBook sb = e.get(SpellBook.class);
+            SpellBook sb = e.get(SpellBook.class
+            );
             sb.setChosenSpell(FROSTBOLT);
+
         }
         else if (gameData.getKeys().isPressed(NUM_3)) {
             //Spell 3
-            SpellBook sb = e.get(SpellBook.class);
+            SpellBook sb = e.get(SpellBook.class
+            );
             sb.setChosenSpell(TELEPORT1);
 
         }
         else {
             return;
+
         }
         if (gameData.getKeys().isPressed(NUM_4)) {
             //Spell 4

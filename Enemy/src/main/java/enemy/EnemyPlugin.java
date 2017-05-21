@@ -53,28 +53,31 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity e : world.getEntities(ENEMY)) {
-            if (e.getCharState().equals(CharacterState.DEAD)) {
+            if (e.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
                 netherworld.addEntity(e);
                 world.removeEntity(e);
-                
+
             }
 
             handleShoot(e);
             handleMovement(e, gameData);
         }
-        if (gameData.getGameState().equals(GameState.ROUNDEND)) {
-            for (Entity e : netherworld.getEntities(ENEMY) ) {
+        for (Entity e : netherworld.getEntities(ENEMY)) {
+            if (gameData.getGameState().equals(GameState.PAUSE)) {
                 resetPosition(e, gameData);
                 e.get(Health.class).setHp(e.get(Health.class).getMaxHp());
-
             }
-            
+            else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 55) {
+                world.addEntity(e);
+                netherworld.removeEntity(e);
+            }
+
         }
     }
 
     private void resetPosition(Entity enemy, GameData gameData) {
         Random rand = new Random();
-        int randX = rand.nextInt(500) + gameData.getMapWidth()/2;
+        int randX = rand.nextInt(500) + gameData.getMapWidth() / 2;
         int randY = rand.nextInt(500);
         Position p = enemy.get(Position.class);
         p.setPosition(randX, randY);
