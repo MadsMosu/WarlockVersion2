@@ -150,6 +150,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         si.setSpellType(spellType);
         Owner owner = new Owner(caster.getID());
         owner.setOwnerType(caster.getType());
+        owner.setOwnerEntity(caster);
         si.setIsMoving(false);
         se.add(dmg);
         se.add(bounce);

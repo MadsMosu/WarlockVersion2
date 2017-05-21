@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
@@ -141,8 +140,20 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
         for (Entity spell : collidingSpells) {
             Vector2 spellDirection = new Vector2(spell.get(Velocity.class).getVector());
-            ai.get(Velocity.class).setVector(spellDirection.rotateDegrees(80).setMagnitude(100f));
-            ai.setCharState(CharacterState.MOVING);
+            Position casterPos = spell.get(Owner.class).getOwnerEntity().get(Position.class);
+            
+            Vector2 casterToAI = new Vector2(casterPos, ai.get(Position.class));
+            float diffY = casterToAI.getY()/spellDirection.getY();
+                
+            Vector2 vector = spellDirection.scalarMultiply(diffY);
+            if(vector.isOnLine(ai.get(Velocity.class).getVector())){
+                
+                ai.get(Velocity.class).setVector(spellDirection.rotateDegrees(80).setMagnitude(100f));
+                ai.setCharState(CharacterState.MOVING);
+                System.out.println("Spell is at positions y valuejhjjjj");
+            }
+            
+            
         }
 
 //        AI aiComp = ai.get(AI.class);
