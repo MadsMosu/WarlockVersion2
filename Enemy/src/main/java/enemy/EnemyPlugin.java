@@ -60,14 +60,14 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
 
             }
 
-            handleShoot(e);
             handleMovement(e, gameData);
+            handleShoot(e);
         }
         for (Entity e : netherworld.getEntities(ENEMY)) {
             if (gameData.getGameState().equals(GameState.PAUSE)) {
                 resetPosition(e, gameData);
                 e.get(Health.class).setHp(e.get(Health.class).getMaxHp());
-            } else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 55) {
+            } else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
                 world.addEntity(e);
                 netherworld.removeEntity(e);
             }
@@ -84,7 +84,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     }
 
     private void handleShoot(Entity e) {
-        if (e.get(SpellBook.class).getChosenSpell() != null) {
+        if (e.get(SpellBook.class).getChosenSpell() != null && !e.getCharState().equals(CharacterState.BOUNCING)) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
         }
