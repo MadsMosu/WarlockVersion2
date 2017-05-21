@@ -1,7 +1,6 @@
 package data;
 
-import events.Event;
-import events.EventType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -16,7 +15,6 @@ public class GameData {
     private int displayWidth;
     private int displayHeight;
     private final GameKeys keys = new GameKeys();
-    private final List<Event> events = new CopyOnWriteArrayList<>();
     private int screenX;
     private int screenY;
     private GameState gameState;
@@ -117,29 +115,6 @@ public class GameData {
 
     public void setShrinkTime(int shrinkTime) {
         this.shrinkTime = shrinkTime;
-    }
-
-    public void addEvent(Event e) {
-        events.add(e);
-    }
-
-    public void removeEvent(Event e) {
-        events.remove(e);
-    }
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public List<Event> getEvents(EventType eventType, String id) {
-        List<Event> r = new ArrayList<>();
-
-        for (Event event : events) {
-            if (event.getType().equals(eventType) && event.getEntityID().equals(id)) {
-                r.add(event);
-            }
-        }
-        return r;
     }
 
     public GameKeys getKeys() {

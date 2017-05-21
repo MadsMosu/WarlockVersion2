@@ -169,8 +169,8 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
     
     
     private Vector2 setSpellDirection(Entity e, Velocity v, GameData gameData) {
-        if (e.getType() == ENEMY) {
-            AI ai = e.get(AI.class);
+        AI ai = e.get(AI.class);
+        if (e.getType() == ENEMY && ai.getCurrentTarget() != null) {
             Position aiPosition = e.get(Position.class);
             
             float targetX = ai.getCurrentTarget().get(Position.class).getX();
