@@ -21,7 +21,7 @@ import data.componentdata.Health;
 
 public class RoundPlugin implements IGamePluginService, IEntityProcessingService {
 
-    private float roundTime;
+    private boolean isPause;
     private float numbOfCharacters;
 
     @Override
@@ -42,58 +42,73 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
 
     @Override
     public void process(GameData gameData, World world, Netherworld netherworld) {
+        
+        if (gameData.getRoundNumber() > gameData.getMaxRounds()) {
+            gameData.setGameState(GameState.ROUNDEND);
+            for (Entity e : world.getEntities()) {
+                world.removeEntity(e);
+
+            }
+        }
 
         float dt = gameData.getDelta();
-        if (gameData.getRoundTime() > 0 && gameData.getRoundNumber() <= gameData.getMaxRounds() && !gameData.getGameState().equals(GameState.ROUNDEND)) {
-            roundTime = gameData.getRoundTime() - dt;
+        if (gameData.getRoundTime() > 0 && !gameData.getGameState().equals(GameState.ROUNDEND)) {
+            gameData.setRoundTime(gameData.getRoundTime() - dt);
+            
         }
-            numbOfCharacters= world.getEntities(EntityType.PLAYER, EntityType.ENEMY).size();
-        
+        for(Entity e : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)){
+            numbOfCharacters++;
+        }
+//        numbOfCharacters = world.getEntities(EntityType.PLAYER, EntityType.ENEMY).size();
 
-        gameData.setRoundTime(roundTime);
-        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 0 && gameData.getRoundNumber() <= gameData.getMaxRounds()) {
-            gameData.setGameState(GameState.ROUNDEND);
+        if (gameData.getRoundTime() <= 0 || numbOfCharacters == 1) {
 
             if (numbOfCharacters == 1) {
                 for (Entity e : world.getEntities()) {
                     e.setCharState(CharacterState.IDLE);
                     if (e.isType(EntityType.ENEMY)) {
                         gameData.setWhoWinsRound("ENEMY WINS THE ROUND!");
-                    } else if (e.isType(EntityType.PLAYER)) {
+                    }
+                    else if (e.isType(EntityType.PLAYER)) {
                         gameData.setWhoWinsRound("PLAYER WINS THE ROUND!");
                     }
-                    world.removeEntity(e);
-                    netherworld.addEntity(e);
                 }
-            } else {
+            }
+            
+            else {
                 gameData.setWhoWinsRound("THE ROUND IS A DRAW!");
             }
+            gameData.setGameState(GameState.ROUNDEND);
+            gameData.setRoundTime(0);
 
             if (gameData.getNextRoundCountdown() <= 0) {
-                for (Entity e : netherworld.getEntities()) {
-                        Health hp = e.get(Health.class);
-                        hp.setHp(hp.getMaxHp());
-                        world.addEntity(e);
-                        netherworld.removeEntity(e);
-                        resetNextRoundTime(gameData);
-                }
+                
                 resetRoundTime(gameData);
                 gameData.setRoundNumber(gameData.getRoundNumber() + 1);
-                gameData.setGameState(GameState.RUN);
+                gameData.setGameState(GameState.PAUSE);
+                resetNextRoundTime(gameData);
             }
-            if (gameData.getRoundNumber() <= gameData.getMaxRounds()) {
+            
+            else {
                 gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);
+                
             }
-        } else if (gameData.getRoundNumber() == gameData.getMaxRounds()+1) {
-            for (Entity e : world.getEntities()) {
-                world.removeEntity(e);
+             if(netherworld.getEntities().isEmpty()){
+              gameData.setGameState(GameState.RUN);
             }
+
+            
         }
         numbOfCharacters = 0;
     }
 
-    @Override
-    public void stop() {
+        @Override
+        public void stop
+        
+        
+    
+
+() {
     }
 
 }

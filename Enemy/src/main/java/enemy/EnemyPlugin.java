@@ -53,26 +53,29 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity e : world.getEntities(ENEMY)) {
-            if (e.getCharState().equals(CharacterState.DEAD)) {
+            if (e.getCharState().equals(CharacterState.DEAD)|| gameData.getGameState().equals(GameState.ROUNDEND)) {
                 netherworld.addEntity(e);
                 world.removeEntity(e);
-
             }
 
             handleShoot(e);
             handleMovement(e, gameData);
         }
-        if (gameData.getGameState().equals(GameState.ROUNDEND)) {
-            for (Entity e : netherworld.getEntities(ENEMY)) {
-                resetPosition(e);
+        if (gameData.getGameState().equals(GameState.PAUSE)) {
+            for (Entity e : netherworld.getEntities(ENEMY) ) {
+                resetPosition(e, gameData);
+                e.get(Health.class).setHp(e.get(Health.class).getMaxHp());
+                world.addEntity(e);
+                netherworld.removeEntity(e);
             }
+            
         }
     }
 
-    private void resetPosition(Entity enemy) {
+    private void resetPosition(Entity enemy, GameData gameData) {
         Random rand = new Random();
-        int randX = rand.nextInt(4000) + 2500;
-        int randY = rand.nextInt(700);
+        int randX = rand.nextInt(500) + gameData.getMapWidth()/2;
+        int randY = rand.nextInt(500);
         Position p = enemy.get(Position.class);
         p.setPosition(randX, randY);
     }

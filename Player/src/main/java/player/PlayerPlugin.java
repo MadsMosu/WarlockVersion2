@@ -34,6 +34,7 @@ import java.util.Random;
 })
 
 public class PlayerPlugin implements IEntityProcessingService, IGamePluginService {
+
     public static final String CHARACTER_IMAGE_PATH = "assets/Characters.png";
     public static String CHARACTER_FINAL_IMAGE_PATH = "";
     private World world;
@@ -50,25 +51,30 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     public void process(GameData gameData, World world, Netherworld netherworld) {
 
         for (Entity p : world.getEntities(PLAYER)) {
+            if (p.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
+                netherworld.addEntity(p);
+                world.removeEntity(p);
+            }
             handleMove(p, gameData);
             handleTargetClick(p, gameData);
             handleShoot(p, gameData);
-            if (p.getCharState() == CharacterState.DEAD) {
-                netherworld.addEntity(p);
-                world.removeEntity(p);
 
+        }
+        if (gameData.getGameState().equals(GameState.PAUSE)) {
+            for (Entity p : netherworld.getEntities(PLAYER)) {
+                resetPosition(p, gameData);
+                p.get(Health.class).setHp(p.get(Health.class).getMaxHp());
+                world.addEntity(p);
+                netherworld.removeEntity(p);
             }
-                    if (netherworld.getEntities().contains(p) && gameData.getGameState().equals(GameState.ROUNDEND)) {
-            resetPosition(p);
-        }
-        }
 
-     }
+        }
+    }
 
-    private void resetPosition(Entity player) {
+    private void resetPosition(Entity player, GameData gameData) {
         Random rand = new Random();
-        int randX = rand.nextInt(4000) + 2500;
-        int randY = rand.nextInt(700);
+        int randX = rand.nextInt(500) + gameData.getMapWidth() / 2;
+        int randY = rand.nextInt(500);
         Position p = player.get(Position.class);
         p.setPosition(randX, randY);
     }
@@ -182,7 +188,8 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     @Override
     public void stop() {
         for (Entity p : world.getEntities(PLAYER)) {
-        world.removeEntity(p);
-    }}
+            world.removeEntity(p);
+        }
+    }
 
 }
