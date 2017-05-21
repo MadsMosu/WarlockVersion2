@@ -42,6 +42,10 @@ public class RoundTest {
         gameData = new GameData();
         gameData.setDelta(0.1f);
 
+        gameData.setRoundNumber(1);
+        gameData.setRoundTime(60);
+        gameData.setNextRoundCountdown(5);
+        gameData.setMaxRounds(5);
         processor = new RoundPlugin();
     }
 
@@ -50,34 +54,18 @@ public class RoundTest {
     }
 
     /**
-     * Test that the entity moves to the right position when creating a vector from 
-     * a given start and end position.
+     * Test that the entity moves to the right position when creating a vector
+     * from a given start and end position.
      */
-    @Test
-    public void testEntityMove() {
-        Entity entity = new Entity();
-        Velocity v = new Velocity();
-        Position p1 = new Position(100, 0);
-        Position p2 = new Position(200, 100);
-        v.setVector(new Vector2(p1, p2));
-        v.setSpeed(10);
-        entity.add(v);
-        entity.add(p1);
-        entity.setType(EntityType.PLAYER);
-        entity.setCharState(CharacterState.MOVING);
-        world.addEntity(entity);
-
-        float expectedX = (float) (p1.getX() + (v.getVector().getX() * v.getSpeed() * gameData.getDelta()));
-        float expectedY = (float) (p1.getY() + (v.getVector().getY() * v.getSpeed() * gameData.getDelta()));
-        Position expectedPosition = new Position(expectedX, expectedY);
-        
-        processor.process(gameData, world, netherworld);
-        float actualX = (float) entity.get(Position.class).getX();
-        float actualY = (float) entity.get(Position.class).getY();
-        Position actualPosition = new Position(actualX, actualY);
-        
-        assertTrue(expectedPosition.equals(actualPosition));
-        assertTrue(actualX == p2.getX() && actualY == p2.getY());
-    }
+//    @Test
+//    public void testRoundSystem() {
+//        Entity entity = new Entity();
+//
+//        entity.setType(EntityType.PLAYER);
+//        world.addEntity(entity);
+//
+//        processor.process(gameData, world, netherworld);
+//
+//    }
 
 }

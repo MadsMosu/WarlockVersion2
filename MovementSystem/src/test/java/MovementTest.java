@@ -54,7 +54,7 @@ public class MovementTest {
      * a given start and end position.
      */
     @Test
-    public void testEntityMove() {
+    public void testMovement() {
         Entity entity = new Entity();
         Velocity v = new Velocity();
         Position p1 = new Position(100, 0);

@@ -10,11 +10,7 @@ import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.GameState;
-import static data.EntityType.ENEMY;
-import static data.EntityType.PLAYER;
 import data.Netherworld;
-import data.componentdata.Health;
-import data.componentdata.Position;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IGamePluginService.class)
@@ -24,7 +20,6 @@ import data.componentdata.Position;
 
 public class RoundPlugin implements IGamePluginService, IEntityProcessingService {
 
-    private float roundTime;
     private float numbOfCharacters;
 
     @Override
@@ -69,11 +64,13 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
                         e.setCharState(CharacterState.IDLE);
                         if (e.isType(EntityType.ENEMY)) {
                             gameData.setWhoWinsRound("ENEMY WINS THE ROUND!");
-                        } else if (e.isType(EntityType.PLAYER)) {
+                        }
+                        else if (e.isType(EntityType.PLAYER)) {
                             gameData.setWhoWinsRound("PLAYER WINS THE ROUND!");
                         }
                     }
-                } else {
+                }
+                else {
                     gameData.setWhoWinsRound("THE ROUND IS A DRAW!");
                 }
                 gameData.setGameState(GameState.ROUNDEND);
@@ -89,7 +86,8 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
                     resetNextRoundTime(gameData);
                     gameData.setRoundNumber(gameData.getRoundNumber() + 1);
                     gameData.setGameState(GameState.RUN);
-                } else {
+                }
+                else {
                     gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);
                 }
             }
