@@ -15,6 +15,7 @@ import data.componentdata.Damage;
 import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
+import data.componentdata.Position;
 import data.componentdata.Velocity;
 import java.util.Collection;
 import org.openide.util.lookup.ServiceProvider;
@@ -59,10 +60,14 @@ public class CollisionPlugin implements IEntityProcessingService {
                     //System.out.println("dmgTaken: " + dmgTaken.getDamage());
                     collideWith.get(Health.class).addDamageTaken(dmgTaken);
                     //System.out.println(collideWith.get(Health.class).getHp());
-                    Velocity v = handled.get(Velocity.class);
-                    v.setVector(v.getVector());
+                    Velocity v = collideWith.get(Velocity.class);
+                    v.setVector(handled.get(Velocity.class).getVector());
                     v.getVector().setMagnitude(300);
+                    System.out.println(v.getVector().getMagnitude());
                     v.setTravelDist(v.getVector().getMagnitude());
+                    v.getVector().normalize();
+                    Position p = collideWith.get(Position.class);
+                    p.setStartPosition(new Position(p));
                     collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
                 }
@@ -75,6 +80,7 @@ public class CollisionPlugin implements IEntityProcessingService {
                     v.setVector(handled.get(Velocity.class).getVector());
                     v.getVector().setMagnitude(300);
                     v.setTravelDist(v.getVector().getMagnitude());
+                    v.getVector().normalize();
                     collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
                 }

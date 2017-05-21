@@ -28,12 +28,9 @@ public class ControlProcessor implements IEntityProcessingService {
 
         for (Entity entity : world.getEntities(EntityType.PLAYER, EntityType.ENEMY)) {
             handleMovement(entity, gameData);
-
         }
-
         for (Entity spell : world.getEntities(EntityType.SPELL)) {
                 handleSpellMovement(spell, gameData);
-
         }
     }
 
@@ -52,9 +49,12 @@ public class ControlProcessor implements IEntityProcessingService {
         Position p = e.get(Position.class);
         Velocity v = e.get(Velocity.class);
 
-        if (!e.getCharState().equals(CharacterState.IDLE)) {
+        if (e.getCharState().equals(CharacterState.MOVING)) {
             p.setX(p.getX() + v.getVector().getX() * v.getSpeed() * gameData.getDelta());
             p.setY(p.getY() + v.getVector().getY() * v.getSpeed() * gameData.getDelta());
+        } else if(e.getCharState().equals(CharacterState.BOUNCING)){
+            p.setX(p.getX() + v.getVector().getX() * v.getSpeed()* 2.5f * gameData.getDelta());
+            p.setY(p.getY() + v.getVector().getY() * v.getSpeed()* 2.5f * gameData.getDelta());
         }
     }
 }

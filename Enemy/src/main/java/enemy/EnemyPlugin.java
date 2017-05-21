@@ -119,7 +119,15 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         AI aiComp = e.get(AI.class);
         Position p = e.get(Position.class);
         Velocity v = e.get(Velocity.class);
-        if (aiComp.getCurrentTarget() != null) {
+        
+        if(e.getCharState().equals(CharacterState.BOUNCING)){
+            Vector2 stopCheck = new Vector2(p, p.getStartPosition());
+            if (v.getTravelDist() <= stopCheck.getMagnitude()) {
+
+                e.setCharState(CharacterState.IDLE);
+                e.setMoveState(MovementState.STANDING);
+            }
+        } else if (aiComp.getCurrentTarget() != null) {
             Position aiPosition = new Position(p);
             Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
             Vector2 direction = new Vector2(aiPosition, entityPosition);

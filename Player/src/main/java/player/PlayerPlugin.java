@@ -105,7 +105,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         Body b = e.get(Body.class);
         Velocity v = e.get(Velocity.class);
 
-        if (gameData.getKeys().isPressed(RIGHT_MOUSE)) {
+        if (gameData.getKeys().isPressed(RIGHT_MOUSE) && !e.getCharState().equals(CharacterState.BOUNCING)) {
             gameData.getKeys().setKey(RIGHT_MOUSE, false);
 
             float endX = gameData.getMousePositionX() - (b.getWidth() / 2);
@@ -171,7 +171,6 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         ).getChosenSpell() != null) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
-
         }
     }
 
