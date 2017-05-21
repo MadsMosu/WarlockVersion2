@@ -212,7 +212,7 @@ public class GameEngine implements ApplicationListener {
                     spriteBatch.setProjectionMatrix(camera.combined);
                     spriteBatch.begin();
                     if (e.get(SpellInfos.class).getSpellType() != TELEPORT1 && e.get(SpellInfos.class).getSpellType() != TELEPORT2) {
-                        spriteBatch.draw(animator.getSpellAnimation(e), p.getX(), p.getY(), 0, animator.getSpellAnimation(e).getRegionHeight() / 2, animator.getSpellAnimation(e).getRegionWidth(), animator.getSpellAnimation(e).getRegionHeight(), 1, 1, e.getAngle());
+                        spriteBatch.draw(animator.getSpellAnimation(e), p.getX(), p.getY(), 0, animator.getSpellAnimation(e).getRegionHeight()/2, animator.getSpellAnimation(e).getRegionWidth(), animator.getSpellAnimation(e).getRegionHeight(), 1, 1, e.getAngle());
                     } else {
                         spriteBatch.draw(animator.getSpellAnimation(e), p.getX(), p.getY());
                     }

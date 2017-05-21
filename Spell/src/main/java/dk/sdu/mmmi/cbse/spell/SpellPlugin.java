@@ -139,8 +139,8 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         SpellInfos si = new SpellInfos();
         Body b = new Body(spellArchive.getSpell(spellType).getHeight(), spellArchive.getSpell(spellType).getWidth(), Geometry.CIRCLE);
         b.setSpriteSize(spellArchive.getSpell(spellType).getSpriteWidth(), spellArchive.getSpell(spellType).getSpriteHeight());
-        b.setFrames(SpellArchive.getSpell(spellType).getFrames());
-        b.setFrameSpeed(SpellArchive.getSpell(spellType).getFrameSpeed());
+        b.setFrames(spellArchive.getSpell(spellType).getFrames());
+        b.setFrameSpeed(spellArchive.getSpell(spellType).getFrameSpeed());
         Damage dmg = new Damage(spellArchive.getSpell(spellType).getDamage());
         Bounce bounce = new Bounce(spellArchive.getSpell(spellType).getBouncePoints());
         Velocity v = new Velocity();
@@ -155,8 +155,9 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         se.add(bounce);
         se.add(new Expiration(spellArchive.getSpell(spellType).getExpiration()));
         se.add(owner);
-        float x = p.getX() + caster.get(Body.class).getWidth() / 2 - spellArchive.getSpell(spellType).getWidth() / 2;
-        float y = p.getY() + caster.get(Body.class).getHeight() / 2 - spellArchive.getSpell(spellType).getHeight() / 2;
+        float x = p.getX() + caster.get(Body.class).getWidth() / 2;
+        float y = p.getY() + caster.get(Body.class).getHeight() / 2;
+       
         se.add(new Position(x, y));
 
         se.add(si);
@@ -171,14 +172,18 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         if (e.getType() == ENEMY) {
             AI ai = e.get(AI.class);
             Position aiPosition = e.get(Position.class);
-            Position targetPosition = ai.getCurrentTarget().get(Position.class);
+            float targetX = ai.getCurrentTarget().get(Position.class).getX();
+            float targetY = ai.getCurrentTarget().get(Position.class).getY();
+            Position targetPosition =  new Position(targetX, targetY);
             Vector2 direction = new Vector2(aiPosition, targetPosition);
             direction.normalize();
             return direction;
         }
         else {
             Position p = e.get(Position.class);
-            Position targetPosition = new Position(gameData.getMousePositionX(), gameData.getMousePositionY());
+            float targetX = gameData.getMousePositionX() - e.get(Body.class).getWidth()/2;
+            float targetY = gameData.getMousePositionY() - e.get(Body.class).getHeight()/2;
+            Position targetPosition = new Position(targetX, targetY);
             Vector2 direction = new Vector2(p, targetPosition);
             direction.normalize();
             return direction;
