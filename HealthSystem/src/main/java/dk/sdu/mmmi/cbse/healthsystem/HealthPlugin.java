@@ -11,6 +11,7 @@ import data.World;
 import data.SpellList;
 import data.componentdata.DamageTaken;
 import data.componentdata.Health;
+import data.componentdata.Score;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;

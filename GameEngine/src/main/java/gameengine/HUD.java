@@ -13,6 +13,7 @@ import data.EntityType;
 import data.GameData;
 import data.World;
 import data.componentdata.Health;
+import data.componentdata.Score;
 
 public class HUD {
 
@@ -20,15 +21,15 @@ public class HUD {
     private FitViewport viewPort;
 
     private float health;
-
     private float roundTimer;
     private int roundNumb;
+    private int kills;
+    private int roundsWon;
     private Label roundTimerLabel;
     private Label roundNumbLabel;
-    private Label expLabel;
-    private Label levelLabel;
     private Label healthLabel;
     private Label FPSLabel;
+    private Label roundsWonLabel;
 
     private Table table;
     private Table winnerTable;
@@ -44,7 +45,8 @@ public class HUD {
         for (Entity player : world.getEntities(EntityType.PLAYER)) {
             this.player = player;
             health = player.get(Health.class).getHp();
-
+            Score score = player.get(Score.class);
+            roundsWon = score.getRoundsWon();
         }
 
         viewPort = new FitViewport(gameData.getDisplayWidth(), gameData.getDisplayHeight());
@@ -62,11 +64,13 @@ public class HUD {
         roundNumbLabel = new Label("Round: " + roundNumb, new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         roundTimerLabel = new Label("Time: " + String.format("%.2f", roundTimer), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         FPSLabel = new Label("FPS: " + gameData.getFPS(), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-
+        roundsWonLabel = new Label("Rounds won: " + roundsWon, new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        
         table.add(healthLabel).expandX().padTop(10);
         table.add(roundNumbLabel).expandX().padTop(10);
         table.add(roundTimerLabel).expandX().padTop(10);
         table.add(FPSLabel).expandX().padTop(10);
+        table.add(roundsWonLabel).expandX().padTop(10);
 
         winnerLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         nextRoundCDLabel = new Label("Next round starts in " + String.format("%.2f", gameData.getNextRoundCountdown()), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
@@ -76,6 +80,10 @@ public class HUD {
         winnerTable.add(nextRoundCDLabel).center();
 
         winnerTable.setVisible(false);
+        
+        
+        
+        
 
         stage.addActor(table);
         stage.addActor(winnerTable);
@@ -89,16 +97,16 @@ public class HUD {
         healthLabel.setText("Health: " + player.get(Health.class).getHp());
         roundNumbLabel.setText("Round: " + gameData.getRoundNumber());
         roundTimerLabel.setText("Time: " + String.format("%.2f", gameData.getRoundTime()));
-        FPSLabel.setText("FPS: " + gameData.getFPS());
+        FPSLabel.setText("FPS: " + gameData.getFPS());      
+        roundsWonLabel.setText("Rounds won: " + player.get(Score.class).getRoundsWon());
 
         if (gameData.getGameState().equals(GameState.PAUSE)) {
             winnerTable.setVisible(true);
             winnerLabel.setText(gameData.getWhoWinsRound());
-            if (gameData.getRoundNumber() < gameData.getMaxRounds()) {
-                nextRoundCDLabel.setText("Next round starts in " + String.format("%.2f", gameData.getNextRoundCountdown()));
-            }
-            else {
-                nextRoundCDLabel.setText("Game has ended..");
+            if(gameData.getRoundNumber() < gameData.getMaxRounds()){
+                nextRoundCDLabel.setText("Next round starts in " + String.format("%.2f", gameData.getNextRoundCountdown()));     
+            } else {
+                nextRoundCDLabel.setText("Game has ended..." + gameData.getWinner());
             }
         }
         else {

@@ -22,7 +22,6 @@ public class CollisionHandler {
         Owner ow1 = e1.get(Owner.class);
         Owner ow2 = e2.get(Owner.class);
 
-        // TODO find out if objects owned by the same owner can collide, atm they can.
         if ((ow1 != null && ow1.getID().equals(e2.getID())) || (ow2 != null && ow2.getID().equals(e1.getID())))
         {
             return false;
@@ -56,15 +55,6 @@ public class CollisionHandler {
         return false;
     }
 
-    /**
-     * Checks if 2 circles are colliding.
-     *
-     * @param o1
-     * Circle 1
-     * @param o2
-     * Circle 2
-     * @return Returns true if the 2 circles are colliding.
-     */
     private static boolean collisionCircleCircle(CollisionDAO responding, CollisionDAO other)
     {
         double dx = responding.centerX - other.centerX;
@@ -74,15 +64,6 @@ public class CollisionHandler {
         return Math.sqrt((dx * dx) + (dy * dy)) <= (respondingRadius + otherRadius);
     }
 
-    /**
-     * Checks if a circle and rectangle is colliding.
-     *
-     * @param circle
-     * The circle
-     * @param rect
-     * The rectangle.
-     * @return Returns true if the rectangle and the circle is colliding.
-     */
     public static boolean collisionCircleRectangle(CollisionDAO circ, CollisionDAO rect)
     {
         double circleDistanceX = Math.abs(rect.centerX - circ.centerX);
@@ -106,20 +87,20 @@ public class CollisionHandler {
 
         float cornerX = (float) rect.x;
         float cornerY = (float) rect.y;
-        if (circ.centerX > rect.x) // Means the circle center is on the right side of the square.
+        if (circ.centerX > rect.x) 
         {
-            cornerX += rect.width; // We know the corner is on the right side.
-            if (circ.centerY > rect.y) // Means the circle center is below (Above in libgdx)
+            cornerX += rect.width; 
+            if (circ.centerY > rect.y) 
             {
-                cornerY += rect.height;  // We know the corner is on the buttom.
+                cornerY += rect.height; 
             }
 
         }
-        else if (circ.centerX < rect.x) // Means the circle center is on the left side of the square.
+        else if (circ.centerX < rect.x) 
         {
-            if (circ.centerY > rect.y) // Means the circle center is below (Above in libgdx)
+            if (circ.centerY > rect.y) 
             {
-                cornerY += rect.height; // We know the corner is on the buttom.
+                cornerY += rect.height; 
             }
         }
         
@@ -128,15 +109,6 @@ public class CollisionHandler {
         return (cornerToCircCenter.getMagnitude() < circ.height / 2);
     }
 
-    /**
-     * Checks if 2 rectangles are colliding.
-     *
-     * @param rect1
-     * Rectangle 1
-     * @param rect2
-     * Rectangle 2
-     * @return Returns true if the 2 rectangles are colliding
-     */
     public static boolean collisionRectangleRectangle(CollisionDAO o1, CollisionDAO o2)
     {
         boolean xOverlap = valueInRange(o1.x, o2.x, o2.x + o2.width) || valueInRange(o2.x, o1.x, o1.x + o1.width);

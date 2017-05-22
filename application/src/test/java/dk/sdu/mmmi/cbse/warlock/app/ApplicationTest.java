@@ -12,7 +12,7 @@ import junit.framework.Test;
 import static junit.framework.TestCase.assertTrue;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestCase;
-import org.netbeans.modules.autoupdate.silentupdate.UpdateHandler;
+//import org.netbeans.modules.autoupdate.silentupdate.UpdateHandler;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.w3c.dom.Document;
@@ -46,7 +46,7 @@ public class ApplicationTest extends NbTestCase {
 
     public void WaitForUpdate() throws InterruptedException {
 
-        UpdateHandler.checkAndHandleUpdates();
+        //UpdateHandler.checkAndHandleUpdates();
         try {
             Thread.sleep(10000);
         } catch (InterruptedException ex) {

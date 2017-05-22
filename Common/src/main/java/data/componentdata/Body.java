@@ -27,6 +27,10 @@ public class Body
         this.width = width;
         this.geometry = geometry;
     }
+    
+    public Position getCenter(float posx, float posy){
+        return new Position(posx + (width/2), posy + (height/2));
+    }
 
     public Geometry getGeometry()
     {
