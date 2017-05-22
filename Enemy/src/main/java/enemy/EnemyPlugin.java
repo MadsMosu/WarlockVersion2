@@ -10,6 +10,7 @@ import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.MovementState;
+import States.StateMachine;
 import static data.EntityType.ENEMY;
 import data.ImageManager;
 import data.Netherworld;
@@ -44,10 +45,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         ImageManager.createImage(ENEMY_FINAL_IMAGE_PATH, false);
         this.world = world;
         enemies = new ArrayList();
-
-        enemies.add(makeEnemy(3000, 0));
-        enemies.add(makeEnemy(3600, 0));
-
+ 
+        enemies.add(makeEnemy(gameData));
+        enemies.add(makeEnemy(gameData));
+        enemies.add(makeEnemy(gameData));
+        enemies.add(makeEnemy(gameData));
     }
 
     @Override
@@ -60,8 +62,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
                 world.removeEntity(e);
 
             }
-
-            handleMovement(e, gameData);
             handleShoot(e);
         }
         for (Entity e : netherworld.getEntities(ENEMY)) {
@@ -93,12 +93,16 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         }
     }
 
-    private Entity makeEnemy(float xPosition, float yPosition)
+    private Entity makeEnemy(GameData gameData)
     {
         Entity enemy = new Entity();
         enemy.setType(ENEMY);
+        
+        Random rand = new Random();
+        int randX = rand.nextInt(500) + gameData.getMapWidth() / 2;
+        int randY = rand.nextInt(500);
 
-        Position pos = new Position(xPosition, yPosition);
+        Position pos = new Position(randX, randY);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
         Owner ow = new Owner(enemy.getID());
@@ -106,7 +110,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Velocity v = new Velocity();
         Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         Score score = new Score();
-        v.setSpeed(50);
+        v.setSpeed(100);
         sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         enemy.add(ow);
         enemy.add(ImageManager.getImage(ENEMY_FINAL_IMAGE_PATH));
@@ -122,53 +126,6 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.setCharState(CharacterState.IDLE);
         world.addEntity(enemy);
         return enemy;
-    }
-
-    private void handleMovement(Entity e, GameData gameData)
-    {
-        AI aiComp = e.get(AI.class);
-        Position p = e.get(Position.class);
-        Velocity v = e.get(Velocity.class);
-
-        if (e.getCharState().equals(CharacterState.BOUNCING)) {
-            Vector2 stopCheck = new Vector2(p, p.getStartPosition());
-            if (v.getTravelDist() <= stopCheck.getMagnitude()) {
-
-                e.setCharState(CharacterState.IDLE);
-                e.setMoveState(MovementState.STANDING);
-            }
-        } else if (aiComp.getCurrentTarget() != null) {
-            Position aiPosition = new Position(p);
-            Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
-            Vector2 direction = new Vector2(aiPosition, entityPosition);
-            float gap = direction.getMagnitude();
-            v.setVector(direction);
-            v.getVector().normalize();
-
-            if (p.isInLava()) {
-                Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
-                Vector2 directionToMiddle = new Vector2(aiPosition, middle);
-                float distanceToMiddle = directionToMiddle.getMagnitude();
-
-                e.setAngle((float) directionToMiddle.getAngle());
-                e.setRunningState(e.getAngle(), e);
-
-                v.setVector(directionToMiddle);
-                v.getVector().normalize();
-                if (e.getCharState().equals(CharacterState.IDLE)) {
-                    e.setCharState(CharacterState.MOVING);
-                }
-            } else if (gap == 100) {
-                e.setMoveState(MovementState.STANDING);
-            } else {
-                e.setAngle(direction.getAngle());
-                e.setRunningState(e.getAngle(), e);
-                if (e.getCharState().equals(CharacterState.IDLE)) {
-                    e.setCharState(CharacterState.MOVING);
-                }
-
-            }
-        }
     }
 
     @Override

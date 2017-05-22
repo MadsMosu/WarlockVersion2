@@ -67,8 +67,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
                 resetPosition(p, gameData);
                 p.get(Health.class).setHp(p.get(Health.class).getMaxHp());
-            }
-            else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
+            } else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
                 world.addEntity(p);
                 netherworld.removeEntity(p);
             }
@@ -128,8 +127,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             v.getVector().normalize();
             if (v.getVector().getMagnitude() == 0) {
                 e.setCharState(CharacterState.IDLE);
-            }
-            else {
+            } else {
                 e.setAngle(v.getVector().getAngle());
                 e.setCharState(CharacterState.MOVING);
                 e.setRunningState(e.getAngle(), e);
@@ -161,6 +159,14 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(FIREBALL);
 
+        } else if (gameData.getKeys().isPressed(NUM_2)) {
+
+            SpellBook sb = e.get(SpellBook.class
+            );
+            sb.setChosenSpell(FROSTBOLT);
+
+        } else if (gameData.getKeys().isPressed(NUM_3)) {
+            //Spell 3
         }
         else if (gameData.getKeys().isPressed(NUM_2)) {
             SpellBook sb = e.get(SpellBook.class);
@@ -168,12 +174,10 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
         }
         else if (gameData.getKeys().isPressed(NUM_3)) {
-            SpellBook sb = e.get(SpellBook.class
-            );
+            SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(TELEPORT1);
 
-        }
-        else {
+        } else {
             return;
 
         }

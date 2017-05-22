@@ -1,5 +1,6 @@
 package data.componentdata;
 
+import States.StateMachine;
 import data.Entity;
 import data.util.Vector2;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ public class AI {
     private Entity currentTarget;
     private Entity[] spellToAvoid;
     private boolean avoidSpell = false;
+    private StateMachine state;
     private Map<Entity, Float> allEntities = new HashMap();
     private Map<Entity, Float> EntitiesHealthInDist = new HashMap();
     private Map<Entity, List<Entity>> closeSpells = new HashMap();
@@ -18,6 +20,15 @@ public class AI {
     public Map<Entity, List<Entity>> getCloseSpells() {
         return closeSpells;
     }
+
+    public StateMachine getState() {
+        return state;
+    }
+
+    public void setState(StateMachine state) {
+        this.state = state;
+    }
+    
 
     public void setCloseSpells(Map<Entity,List<Entity>> closeSpellMap){
         this.closeSpells =  closeSpellMap;

@@ -5,6 +5,7 @@
  */
 package managers;
 
+import States.StateMachine;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.maps.MapLayers;
@@ -17,6 +18,7 @@ import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
 import data.GameData;
 import data.World;
+import data.componentdata.AI;
 import data.componentdata.Damage;
 import data.componentdata.DamageTaken;
 import data.componentdata.Health;
