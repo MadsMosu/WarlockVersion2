@@ -14,7 +14,6 @@ import data.Netherworld;
 import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.AI;
-import data.componentdata.Body;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
@@ -57,25 +56,6 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
             }
         }
         return false;
-    }
-
-    private boolean SpellInDistance(World world, Entity ai, float distanceValue) {
-        for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
-            if (!entity.equals(ai)) {
-                Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
-
-                float distance = direction.getMagnitude();
-                if (distance <= distanceValue) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private float getDistance(Entity ai, Entity opponent) {
-        Vector2 direction = new Vector2(ai.get(Position.class), opponent.get(Position.class));
-        return direction.getMagnitude();
     }
 
     private void detectEnemies(World world, Entity ai) {
@@ -156,7 +136,9 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         AI aiComp = ai.get(AI.class);
         aiComp.getAllEntities().clear();
         aiComp.getEntitiesHealthInDist().clear();
-        incomingSpells.clear();
+        if (incomingSpells.get(ai) != null) {
+            incomingSpells.get(ai).clear();
+        }
     }
 
     private void radarScan(World world, Entity ai) {
@@ -166,14 +148,10 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
     }
 
-    //sets the AI state
     private void stateProcessor(Entity ai, World world, Position p, AI aiComp) {
-        if (p.isInLava()) {
-            aiComp.setState(StateMachine.INLAVA);
-        }
         if ((opponentInDistance(world, ai, 400) && !p.isInLava())) {
             aiComp.setState(StateMachine.ATTACK);
-        } else if (p.isInLava() || !incomingSpells.isEmpty()) {
+        } else if (p.isInLava() || !incomingSpells.get(ai).isEmpty()) {
             aiComp.setState(StateMachine.EVADE);
         } else if (!p.isInLava()) {
             aiComp.setState(StateMachine.CHASE);
@@ -191,13 +169,20 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     private void handleChasing(Entity ai, AI aiComp, Position p, Velocity v) {
         aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
 
-        Position aiPosition = new Position(p);
-        Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
-        Vector2 direction = new Vector2(aiPosition, entityPosition);
-        v.setVector(direction);
-        v.getVector().normalize();
+        if (aiComp.getCurrentTarget() != null) {
+            Position aiPosition = new Position(p);
+            Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
+            Vector2 direction = new Vector2(aiPosition, entityPosition);
+            v.setVector(direction);
+            v.getVector().normalize();
 
-        ai.setCharState(CharacterState.MOVING);
+            ai.setCharState(CharacterState.MOVING);
+        }
+    }
+
+    private void setSpriteAngle(Entity e, Velocity v) {
+        e.setAngle(v.getVector().getAngle());
+        e.setRunningState(e.getAngle(), e);
     }
 
     private void handleEvade(Entity ai, Velocity v, Position p) {
@@ -220,7 +205,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     }
 
     private void handleInLava(Entity ai, GameData gameData, Position p, Velocity v) {
-        Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
+        Position middle = new Position(gameData.getMapWidth() / 2, 0);
         Vector2 directionToMiddle = new Vector2(new Position(p), middle);
         //float distanceToMiddle = directionToMiddle.getMagnitude();
 
@@ -256,27 +241,25 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         if (!ai.getCharState().equals(CharacterState.BOUNCING)) {
             stateProcessor(ai, world, p, aiComp);
         }
-        System.out.println("State: " + aiComp.getState());
         if (ai.getCharState().equals(CharacterState.BOUNCING)) {
             handleBouncing(ai, p, v);
         }
-        if (aiComp.getState() == StateMachine.INLAVA) {
-            handleInLava(ai, gameData, p, v);
-            handleEvade(ai, v, p);
-        }
-
         if (aiComp.getState() == StateMachine.EVADE) {
             handleEvade(ai, v, p);
         }
-
-        if (aiComp.getState() == StateMachine.ATTACK) {
-            handleAttacking(ai, sb, aiComp);
+        if (p.isInLava() && !ai.getCharState().equals(CharacterState.BOUNCING)) {
+            handleInLava(ai, gameData, p, v);
         }
+        if (!p.isInLava()) {
+            if (aiComp.getState() == StateMachine.ATTACK) {
+                handleAttacking(ai, sb, aiComp);
+            }
 
-        if (aiComp.getState() == StateMachine.CHASE) {
-            handleChasing(ai, aiComp, p, v);
+            if (aiComp.getState() == StateMachine.CHASE) {
+                handleChasing(ai, aiComp, p, v);
+            }
         }
-
+        setSpriteAngle(ai, v);
     }
 
     @Override

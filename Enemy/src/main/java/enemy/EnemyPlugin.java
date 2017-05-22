@@ -105,7 +105,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         Velocity v = new Velocity();
         Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
         Score score = new Score();
-        v.setSpeed(50);
+        v.setSpeed(100);
         sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         enemy.add(ow);
         enemy.add(ImageManager.getImage(ENEMY_FINAL_IMAGE_PATH));
