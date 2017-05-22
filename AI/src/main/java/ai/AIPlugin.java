@@ -3,6 +3,8 @@ package ai;
 import data.util.PQHeap;
 import data.util.EntityValue;
 import States.CharacterState;
+import States.MovementState;
+import States.StateMachine;
 import data.Entity;
 import static data.EntityType.ENEMY;
 import static data.EntityType.PLAYER;
@@ -127,7 +129,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
             if (!pq.getQueue().isEmpty()) {
 
                 for (Entry<Entity, Float> entry : map.entrySet()) {
-                    float value = pq.extractMin().value; 
+                    float value = pq.extractMin().value;
                     if (value == entry.getValue()) {
                         return entry.getKey();
                     }
@@ -136,37 +138,6 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
         return null;
     }
-
-    private void avoidSpells(Entity ai) {
-        List<Entity> collidingSpells = incomingSpells.get(ai);
-
-        for (Entity spell : collidingSpells) {
-            
-            Velocity v = ai.get(Velocity.class);
-            Vector2 spellDirection = new Vector2(spell.get(Velocity.class).getVector());
-            Vector2 dodgeVector = spellDirection.rotateDegrees(80);
-            v.setTravelDist(dodgeVector.getMagnitude());
-            v.setVector(dodgeVector.setMagnitude(100));
-            ai.setCharState(CharacterState.MOVING);
-            
-            
-            //System.out.println("Spell is at positions y valuejhjjjj");
-        }
-
-    }
-
-//        AI aiComp = ai.get(AI.class);
-//        if (SpellInDistance(world, ai, 400)) {
-//
-//        }
-//        aiComp.setAvoidSpell(true);
-////        for (Entry<Entity, Float> entry : aiComp.getCloseSpells().entrySet()) {
-////            if(entry.getKey().get(Velocity.class).getDirectionX()){
-////                aiComp.setSpellToAvoid(lowestDistance(aiComp.getCloseSpells()));               
-////            }
-////        }
-//        aiComp.setSpellToAvoid(null);
-
 
     private boolean checkForSameHP(Map<Entity, Float> HPmap) {
 
@@ -181,30 +152,11 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return true;
     }
 
-    private void attack(World world, Entity ai) {
-        AI aiComp = ai.get(AI.class);
-        SpellBook sb = ai.get(SpellBook.class);
-        if (opponentInDistance(world, ai, 400) && !ai.get(Position.class).isInLava()) {
-            sb.setChosenSpell(FIREBALL);
-            if (checkForSameHP(aiComp.getEntitiesHealthInDist())) {
-                aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
-            } else {
-                aiComp.setCurrentTarget(lowestValue(aiComp.getEntitiesHealthInDist()));
-            }
-        } else {
-            aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
-            if (opponentInDistance(world, ai, 200)) {
-                sb.setChosenSpell(FIREBALL);
-            }
-        }
-    }
-
     private void clearRadar(Entity ai) {
-        AI aiComp = ai.get(AI.class
-        );
+        AI aiComp = ai.get(AI.class);
         aiComp.getAllEntities().clear();
-        aiComp.getCloseSpells().clear();
         aiComp.getEntitiesHealthInDist().clear();
+        incomingSpells.clear();
     }
 
     private void radarScan(World world, Entity ai) {
@@ -214,21 +166,124 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
     }
 
-    private void behaviour(World world, Entity ai) {
+    //sets the AI state
+    private void stateProcessor(Entity ai, World world, Position p, AI aiComp) {
+        if (p.isInLava()) {
+            aiComp.setState(StateMachine.INLAVA);
+        }
+        if ((opponentInDistance(world, ai, 400) && !p.isInLava())) {
+            aiComp.setState(StateMachine.ATTACK);
+        } else if (p.isInLava() || !incomingSpells.isEmpty()) {
+            aiComp.setState(StateMachine.EVADE);
+        } else if (!p.isInLava()) {
+            aiComp.setState(StateMachine.CHASE);
+        }
+    }
+
+    private void handleBouncing(Entity ai, Position p, Velocity v) {
+        Vector2 stopCheck = new Vector2(p, p.getStartPosition());
+        if (v.getTravelDist() <= stopCheck.getMagnitude()) {
+            ai.setCharState(CharacterState.IDLE);
+            ai.setMoveState(MovementState.STANDING);
+        }
+    }
+
+    private void handleChasing(Entity ai, AI aiComp, Position p, Velocity v) {
+        aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
+
+        Position aiPosition = new Position(p);
+        Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
+        Vector2 direction = new Vector2(aiPosition, entityPosition);
+        v.setVector(direction);
+        v.getVector().normalize();
+
+        ai.setCharState(CharacterState.MOVING);
+    }
+
+    private void handleEvade(Entity ai, Velocity v, Position p) {
+        List<Entity> collidingSpells = incomingSpells.get(ai);
+        for (Entity spell : collidingSpells) {
+            Vector2 spellDirection = new Vector2(spell.get(Velocity.class).getVector());
+            Vector2 dodgeVector = spellDirection.rotateDegrees(80);
+            v.setVector(dodgeVector.setMagnitude(100));
+            v.setTravelDist(dodgeVector.getMagnitude());
+            v.getVector().normalize();
+            ai.setCharState(CharacterState.MOVING);
+
+            p.setStartPosition(new Position(p));
+            Vector2 stopCheck = new Vector2(p, p.getStartPosition());
+            if (v.getTravelDist() <= stopCheck.getMagnitude()) {
+                ai.setCharState(CharacterState.IDLE);
+                ai.setMoveState(MovementState.STANDING);
+            }
+        }
+    }
+
+    private void handleInLava(Entity ai, GameData gameData, Position p, Velocity v) {
+        Position middle = new Position(gameData.getMapWidth() / 2, gameData.getMapHeight() / 2);
+        Vector2 directionToMiddle = new Vector2(new Position(p), middle);
+        //float distanceToMiddle = directionToMiddle.getMagnitude();
+
+        ai.setAngle((float) directionToMiddle.getAngle());
+        ai.setRunningState(ai.getAngle(), ai);
+
+        v.setVector(directionToMiddle);
+        v.getVector().normalize();
+        if (ai.getCharState().equals(CharacterState.IDLE)) {
+            ai.setCharState(CharacterState.MOVING);
+        }
+    }
+
+    private void handleAttacking(Entity ai, SpellBook sb, AI aiComp) {
+        ai.setMoveState(MovementState.STANDING);
+
+        if (checkForSameHP(aiComp.getEntitiesHealthInDist())) {
+            aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
+        } else {
+            aiComp.setCurrentTarget(lowestValue(aiComp.getEntitiesHealthInDist()));
+        }
+        sb.setChosenSpell(FIREBALL);
+    }
+
+    private void behaviour(World world, GameData gameData, Entity ai) {
+        AI aiComp = ai.get(AI.class);
+        Position p = ai.get(Position.class);
+        Velocity v = ai.get(Velocity.class);
+        SpellBook sb = ai.get(SpellBook.class);
+
         clearRadar(ai);
         radarScan(world, ai);
+        if (!ai.getCharState().equals(CharacterState.BOUNCING)) {
+            stateProcessor(ai, world, p, aiComp);
+        }
+        System.out.println("State: " + aiComp.getState());
+        if (ai.getCharState().equals(CharacterState.BOUNCING)) {
+            handleBouncing(ai, p, v);
+        }
+        if (aiComp.getState() == StateMachine.INLAVA) {
+            handleInLava(ai, gameData, p, v);
+            handleEvade(ai, v, p);
+        }
 
-        avoidSpells(ai);
-        attack(world, ai);
+        if (aiComp.getState() == StateMachine.EVADE) {
+            handleEvade(ai, v, p);
+        }
+
+        if (aiComp.getState() == StateMachine.ATTACK) {
+            handleAttacking(ai, sb, aiComp);
+        }
+
+        if (aiComp.getState() == StateMachine.CHASE) {
+            handleChasing(ai, aiComp, p, v);
+        }
 
     }
 
     @Override
     public void process(GameData gameData, World world, Netherworld netherWorld) {
         for (Entity ai : world.getEntities(ENEMY)) {
-            behaviour(world, ai);
+            behaviour(world, gameData, ai);
         }
-
     }
 
     @Override

@@ -67,8 +67,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
                 resetPosition(p, gameData);
                 p.get(Health.class).setHp(p.get(Health.class).getMaxHp());
-            }
-            else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
+            } else if (gameData.getGameState().equals(GameState.RUN) && gameData.getRoundTime() >= 58) {
                 world.addEntity(p);
                 netherworld.removeEntity(p);
             }
@@ -112,12 +111,9 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     }
 
     private void handleMove(Entity e, GameData gameData) {
-        Position p = e.get(Position.class
-        );
-        Body b = e.get(Body.class
-        );
-        Velocity v = e.get(Velocity.class
-        );
+        Position p = e.get(Position.class);
+        Body b = e.get(Body.class);
+        Velocity v = e.get(Velocity.class);
 
         if (gameData.getKeys().isPressed(RIGHT_MOUSE) && !e.getCharState().equals(CharacterState.BOUNCING)) {
             gameData.getKeys().setKey(RIGHT_MOUSE, false);
@@ -131,8 +127,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             v.getVector().normalize();
             if (v.getVector().getMagnitude() == 0) {
                 e.setCharState(CharacterState.IDLE);
-            }
-            else {
+            } else {
                 e.setAngle(v.getVector().getAngle());
                 e.setCharState(CharacterState.MOVING);
                 e.setRunningState(e.getAngle(), e);
@@ -165,22 +160,19 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
             );
             sb.setChosenSpell(FIREBALL);
 
-        }
-        else if (gameData.getKeys().isPressed(NUM_2)) {
+        } else if (gameData.getKeys().isPressed(NUM_2)) {
 
             SpellBook sb = e.get(SpellBook.class
             );
             sb.setChosenSpell(FROSTBOLT);
 
-        }
-        else if (gameData.getKeys().isPressed(NUM_3)) {
+        } else if (gameData.getKeys().isPressed(NUM_3)) {
             //Spell 3
             SpellBook sb = e.get(SpellBook.class
             );
             sb.setChosenSpell(TELEPORT1);
 
-        }
-        else {
+        } else {
             return;
 
         }
