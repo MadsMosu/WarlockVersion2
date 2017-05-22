@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module-Install: map/Installer.class
-OpenIDE-Module-Localizing-Bundle: dk/sdu/mmmi/cbse/map/Bundle.properties
-

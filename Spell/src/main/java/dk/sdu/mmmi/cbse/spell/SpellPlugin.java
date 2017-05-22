@@ -20,7 +20,6 @@ import data.SpellList;
 import data.componentdata.AI;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
-import data.componentdata.Bounce;
 import data.componentdata.Damage;
 import data.componentdata.Expiration;
 import data.componentdata.Owner;
@@ -142,7 +141,6 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         b.setFrames(spellArchive.getSpell(spellType).getFrames());
         b.setFrameSpeed(spellArchive.getSpell(spellType).getFrameSpeed());
         Damage dmg = new Damage(spellArchive.getSpell(spellType).getDamage());
-        Bounce bounce = new Bounce(spellArchive.getSpell(spellType).getBouncePoints());
         Velocity v = new Velocity();
         v.setVector(setSpellDirection(caster, v, gameData));
         v.setSpeed(spellArchive.getSpell(spellType).getSpeed());
@@ -152,7 +150,6 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         owner.setOwnerType(caster.getType());
         si.setIsMoving(false);
         se.add(dmg);
-        se.add(bounce);
         se.add(new Expiration(spellArchive.getSpell(spellType).getExpiration()));
         se.add(owner);
         float x = p.getX() + caster.get(Body.class).getWidth() / 2;

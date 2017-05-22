@@ -53,17 +53,15 @@ public class CollisionPlugin implements IEntityProcessingService {
             if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
 
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
+                    //Add damage to entity
                     Damage dmg = new Damage(handled.get(Damage.class).getDamage());
-                    //System.out.println("Damage: " + dmg.getDamage());
                     Owner owner = (handled.get(Owner.class));
                     DamageTaken dmgTaken = new DamageTaken(dmg, owner);
-                    //System.out.println("dmgTaken: " + dmgTaken.getDamage());
                     collideWith.get(Health.class).addDamageTaken(dmgTaken);
-                    //System.out.println(collideWith.get(Health.class).getHp());
+                    
+                    //Transfer vector for bounce
                     Velocity v = collideWith.get(Velocity.class);
-                    v.setVector(handled.get(Velocity.class).getVector());
-                    v.getVector().setMagnitude(300);
-                    System.out.println(v.getVector().getMagnitude());
+                    v.setVector(handled.get(Velocity.class).getVector().setMagnitude(300));
                     v.setTravelDist(v.getVector().getMagnitude());
                     v.getVector().normalize();
                     Position p = collideWith.get(Position.class);
@@ -74,8 +72,9 @@ public class CollisionPlugin implements IEntityProcessingService {
             }
             else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-                    collideWith.get(Health.class).addDamageTaken(new DamageTaken(new Damage(handled.get(Damage.class).getDamage()), new Owner(collideWith.getID())));
+                    collideWith.get(Health.class).addDamageTaken(new DamageTaken(handled.get(Damage.class), new Owner(collideWith.getID())));
                     
+                    //
                     Velocity v = collideWith.get(Velocity.class);
                     v.setVector(handled.get(Velocity.class).getVector());
                     v.getVector().setMagnitude(300);
