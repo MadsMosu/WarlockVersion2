@@ -12,6 +12,7 @@ import data.Netherworld;
 import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.AI;
+import data.componentdata.Body;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
@@ -23,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
@@ -141,10 +141,19 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         List<Entity> collidingSpells = incomingSpells.get(ai);
 
         for (Entity spell : collidingSpells) {
+            
+            Velocity v = ai.get(Velocity.class);
             Vector2 spellDirection = new Vector2(spell.get(Velocity.class).getVector());
-            ai.get(Velocity.class).setVector(spellDirection.rotateDegrees(80).setMagnitude(100f));
+            Vector2 dodgeVector = spellDirection.rotateDegrees(80);
+            v.setTravelDist(dodgeVector.getMagnitude());
+            v.setVector(dodgeVector.setMagnitude(100));
             ai.setCharState(CharacterState.MOVING);
+            
+            
+            //System.out.println("Spell is at positions y valuejhjjjj");
         }
+
+    }
 
 //        AI aiComp = ai.get(AI.class);
 //        if (SpellInDistance(world, ai, 400)) {
@@ -157,9 +166,10 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 ////            }
 ////        }
 //        aiComp.setSpellToAvoid(null);
-    }
+
 
     private boolean checkForSameHP(Map<Entity, Float> HPmap) {
+
         Object value = null;
         for (Object entry : HPmap.values()) {
             if (value == null) {

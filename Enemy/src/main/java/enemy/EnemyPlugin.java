@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 @ServiceProviders(value = {
-    @ServiceProvider(service = IEntityProcessingService.class)
-    ,
+    @ServiceProvider(service = IEntityProcessingService.class),
     @ServiceProvider(service = IGamePluginService.class)
 })
 public class EnemyPlugin implements IEntityProcessingService, IGamePluginService {
@@ -39,7 +38,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     private List<Entity> enemies;
 
     @Override
-    public void start(GameData gameData, World world) {
+    public void start(GameData gameData, World world)
+    {
         ENEMY_FINAL_IMAGE_PATH = EnemyPlugin.class.getResource(ENEMY_IMAGE_PATH).getPath().replace("file:", "");
         ImageManager.createImage(ENEMY_FINAL_IMAGE_PATH, false);
         this.world = world;
@@ -51,7 +51,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
     }
 
     @Override
-    public void process(GameData gameData, World world, Netherworld netherworld) {
+    public void process(GameData gameData, World world, Netherworld netherworld)
+    {
 
         for (Entity e : world.getEntities(ENEMY)) {
             if (e.getCharState() == CharacterState.DEAD || gameData.getGameState().equals(GameState.ROUNDEND)) {
@@ -75,7 +76,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         }
     }
 
-    private void resetPosition(Entity enemy, GameData gameData) {
+    private void resetPosition(Entity enemy, GameData gameData)
+    {
         Random rand = new Random();
         int randX = rand.nextInt(500) + gameData.getMapWidth() / 2;
         int randY = rand.nextInt(500);
@@ -83,14 +85,16 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         p.setPosition(randX, randY);
     }
 
-    private void handleShoot(Entity e) {
+    private void handleShoot(Entity e)
+    {
         if (e.get(SpellBook.class).getChosenSpell() != null && !e.getCharState().equals(CharacterState.BOUNCING)) {
             e.setMoveState(MovementState.STANDING);
             e.setCharState(CharacterState.CASTING);
         }
     }
 
-    private Entity makeEnemy(float xPosition, float yPosition) {
+    private Entity makeEnemy(float xPosition, float yPosition)
+    {
         Entity enemy = new Entity();
         enemy.setType(ENEMY);
 
@@ -120,7 +124,8 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         return enemy;
     }
 
-    private void handleMovement(Entity e, GameData gameData) {
+    private void handleMovement(Entity e, GameData gameData)
+    {
         AI aiComp = e.get(AI.class);
         Position p = e.get(Position.class);
         Velocity v = e.get(Velocity.class);
@@ -153,25 +158,22 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
                 if (e.getCharState().equals(CharacterState.IDLE)) {
                     e.setCharState(CharacterState.MOVING);
                 }
+            } else if (gap == 100) {
+                e.setMoveState(MovementState.STANDING);
             } else {
-                if (gap >= 100) {
-                    if (gap >= 100 && gap < 101) {
-                        e.setMoveState(MovementState.STANDING);
-                    } else {
-                        e.setAngle(direction.getAngle());
-                        e.setRunningState(e.getAngle(), e);
-                        if (e.getCharState().equals(CharacterState.IDLE)) {
-                            e.setCharState(CharacterState.MOVING);
-                        }
-
-                    }
+                e.setAngle(direction.getAngle());
+                e.setRunningState(e.getAngle(), e);
+                if (e.getCharState().equals(CharacterState.IDLE)) {
+                    e.setCharState(CharacterState.MOVING);
                 }
+
             }
         }
     }
 
     @Override
-    public void stop() {
+    public void stop()
+    {
         for (Entity enemy : enemies) {
             world.removeEntity(enemy);
         }
