@@ -20,8 +20,8 @@ public class SpellList {
     public static final String FIREBALL_IMAGE = "assets/fireballsprite.png";
     public static final int FIREBALL_DMG = 10;
     public static final int FIREBALL_BOUNCE = 4;
-    public static final float FIREBALL_SPEED = 150f;
-    public static final float FIREBALL_EXPIRATION = 4f;
+    public static final float FIREBALL_SPEED = 200f;
+    public static final float FIREBALL_EXPIRATION = 3f;
     public static final float FIREBALL_ACCELERATION = 20f;
     public static final float FIREBALL_COOLDOWN = 2f;
     public static final boolean FIREBALL_STATIC = false;
@@ -35,8 +35,8 @@ public class SpellList {
     public static final String FROSTBOLT_IMAGE = "assets/frostboltsprite.png";
     public static final int FROSTBOLT_DMG = 5;
     public static final int FROSTBOLT_BOUNCE = 4;
-    public static final float FROSTBOLT_SPEED = 150f;
-    public static final float FROSTBOLT_EXPIRATION = 4f;
+    public static final float FROSTBOLT_SPEED = 200f;
+    public static final float FROSTBOLT_EXPIRATION = 3f;
     public static final float FROSTBOLT_ACCELERATION = 20f;
     public static final float FROSTBOLT_COOLDOWN = 3f;
     public static final boolean FROSTBOLT_STATIC = false;

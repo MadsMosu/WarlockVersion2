@@ -45,10 +45,11 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         ImageManager.createImage(ENEMY_FINAL_IMAGE_PATH, false);
         this.world = world;
         enemies = new ArrayList();
-
-        enemies.add(makeEnemy(3000, 0));
-        enemies.add(makeEnemy(3600, 0));
-
+ 
+        enemies.add(makeEnemy(gameData));
+        enemies.add(makeEnemy(gameData));
+        enemies.add(makeEnemy(gameData));
+        enemies.add(makeEnemy(gameData));
     }
 
     @Override
@@ -92,12 +93,16 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         }
     }
 
-    private Entity makeEnemy(float xPosition, float yPosition)
+    private Entity makeEnemy(GameData gameData)
     {
         Entity enemy = new Entity();
         enemy.setType(ENEMY);
+        
+        Random rand = new Random();
+        int randX = rand.nextInt(500) + gameData.getMapWidth() / 2;
+        int randY = rand.nextInt(500);
 
-        Position pos = new Position(xPosition, yPosition);
+        Position pos = new Position(randX, randY);
         Health health = new Health(100);
         SpellBook sb = new SpellBook(new Owner(enemy.getID()));
         Owner ow = new Owner(enemy.getID());

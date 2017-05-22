@@ -143,13 +143,13 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
     private void radarScan(World world, Entity ai) {
         detectEnemies(world, ai);
-        detectIncommingSpells(world, ai, 400);
-        detectEnemiesHealthInDist(world, ai, 200);
+        detectIncommingSpells(world, ai, 300);
+        detectEnemiesHealthInDist(world, ai, 300);
 
     }
 
     private void stateProcessor(Entity ai, World world, Position p, AI aiComp) {
-        if ((opponentInDistance(world, ai, 400) && !p.isInLava())) {
+        if ((opponentInDistance(world, ai, 300) && !p.isInLava())) {
             aiComp.setState(StateMachine.ATTACK);
         } else if (p.isInLava() || !incomingSpells.get(ai).isEmpty()) {
             aiComp.setState(StateMachine.EVADE);
@@ -192,7 +192,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
             Vector2 dodgeVector = spellDirection.rotateDegrees(80);
             v.setVector(dodgeVector.setMagnitude(100));
             v.setTravelDist(dodgeVector.getMagnitude());
-            v.getVector().normalize();
+            //v.getVector().normalize();
             ai.setCharState(CharacterState.MOVING);
 
             p.setStartPosition(new Position(p));
@@ -207,7 +207,6 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     private void handleInLava(Entity ai, GameData gameData, Position p, Velocity v) {
         Position middle = new Position(gameData.getMapWidth() / 2, 0);
         Vector2 directionToMiddle = new Vector2(new Position(p), middle);
-        //float distanceToMiddle = directionToMiddle.getMagnitude();
 
         ai.setAngle((float) directionToMiddle.getAngle());
         ai.setRunningState(ai.getAngle(), ai);
