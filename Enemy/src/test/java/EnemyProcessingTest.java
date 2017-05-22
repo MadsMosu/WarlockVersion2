@@ -14,7 +14,7 @@ import data.componentdata.Velocity;
 import data.componentdata.SpellBook;
 import data.util.Vector2;
 import services.IEntityProcessingService;
-import player.PlayerPlugin;
+import enemy.EnemyPlugin;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class PlayerProcessingTest {
+public class EnemyProcessingTest {
 
     private IEntityProcessingService processor;
     private GameData gameData;
@@ -32,7 +32,7 @@ public class PlayerProcessingTest {
     private Velocity v;
     private SpellBook sb;
 
-    public PlayerProcessingTest() {
+    public EnemyProcessingTest() {
     }
 
     @BeforeClass
@@ -58,7 +58,7 @@ public class PlayerProcessingTest {
         player.add(v);
         world = new World();
         netherworld = new Netherworld();
-        processor = new PlayerPlugin();
+        processor = new EnemyPlugin();
         world.addEntity(player);
     }
 
@@ -82,41 +82,39 @@ public class PlayerProcessingTest {
 //        assertTrue(expectedVec.equals(actualVec));
     }
 
-
-
     /**
      * Test that the right spell is chosen
      */
-    @Test
-    public void testChooseSpell() {
-        gameData.getKeys().setKey(GameKeys.NUM_1, true);
-        processor.process(gameData, world, netherworld);
-        for (Entity e : world.getEntities(EntityType.PLAYER)) {
-            assertTrue(e.get(SpellBook.class).getChosenSpell().equals(SpellType.FIREBALL));
-        }
-
-        gameData.getKeys().setKey(GameKeys.NUM_2, true);
-        processor.process(gameData, world, netherworld);
-        for (Entity e : world.getEntities(EntityType.PLAYER)) {
-            assertTrue(e.get(SpellBook.class).getChosenSpell().equals(SpellType.FROSTBOLT));
-        }
-
-        gameData.getKeys().setKey(GameKeys.NUM_3, true);
-        processor.process(gameData, world, netherworld);
-        for (Entity e : world.getEntities(EntityType.PLAYER)) {
-            assertTrue(e.get(SpellBook.class).getChosenSpell().equals(SpellType.TELEPORT1));
-        }
-    }
-
-    /**
-     * Test that the characters state is set correctly.
-     */
-    @Test
-    public void testShootSpell() {
-        gameData.getKeys().setKey(GameKeys.LEFT_MOUSE, true);
-        for (Entity e : world.getEntities(EntityType.PLAYER)) {
-            assertTrue(e.getCharState().equals(CharacterState.CASTING));
-        }
-
-    }
+//    @Test
+//    public void testChooseSpell() {
+//        gameData.getKeys().setKey(GameKeys.NUM_1, true);
+//        processor.process(gameData, world, netherworld);
+//        for (Entity e : world.getEntities(EntityType.PLAYER)) {
+//            assertTrue(e.get(SpellBook.class).getChosenSpell().equals(SpellType.FIREBALL));
+//        }
+//
+//        gameData.getKeys().setKey(GameKeys.NUM_2, true);
+//        processor.process(gameData, world, netherworld);
+//        for (Entity e : world.getEntities(EntityType.PLAYER)) {
+//            assertTrue(e.get(SpellBook.class).getChosenSpell().equals(SpellType.FROSTBOLT));
+//        }
+//
+//        gameData.getKeys().setKey(GameKeys.NUM_3, true);
+//        processor.process(gameData, world, netherworld);
+//        for (Entity e : world.getEntities(EntityType.PLAYER)) {
+//            assertTrue(e.get(SpellBook.class).getChosenSpell().equals(SpellType.TELEPORT1));
+//        }
+//    }
+//
+//    /**
+//     * Test that the characters state is set correctly.
+//     */
+//    @Test
+//    public void testShootSpell() {
+//        gameData.getKeys().setKey(GameKeys.LEFT_MOUSE, true);
+//        for (Entity e : world.getEntities(EntityType.PLAYER)) {
+//            assertTrue(e.getCharState().equals(CharacterState.CASTING));
+//        }
+//
+//    }
 }

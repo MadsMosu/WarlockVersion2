@@ -4,7 +4,7 @@ import data.EntityType;
 import data.GameData;
 import data.World;
 import services.IGamePluginService;
-import player.PlayerPlugin;
+import enemy.EnemyPlugin;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertFalse;
@@ -13,14 +13,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+public class EnemyPluginTest {
 
-public class PlayerPluginTest {
-
-    private World world;
+   private World world;
     private GameData gameData;
     private IGamePluginService plugin;
+    private boolean hasEnemy;
 
-    public PlayerPluginTest() {
+    public EnemyPluginTest() {
     }
 
     @BeforeClass
@@ -34,8 +34,9 @@ public class PlayerPluginTest {
     @Before
     public void setUp() {
         gameData = new GameData();
-        plugin = new PlayerPlugin();
+        plugin = new EnemyPlugin();
         world = new World();
+        hasEnemy = false;
     }
 
     @After
@@ -43,17 +44,16 @@ public class PlayerPluginTest {
     }
 
     /**
-     * Test that a player is added to the world at game start.
+     * Test that an enemy is added to the world at game start.
      */
     @Test
     public void testStart() {
         plugin.start(gameData, world);
 
-        boolean hasPlayer = false;
-        for (Entity e : world.getEntities(EntityType.PLAYER)) {
-            hasPlayer = true;
+        for (Entity e : world.getEntities(EntityType.ENEMY)) {
+            hasEnemy = true;
         }
-        assertTrue(hasPlayer);
+        assertTrue(hasEnemy);
     }
 
     /**
@@ -65,12 +65,9 @@ public class PlayerPluginTest {
         plugin.start(gameData, world);
         plugin.stop();
 
-        boolean hasPlayer = false;
-        for (Entity e : world.getEntities(EntityType.PLAYER)) {
-
-            hasPlayer = true;
-
+        for (Entity e : world.getEntities(EntityType.ENEMY)) {
+            hasEnemy = true;
         }
-        assertFalse(hasPlayer);
+        assertFalse(hasEnemy);
     }
 }

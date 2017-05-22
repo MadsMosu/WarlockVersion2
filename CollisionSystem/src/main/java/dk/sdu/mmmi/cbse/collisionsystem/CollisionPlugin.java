@@ -48,7 +48,7 @@ public class CollisionPlugin implements IEntityProcessingService {
 
     private void handleCollision(Entity handled, Entity collideWith, World world, GameData gameData) {
         if (handled != null && collideWith != null) {
-            if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+            if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionManager.isColliding(handled, collideWith)) {
 
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     //Add damage to entity
@@ -68,7 +68,7 @@ public class CollisionPlugin implements IEntityProcessingService {
                     collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
                 }
-            } else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
+            } else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionManager.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     collideWith.get(Health.class).addDamageTaken(new DamageTaken(handled.get(Damage.class), handled.get(Owner.class)));
 
@@ -80,17 +80,17 @@ public class CollisionPlugin implements IEntityProcessingService {
                     collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
                 }
-            } else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+            } else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionManager.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
 
                 }
 
-            } else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+            } else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionManager.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
 
                 }
 
-            } else if (handled.getType() == SPELL && collideWith.getType() == SPELL && CollisionHandler.isColliding(handled, collideWith)) {
+            } else if (handled.getType() == SPELL && collideWith.getType() == SPELL && CollisionManager.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.get(Owner.class).getID())) {
 //                    world.removeEntity(handled);
 //                    world.removeEntity(collideWith);

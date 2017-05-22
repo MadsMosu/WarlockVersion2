@@ -5,6 +5,8 @@
  */
 package gameengine;
 
+import managers.DotaCamera;
+import managers.HUDManager;
 import States.GameState;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -43,7 +45,6 @@ import data.componentdata.SpellInfos;
 import java.util.Collection;
 import managers.AnimationHandler;
 import managers.HealthBarManager;
-import managers.Jukebox;
 import managers.MapManager;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -69,7 +70,7 @@ public class GameEngine implements ApplicationListener {
     private AnimationHandler animator;
     private MapManager mapManager;
     private HealthBarManager healthBarManager;
-    private HUD hud;
+    private HUDManager hud;
     private Music backgroundMusic;
 
     public static final String BACKGROUNDMUSIC_PATH = "assets/sounds/Soundtrack.ogg";
@@ -114,7 +115,7 @@ public class GameEngine implements ApplicationListener {
             entityPlugins.add(plugin);
         }
         loadImages();
-        hud = new HUD(spriteBatch, gameData, world);
+        hud = new HUDManager(spriteBatch, gameData, world);
 
         gameData.setGameState(GameState.RUN);
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/backgroundmusic.mp3"));

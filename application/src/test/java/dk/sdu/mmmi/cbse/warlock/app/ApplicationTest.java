@@ -76,9 +76,10 @@ public class ApplicationTest extends NbTestCase {
 //        assertTrue(entityList.size() == originalEntityList - 1);
 //        assertTrue(processorList.size() == originalProcessorList - 1);
 //
-//        copy(get(remPlayerFilePath), get(filepath), REPLACE_EXISTING);
+//        copy(get(playerFilePath), get(filepath), REPLACE_EXISTING);
 //        WaitForUpdate();
 //        assertTrue(originalEntityList == originalEntityList);
 //        assertTrue(originalProcessorList == originalProcessorList);
+        
     }
 }

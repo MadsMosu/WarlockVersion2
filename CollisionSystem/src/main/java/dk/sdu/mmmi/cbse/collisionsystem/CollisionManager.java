@@ -12,7 +12,7 @@ import data.componentdata.Position;
  *
  * @author jonaspedersen
  */
-public class CollisionHandler {
+public class CollisionManager {
     
     public static boolean isColliding(Entity e1, Entity e2)
     {

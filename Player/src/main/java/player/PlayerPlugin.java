@@ -112,12 +112,9 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
     }
 
     private void handleMove(Entity e, GameData gameData) {
-        Position p = e.get(Position.class
-        );
-        Body b = e.get(Body.class
-        );
-        Velocity v = e.get(Velocity.class
-        );
+        Position p = e.get(Position.class);
+        Body b = e.get(Body.class);
+        Velocity v = e.get(Velocity.class);
 
         if (gameData.getKeys().isPressed(RIGHT_MOUSE) && !e.getCharState().equals(CharacterState.BOUNCING)) {
             gameData.getKeys().setKey(RIGHT_MOUSE, false);

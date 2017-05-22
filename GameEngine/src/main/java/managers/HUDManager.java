@@ -1,4 +1,4 @@
-package gameengine;
+package managers;
 
 import States.GameState;
 import com.badlogic.gdx.graphics.Color;
@@ -15,7 +15,7 @@ import data.World;
 import data.componentdata.Health;
 import data.componentdata.Score;
 
-public class HUD {
+public class HUDManager {
 
     private Stage stage;
     private FitViewport viewPort;
@@ -38,7 +38,7 @@ public class HUD {
     private Label winnerLabel;
     private Label nextRoundCDLabel;
 
-    public HUD(SpriteBatch spriteBatch, GameData gameData, World world) {
+    public HUDManager(SpriteBatch spriteBatch, GameData gameData, World world) {
         roundTimer = gameData.getRoundTime();
         roundNumb = gameData.getRoundNumber();
 
