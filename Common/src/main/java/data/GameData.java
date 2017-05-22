@@ -24,6 +24,7 @@ public class GameData {
     private int mapHeight;
     private int mapWidth;
     private String whoWinsRound = "";
+    private String winner = "";
     private int maxRounds;
     
     private int mousePositionX;
@@ -35,6 +36,14 @@ public class GameData {
 
     public void setFPS(int FPS) {
         this.FPS = FPS;
+    }
+
+    public String getWinner() {
+        return winner;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
     }
     
     public int getMaxRounds() {

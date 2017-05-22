@@ -79,5 +79,15 @@ public class SpellList {
         return 0; 
     }
     
+    public static float getSpellDmg(SpellType spellType){
+        switch(spellType){
+            case FIREBALL:
+                return FIREBALL_DMG;
+            case FROSTBOLT:
+                return FROSTBOLT_DMG;
+        }
+        return 0; 
+    }
+    
     
 }

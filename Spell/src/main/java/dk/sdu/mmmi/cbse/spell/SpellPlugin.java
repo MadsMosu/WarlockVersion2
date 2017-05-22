@@ -149,6 +149,7 @@ public class SpellPlugin implements IGamePluginService, IEntityProcessingService
         se.setAngle(v.getVector().getAngle());
         si.setSpellType(spellType);
         Owner owner = new Owner(caster.getID());
+        owner.setOwnerEntity(se);
         owner.setOwnerType(caster.getType());
         si.setIsMoving(false);
         se.add(dmg);

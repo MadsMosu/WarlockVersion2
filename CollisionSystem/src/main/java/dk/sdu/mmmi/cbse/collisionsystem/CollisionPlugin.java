@@ -16,16 +16,15 @@ import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
+import data.componentdata.Score;
+import data.componentdata.SpellBook;
+import data.componentdata.SpellInfos;
 import data.componentdata.Velocity;
 import java.util.Collection;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
 
-/**
- *
- * @author jonas_000
- */
 @ServiceProviders(value = {
     @ServiceProvider(service = IEntityProcessingService.class),})
 
@@ -49,7 +48,6 @@ public class CollisionPlugin implements IEntityProcessingService {
 
     private void handleCollision(Entity handled, Entity collideWith, World world, GameData gameData) {
         if (handled != null && collideWith != null) {
-
             if (handled.getType() == SPELL && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
 
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
@@ -61,7 +59,7 @@ public class CollisionPlugin implements IEntityProcessingService {
                     collideWith.get(Health.class).addDamageTaken(dmgTaken);
                     //System.out.println(collideWith.get(Health.class).getHp());
                     Velocity v = collideWith.get(Velocity.class);
-                    
+
                     v.setVector(handled.get(Velocity.class).getVector());
                     v.getVector().setMagnitude(200);
                     v.setTravelDist(v.getVector().getMagnitude());
@@ -71,11 +69,10 @@ public class CollisionPlugin implements IEntityProcessingService {
                     collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
                 }
-            }
-            else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
+            } else if (handled.getType() == SPELL && collideWith.getType() == PLAYER && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-                    collideWith.get(Health.class).addDamageTaken(new DamageTaken(new Damage(handled.get(Damage.class).getDamage()), new Owner(collideWith.getID())));
-                    
+                    collideWith.get(Health.class).addDamageTaken(new DamageTaken(handled.get(Damage.class), handled.get(Owner.class)));
+
                     Velocity v = collideWith.get(Velocity.class);
                     v.setVector(handled.get(Velocity.class).getVector());
                     v.getVector().setMagnitude(200);
@@ -84,16 +81,14 @@ public class CollisionPlugin implements IEntityProcessingService {
                     collideWith.setCharState(CharacterState.BOUNCING);
                     world.removeEntity(handled);
                 }
-            }
-            else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+            } else if (handled.getType() == PLAYER && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-                    
+
                 }
 
-            }
-            else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
+            } else if (handled.getType() == ENEMY && collideWith.getType() == ENEMY && CollisionHandler.isColliding(handled, collideWith)) {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
-                    
+
                 }
 
             } else if (handled.getType() == SPELL && collideWith.getType() == SPELL && CollisionHandler.isColliding(handled, collideWith)) {

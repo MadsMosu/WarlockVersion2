@@ -15,10 +15,10 @@ import data.ImageManager;
 import data.Netherworld;
 import data.componentdata.AI;
 import data.componentdata.Body;
-import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
+import data.componentdata.Score;
 import data.componentdata.SpellBook;
 import data.componentdata.Velocity;
 import data.util.Vector2;
@@ -101,6 +101,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         AI ai = new AI();
         Velocity v = new Velocity();
         Body body = new Body(50, 50, Body.Geometry.RECTANGLE);
+        Score score = new Score();
         v.setSpeed(50);
         sb.setCooldownTimeLeft(sb.getGlobalCooldownTime());
         enemy.add(ow);
@@ -111,6 +112,7 @@ public class EnemyPlugin implements IEntityProcessingService, IGamePluginService
         enemy.add(ai);
         enemy.add(v);
         enemy.add(body);
+        enemy.add(score);
 
         enemy.setMoveState(MovementState.STANDING);
         enemy.setCharState(CharacterState.IDLE);

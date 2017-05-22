@@ -19,10 +19,10 @@ import static data.SpellType.FROSTBOLT;
 import static data.SpellType.TELEPORT1;
 import data.componentdata.Body;
 import data.componentdata.Body.Geometry;
-import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
+import data.componentdata.Score;
 import data.componentdata.SpellBook;
 import data.componentdata.Velocity;
 import data.util.Vector2;
@@ -93,6 +93,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         Owner ow = new Owner(player.getID());
         SpellBook sb = new SpellBook(new Owner(player.getID()));
         Velocity v = new Velocity();
+        Score score = new Score();
         v.setSpeed(100);
         player.add(ow);
         player.add(ImageManager.getImage(CHARACTER_FINAL_IMAGE_PATH));
@@ -100,6 +101,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
         player.add(pos);
         player.add(sb);
         player.add(v);
+        player.add(score);
 
         Body body = new Body(50, 50, Geometry.RECTANGLE);
         player.add(body);

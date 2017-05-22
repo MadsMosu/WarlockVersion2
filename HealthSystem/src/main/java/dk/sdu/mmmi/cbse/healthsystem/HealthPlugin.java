@@ -11,6 +11,7 @@ import data.World;
 import data.SpellList;
 import data.componentdata.DamageTaken;
 import data.componentdata.Health;
+import data.componentdata.Score;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import services.IEntityProcessingService;
@@ -47,6 +48,8 @@ public class HealthPlugin implements IGamePluginService, IEntityProcessingServic
 
                     if (health.getHp() <= 0) {
                         e.setCharState(CharacterState.DEAD);
+                        Score score = dtaken.getOwner().getOwnerEntity().get(Score.class);
+                        score.setKills(score.getKills() + 1);
                     }
                 }
                 health.getDamageTaken().clear();

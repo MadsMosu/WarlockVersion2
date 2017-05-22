@@ -12,9 +12,7 @@ package data.componentdata;
 public class Score {
 
     private int kills = 0;
-    private int hits = 0;
-    private int totalKills = 0;
-    private int totalHits = 0;
+    private int roundsWon = 0;
 
     public int getKills() {
         return kills;
@@ -24,31 +22,15 @@ public class Score {
         this.kills = kills;
     }
 
-    public int getHits() {
-        return hits;
+    public int getRoundsWon() {
+        return roundsWon;
     }
 
-    public void setHits(int hits) {
-        this.hits = hits;
+    public void setRoundsWon(int roundsWon) {
+        this.roundsWon = roundsWon;
     }
+    
+    
 
-    public int getTotalKills() {
-        return totalKills;
-    }
 
-    public void setTotalKills(int totalKills) {
-        if (this.totalKills != totalKills) {
-            this.totalKills = totalKills;
-        }
-    }
-
-    public int getTotalHits() {
-        return totalHits;
-    }
-
-    public void setTotalHits(int totalHits) {
-        if (this.totalHits != totalHits) {
-            this.totalHits = totalHits;
-        }
-    }
 }

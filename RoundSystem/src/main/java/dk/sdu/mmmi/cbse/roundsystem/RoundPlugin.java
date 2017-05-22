@@ -11,6 +11,7 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 import States.GameState;
 import data.Netherworld;
+import data.componentdata.Score;
 
 @ServiceProviders(value = {
     @ServiceProvider(service = IGamePluginService.class)
@@ -43,8 +44,23 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
 
         if (gameData.getRoundNumber() > gameData.getMaxRounds()) {
             for (Entity e : world.getEntities()) {
+                if (e.isType(EntityType.PLAYER) || e.isType(EntityType.ENEMY)) {
+                    netherworld.addEntity(e);
+                }
                 world.removeEntity(e);
                 gameData.setGameState(GameState.PAUSE);
+            }
+            int enemyRoundsWon = 0;
+            for (Entity e : netherworld.getEntities()) {
+                Score score = e.get(Score.class);
+                if (e.isType(EntityType.ENEMY)) {
+                    enemyRoundsWon += score.getRoundsWon();
+                }
+                if (e.isType(EntityType.PLAYER) && score.getRoundsWon() > gameData.getMaxRounds() / 2) {
+                    gameData.setWinner("Player");
+                } else if (e.isType(EntityType.PLAYER) && enemyRoundsWon > gameData.getMaxRounds() / 2) {
+                    gameData.setWinner("Enemy");
+                }
             }
         }
         float dt = gameData.getDelta();
@@ -57,16 +73,17 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
 
             if (numbOfCharacters == 1) {
                 for (Entity e : world.getEntities()) {
+                    Score score = e.get(Score.class);
                     e.setCharState(CharacterState.IDLE);
                     if (e.isType(EntityType.ENEMY)) {
                         gameData.setWhoWinsRound("ENEMY WINS THE ROUND!");
-                    }
-                    else if (e.isType(EntityType.PLAYER)) {
+                        score.setRoundsWon(score.getRoundsWon() + 1);
+                    } else if (e.isType(EntityType.PLAYER)) {
                         gameData.setWhoWinsRound("PLAYER WINS THE ROUND!");
+                        score.setRoundsWon(score.getRoundsWon() + 1);
                     }
                 }
-            }
-            else {
+            } else {
                 gameData.setWhoWinsRound("THE ROUND IS A DRAW!");
             }
             gameData.setGameState(GameState.ROUNDEND);
@@ -82,17 +99,15 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
                 resetNextRoundTime(gameData);
                 gameData.setRoundNumber(gameData.getRoundNumber() + 1);
                 gameData.setGameState(GameState.RUN);
-            }
-            else {
+            } else {
                 gameData.setNextRoundCountdown(gameData.getNextRoundCountdown() - dt);
             }
         }
 
-    
-}
+    }
 
-@Override
-        public void stop() {
+    @Override
+    public void stop() {
     }
 
 }
