@@ -77,7 +77,7 @@ public class CollisionPlugin implements IEntityProcessingService {
                     //
                     Velocity v = collideWith.get(Velocity.class);
                     v.setVector(handled.get(Velocity.class).getVector());
-                    v.getVector().setMagnitude(300);
+                    v.getVector().setMagnitude(200);
                     v.setTravelDist(v.getVector().getMagnitude());
                     v.getVector().normalize();
                     collideWith.setCharState(CharacterState.BOUNCING);

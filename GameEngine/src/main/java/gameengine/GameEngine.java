@@ -55,11 +55,11 @@ import org.openide.util.LookupListener;
 public class GameEngine implements ApplicationListener {
 
     private GameData gameData;
-    private World world;
+    public World world;
     private Netherworld netherworld;
     private final Lookup lookup = Lookup.getDefault();
     private Lookup.Result<IGamePluginService> pluginResult;
-    private List<IGamePluginService> entityPlugins;
+    public List<IGamePluginService> entityPlugins;
     private IsometricTiledMapRenderer renderer;
     public DotaCamera camera;
     private OrthographicCamera hudCamera;
@@ -287,4 +287,5 @@ public class GameEngine implements ApplicationListener {
         assetManager.dispose();
     }
 
+    
 }

@@ -17,22 +17,14 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 
 @ServiceProviders(value = {
-    @ServiceProvider(service = IGamePluginService.class),
     @ServiceProvider(service = IEntityProcessingService.class)
 })
 
-public class HealthPlugin implements IGamePluginService, IEntityProcessingService {
+public class HealthPlugin implements  IEntityProcessingService {
 
     float regenTime = 4;
     float regenTimer = 0;
 
-    @Override
-    public void start(GameData gameData, World world)
-    {
-        for (Entity e : world.getEntities(PLAYER, ENEMY)) {
-
-        }
-    }
 
     @Override
     public void process(GameData data, World world, Netherworld netherworld)
@@ -76,10 +68,5 @@ public class HealthPlugin implements IGamePluginService, IEntityProcessingServic
         }
     }
 
-    @Override
-    public void stop()
-    {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
 }

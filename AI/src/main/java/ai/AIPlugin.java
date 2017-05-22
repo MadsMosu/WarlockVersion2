@@ -1,5 +1,7 @@
 package ai;
 
+import data.util.PQHeap;
+import data.util.EntityValue;
 import States.CharacterState;
 import data.Entity;
 import static data.EntityType.ENEMY;
@@ -28,7 +30,8 @@ import services.IEntityProcessingService;
 import services.IGamePluginService;
 
 @ServiceProviders(value = {
-    @ServiceProvider(service = IEntityProcessingService.class),
+    @ServiceProvider(service = IEntityProcessingService.class)
+    ,
     @ServiceProvider(service = IGamePluginService.class)
 })
 
@@ -37,13 +40,11 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     Map<Entity, List<Entity>> incomingSpells;
 
     @Override
-    public void start(GameData gameData, World world)
-    {
+    public void start(GameData gameData, World world) {
         incomingSpells = new HashMap();
     }
 
-    private boolean opponentInDistance(World world, Entity ai, float distanceValue)
-    {
+    private boolean opponentInDistance(World world, Entity ai, float distanceValue) {
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
                 Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
@@ -56,8 +57,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return false;
     }
 
-    private boolean SpellInDistance(World world, Entity ai, float distanceValue)
-    {
+    private boolean SpellInDistance(World world, Entity ai, float distanceValue) {
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
                 Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
@@ -71,14 +71,12 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return false;
     }
 
-    private float getDistance(Entity ai, Entity opponent)
-    {
+    private float getDistance(Entity ai, Entity opponent) {
         Vector2 direction = new Vector2(ai.get(Position.class), opponent.get(Position.class));
         return direction.getMagnitude();
     }
 
-    private void detectEnemies(World world, Entity ai)
-    {
+    private void detectEnemies(World world, Entity ai) {
         AI aiComp = ai.get(AI.class);
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai)) {
@@ -89,8 +87,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
-    public void detectIncommingSpells(World world, Entity ai, float distanceValue)
-    {
+    public void detectIncommingSpells(World world, Entity ai, float distanceValue) {
 
         for (Entity AI : world.getEntities(ENEMY)) {
             List<Entity> spellsToAvoid = new ArrayList();
@@ -110,8 +107,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
-    private void detectEnemiesHealthInDist(World world, Entity ai, float distanceValue)
-    {
+    private void detectEnemiesHealthInDist(World world, Entity ai, float distanceValue) {
         AI aiComp = ai.get(AI.class);
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
             if (!entity.equals(ai) && opponentInDistance(world, ai, distanceValue)) {
@@ -120,24 +116,29 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
-    private Entity lowestValue(Map<Entity, Float> map)
-    {
-        Entry<Entity, Float> min = null;
+    private Entity lowestValue(Map<Entity, Float> map) {
+        PQHeap pq = new PQHeap(map.size());
+
         if (!map.isEmpty()) {
+
             for (Entry<Entity, Float> entry : map.entrySet()) {
-                if (min == null || min.getValue() > entry.getValue()) {
-                    min = entry;
+                pq.insert(new EntityValue(entry.getValue()));
+            }
+            if (!pq.getQueue().isEmpty()) {
+
+                for (Entry<Entity, Float> entry : map.entrySet()) {
+                    float value = pq.extractMin().value; 
+                    if (value == entry.getValue()) {
+                        return entry.getKey();
+                    }
                 }
             }
-            return min.getKey();
         }
         return null;
     }
 
-    private void avoidSpells(Entity ai)
-    {
+    private void avoidSpells(Entity ai) {
         List<Entity> collidingSpells = incomingSpells.get(ai);
-        
 
         for (Entity spell : collidingSpells) {
             Vector2 spellDirection = new Vector2(spell.get(Velocity.class).getVector());
@@ -158,8 +159,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 //        aiComp.setSpellToAvoid(null);
     }
 
-    private boolean checkForSameHP(Map<Entity, Float> HPmap)
-    {
+    private boolean checkForSameHP(Map<Entity, Float> HPmap) {
         Object value = null;
         for (Object entry : HPmap.values()) {
             if (value == null) {
@@ -171,8 +171,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return true;
     }
 
-    private void attack(World world, Entity ai)
-    {
+    private void attack(World world, Entity ai) {
         AI aiComp = ai.get(AI.class);
         SpellBook sb = ai.get(SpellBook.class);
         if (opponentInDistance(world, ai, 400) && !ai.get(Position.class).isInLava()) {
@@ -190,8 +189,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
-    private void clearRadar(Entity ai)
-    {
+    private void clearRadar(Entity ai) {
         AI aiComp = ai.get(AI.class
         );
         aiComp.getAllEntities().clear();
@@ -199,16 +197,14 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         aiComp.getEntitiesHealthInDist().clear();
     }
 
-    private void radarScan(World world, Entity ai)
-    {
+    private void radarScan(World world, Entity ai) {
         detectEnemies(world, ai);
         detectIncommingSpells(world, ai, 400);
         detectEnemiesHealthInDist(world, ai, 200);
 
     }
 
-    private void behaviour(World world, Entity ai)
-    {
+    private void behaviour(World world, Entity ai) {
         clearRadar(ai);
         radarScan(world, ai);
 
@@ -218,8 +214,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     }
 
     @Override
-    public void process(GameData gameData, World world, Netherworld netherWorld)
-    {
+    public void process(GameData gameData, World world, Netherworld netherWorld) {
         for (Entity ai : world.getEntities(ENEMY)) {
             behaviour(world, ai);
         }
@@ -227,8 +222,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     }
 
     @Override
-    public void stop()
-    {
+    public void stop() {
 
     }
 
