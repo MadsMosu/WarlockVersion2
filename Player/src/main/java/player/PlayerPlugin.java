@@ -156,8 +156,7 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
     private void handleTargetClick(Entity e, GameData gameData) {
         if (gameData.getKeys().isPressed(NUM_1)) {
-            SpellBook sb = e.get(SpellBook.class
-            );
+            SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(FIREBALL);
 
         } else if (gameData.getKeys().isPressed(NUM_2)) {
@@ -168,8 +167,14 @@ public class PlayerPlugin implements IEntityProcessingService, IGamePluginServic
 
         } else if (gameData.getKeys().isPressed(NUM_3)) {
             //Spell 3
-            SpellBook sb = e.get(SpellBook.class
-            );
+        }
+        else if (gameData.getKeys().isPressed(NUM_2)) {
+            SpellBook sb = e.get(SpellBook.class);
+            sb.setChosenSpell(FROSTBOLT);
+
+        }
+        else if (gameData.getKeys().isPressed(NUM_3)) {
+            SpellBook sb = e.get(SpellBook.class);
             sb.setChosenSpell(TELEPORT1);
 
         } else {

@@ -59,14 +59,11 @@
         <module>application</module>
         <module>Enemy</module>
         <module>Spell</module>
-        <module>Map</module>
         <module>GameEngine</module>
         <module>RoundSystem</module>
-        <module>CurrencySystem</module>
         <module>HealthSystem</module>
         <module>CollisionSystem</module>
         <module>MovementSystem</module>
-        <module>LevelSystem</module>
         <module>Player</module>
         <module>Common</module>
         <module>AI</module>

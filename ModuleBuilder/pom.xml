@@ -64,17 +64,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>LevelSystem</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>RoundSystem</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>CurrencySystem</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -95,11 +85,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>HealthSystem</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>Map</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

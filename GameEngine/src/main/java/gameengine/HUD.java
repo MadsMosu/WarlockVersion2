@@ -59,7 +59,7 @@ public class HUD {
         winnerTable = new Table();
         winnerTable.center();
         winnerTable.setFillParent(true);
-        
+
         healthLabel = new Label("HP: " + health, new Label.LabelStyle(new BitmapFont(), Color.GREEN));
         roundNumbLabel = new Label("Round: " + roundNumb, new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         roundTimerLabel = new Label("Time: " + String.format("%.2f", roundTimer), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
@@ -78,14 +78,13 @@ public class HUD {
         winnerTable.add(winnerLabel).center();
         winnerTable.row().padTop(5).padBottom(5);
         winnerTable.add(nextRoundCDLabel).center();
-        
+
         winnerTable.setVisible(false);
         
         
         
         
 
-        
         stage.addActor(table);
         stage.addActor(winnerTable);
     }
@@ -102,14 +101,15 @@ public class HUD {
         roundsWonLabel.setText("Rounds won: " + player.get(Score.class).getRoundsWon());
 
         if (gameData.getGameState().equals(GameState.PAUSE)) {
-            winnerTable.setVisible(true);          
+            winnerTable.setVisible(true);
             winnerLabel.setText(gameData.getWhoWinsRound());
             if(gameData.getRoundNumber() < gameData.getMaxRounds()){
                 nextRoundCDLabel.setText("Next round starts in " + String.format("%.2f", gameData.getNextRoundCountdown()));     
             } else {
                 nextRoundCDLabel.setText("Game has ended..." + gameData.getWinner());
             }
-        } else{
+        }
+        else {
             winnerTable.setVisible(false);
         }
     }

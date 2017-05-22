@@ -45,8 +45,6 @@ public class Velocity {
         this.travelDist = travelDist;
     }
 
-
-
     public float getSpeed() {
         return speed;
     }

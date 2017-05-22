@@ -17,8 +17,7 @@ public class Position implements Serializable {
     private float y;
     private Position startPosition;
     private boolean inLava = false;
-    private float startX;
-    private float startY;
+
 
     public boolean isInLava() {
         return inLava;
