@@ -11,16 +11,7 @@ package data.componentdata;
  */
 public class Score {
 
-    private int kills = 0;
     private int roundsWon = 0;
-
-    public int getKills() {
-        return kills;
-    }
-
-    public void setKills(int kills) {
-        this.kills = kills;
-    }
 
     public int getRoundsWon() {
         return roundsWon;

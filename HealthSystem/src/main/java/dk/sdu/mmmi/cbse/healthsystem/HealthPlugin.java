@@ -48,8 +48,6 @@ public class HealthPlugin implements IGamePluginService, IEntityProcessingServic
 
                     if (health.getHp() <= 0) {
                         e.setCharState(CharacterState.DEAD);
-                        Score score = dtaken.getOwner().getOwnerEntity().get(Score.class);
-                        score.setKills(score.getKills() + 1);
                     }
                 }
                 health.getDamageTaken().clear();

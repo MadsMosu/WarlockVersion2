@@ -57,9 +57,11 @@ public class RoundPlugin implements IGamePluginService, IEntityProcessingService
                     enemyRoundsWon += score.getRoundsWon();
                 }
                 if (e.isType(EntityType.PLAYER) && score.getRoundsWon() > gameData.getMaxRounds() / 2) {
-                    gameData.setWinner("Player");
+                    gameData.setWinner("Player wins the game");
                 } else if (e.isType(EntityType.PLAYER) && enemyRoundsWon > gameData.getMaxRounds() / 2) {
-                    gameData.setWinner("Enemy");
+                    gameData.setWinner("Enemy wins the game");
+                } else {
+                    gameData.setWinner("The game is a draw");
                 }
             }
         }
