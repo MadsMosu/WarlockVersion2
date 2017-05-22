@@ -10,6 +10,7 @@ import data.Netherworld;
 import static data.SpellType.FIREBALL;
 import data.World;
 import data.componentdata.AI;
+import data.componentdata.Body;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
@@ -133,28 +134,24 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         return null;
     }
 
-    private void avoidSpells(Entity ai)
+    private void avoidSpells(Entity ai, World world)
     {
         List<Entity> collidingSpells = incomingSpells.get(ai);
-        
 
         for (Entity spell : collidingSpells) {
+            
+            Velocity v = ai.get(Velocity.class);
             Vector2 spellDirection = new Vector2(spell.get(Velocity.class).getVector());
-            Position casterPos = spell.get(Owner.class).getOwnerEntity().get(Position.class);
-            
-            Vector2 casterToAI = new Vector2(casterPos, ai.get(Position.class));
-            float diffY = casterToAI.getY()/spellDirection.getY();
-                
-            Vector2 vector = spellDirection.scalarMultiply(diffY);
-            if(vector.isOnLine(ai.get(Velocity.class).getVector())){
-                
-                ai.get(Velocity.class).setVector(spellDirection.rotateDegrees(80).setMagnitude(100f));
-                ai.setCharState(CharacterState.MOVING);
-                System.out.println("Spell is at positions y valuejhjjjj");
-            }
+            Vector2 dodgeVector = spellDirection.rotateDegrees(80);
+            v.setTravelDist(dodgeVector.getMagnitude());
+            v.setVector(dodgeVector.setMagnitude(100));
+            ai.setCharState(CharacterState.MOVING);
             
             
+            //System.out.println("Spell is at positions y valuejhjjjj");
         }
+
+    }
 
 //        AI aiComp = ai.get(AI.class);
 //        if (SpellInDistance(world, ai, 400)) {
@@ -167,8 +164,6 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 ////            }
 ////        }
 //        aiComp.setSpellToAvoid(null);
-    }
-
     private boolean checkForSameHP(Map<Entity, Float> HPmap)
     {
         Object value = null;
@@ -223,7 +218,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         clearRadar(ai);
         radarScan(world, ai);
 
-        avoidSpells(ai);
+        avoidSpells(ai, world);
         attack(world, ai);
 
     }
