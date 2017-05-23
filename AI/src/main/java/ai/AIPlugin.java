@@ -54,7 +54,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
                 Vector2 direction = new Vector2(ai.get(Position.class), entity.get(Position.class));
                 float distance = direction.getMagnitude();
                 if (distance <= distanceValue) {
-                    ai.get(AI.class).getAttackTargetsInRange().add(entity);
+                    ai.get(AI.class).getEntitiesInRange().add(entity);
                     return true;
                 }
             }
@@ -70,16 +70,10 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
             if (!e.equals(ai)) {
                 Vector2 direction = new Vector2(ai.get(Position.class), e.get(Position.class));
                 float distance = direction.getMagnitude();
-                if (distance <= distanceValue && !aiComp.getAttackTargetsInRange().contains(e)) {
-                    ai.get(AI.class).getAttackTargetsInRange().add(e);
-                } else if (distance > distanceValue && aiComp.getAttackTargetsInRange().contains(e)) {
-                    aiComp.getAttackTargetsInRange().remove(e);
-                }
-                
-                if (distance <= distanceValue && !aiComp.getChasingTargetsInRange().contains(e) && !e.get(Position.class).isInLava()) {
-                    ai.get(AI.class).getAttackTargetsInRange().add(e);
-                } else if (distance > distanceValue && aiComp.getChasingTargetsInRange().contains(e) && e.get(Position.class).isInLava()) {
-                    aiComp.getAttackTargetsInRange().remove(e);
+                if (distance <= distanceValue && !aiComp.getEntitiesInRange().contains(e)) {
+                    ai.get(AI.class).getEntitiesInRange().add(e);
+                } else if (distance > distanceValue && aiComp.getEntitiesInRange().contains(e)) {
+                    aiComp.getEntitiesInRange().remove(e);
                 }
             }
         }
@@ -122,12 +116,8 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     {
         AI aiComp = ai.get(AI.class);
         for (Entity entity : world.getEntities(PLAYER, ENEMY)) {
-            if (!entity.equals(ai) && ai.get(AI.class).getAttackTargetsInRange().contains(entity)) {
-                aiComp.getAttackTargetsHealthInDist().put(entity, entity.get(Health.class).getHp());
-            }
-            
-            if (!entity.equals(ai) && ai.get(AI.class).getChasingTargetsInRange().contains(entity)) {
-                aiComp.getChaseTargetsHealthInDist().put(entity, entity.get(Health.class).getHp());
+            if (!entity.equals(ai) && ai.get(AI.class).getEntitiesInRange().contains(entity)) {
+                aiComp.getEntitiesHealthInDist().put(entity, entity.get(Health.class).getHp());
             }
 //            if (!entity.equals(ai) && opponentInDistance(world, ai, distanceValue)) {
 //                aiComp.getEntitiesHealthInDist().put(entity, entity.get(Health.class).getHp());
@@ -135,28 +125,41 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         }
     }
 
+//    private Entity lowestValue(Map<Entity, Float> map)
+//    {
+//        if(pq == null){
+//        pq = new PQHeap(map.size());
+//        }
+//        if (!map.isEmpty()) {
+//
+//            for (Entry<Entity, Float> entry : map.entrySet()) {
+//                EntityValue value = new EntityValue(entry.getValue());
+//                if(!pq.getQueue().contains(value)){
+//                pq.insert(value);
+//                }
+//            }
+//            if (!pq.getQueue().isEmpty()) {
+//                float value = pq.extractMin().value;
+//                for (Entry<Entity, Float> entry : map.entrySet()) {
+//
+//                    if (value == entry.getValue()) {
+//                        return entry.getKey();
+//                    }
+//                }
+//            }
+//        }
+//        return null;
+//    }
     private Entity lowestValue(Map<Entity, Float> map)
     {
-        if (pq == null) {
-            pq = new PQHeap(map.size());
-        }
+        Entry<Entity, Float> min = null;
         if (!map.isEmpty()) {
-
             for (Entry<Entity, Float> entry : map.entrySet()) {
-                EntityValue value = new EntityValue(entry.getValue());
-                if (!pq.getQueue().contains(value)) {
-                    pq.insert(value);
+                if (min == null || min.getValue() > entry.getValue()) {
+                    min = entry;
                 }
             }
-            if (!pq.getQueue().isEmpty()) {
-                float value = pq.extractMin().value;
-                for (Entry<Entity, Float> entry : map.entrySet()) {
-
-                    if (value == entry.getValue()) {
-                        return entry.getKey();
-                    }
-                }
-            }
+            return min.getKey();
         }
         return null;
     }
@@ -179,7 +182,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     {
         AI aiComp = ai.get(AI.class);
         aiComp.getAllEntities().clear();
-        aiComp.getAttackTargetsHealthInDist().clear();
+        aiComp.getEntitiesHealthInDist().clear();
         if (incomingSpells.get(ai) != null) {
             incomingSpells.get(ai).clear();
         }
@@ -197,7 +200,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
     {
         if ((opponentInDistance(world, ai, 300) && !p.isInLava())) {
             aiComp.setState(StateMachine.ATTACK);
-        } else if (p.isInLava()) {
+        } else if (p.isInLava() || !incomingSpells.get(ai).isEmpty()) {
             aiComp.setState(StateMachine.EVADE);
         } else if (!p.isInLava()) {
             aiComp.setState(StateMachine.CHASE);
@@ -215,18 +218,16 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
 
     private void handleChasing(Entity ai, AI aiComp, Position p, Velocity v)
     {
-        aiComp.setCurrentChasingTarget(lowestValue(aiComp.getAllEntities()));
+        aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
 
-        if (aiComp.getCurrentChasingTarget() != null) {
-            if (!aiComp.getCurrentChasingTarget().get(Position.class).isInLava()) {
-                Position aiPosition = new Position(p);
-                Position entityPosition = new Position(aiComp.getCurrentChasingTarget().get(Position.class));
-                Vector2 direction = new Vector2(aiPosition, entityPosition);
-                v.setVector(direction);
-                v.getVector().normalize();
+        if (aiComp.getCurrentTarget() != null) {
+            Position aiPosition = new Position(p);
+            Position entityPosition = new Position(aiComp.getCurrentTarget().get(Position.class));
+            Vector2 direction = new Vector2(aiPosition, entityPosition);
+            v.setVector(direction);
+            v.getVector().normalize();
 
-                ai.setCharState(CharacterState.MOVING);
-            }
+            ai.setCharState(CharacterState.MOVING);
         }
     }
 
@@ -292,11 +293,12 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         if (!aiComp.isIsWandering()) {
             ai.setMoveState(MovementState.STANDING);
         }
+        ai.setMoveState(MovementState.STANDING);
 
-        if (checkForSameHP(aiComp.getAttackTargetsHealthInDist())) {
-            aiComp.setCurrentAttackTarget(lowestValue(aiComp.getAllEntities()));
+        if (checkForSameHP(aiComp.getEntitiesHealthInDist())) {
+            aiComp.setCurrentTarget(lowestValue(aiComp.getAllEntities()));
         } else {
-            aiComp.setCurrentAttackTarget(lowestValue(aiComp.getAttackTargetsHealthInDist()));
+            aiComp.setCurrentTarget(lowestValue(aiComp.getEntitiesHealthInDist()));
         }
         if (sb.getSpellCooldowns().get(FIREBALL) <= 0 && sb.getCooldownTimeLeft() <= 0) {
             sb.setChosenSpell(FIREBALL);
@@ -315,6 +317,11 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
                 p.setStartPosition(p);
                 aiComp.setIsWandering(true);
                 ai.setCharState(CharacterState.MOVING);
+//            Vector2 wanderVector = ai.get(Velocity.class).getVector();
+//            wanderVector.setMagnitude(75);
+//            wanderVector.setToRandomDirection();
+//            wanderVector.normalize();
+//            ai.get(Velocity.class).setVector(wanderVector);
             }
             Vector2 stopCheck = new Vector2(p, p.getStartPosition());
             if (v.getTravelDist() <= stopCheck.getMagnitude()) {
@@ -365,6 +372,7 @@ public class AIPlugin implements IEntityProcessingService, IGamePluginService {
         for (Entity ai : world.getEntities(ENEMY)) {
             behaviour(world, gameData, ai);
             setEnemiesInRange(world, ai, 300);
+            System.out.println(incomingSpells.get(ai).size());
         }
 
     }
