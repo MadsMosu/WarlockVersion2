@@ -8,7 +8,7 @@ To install the game, navigate to the file Bundle.properties in /SilentUpdate/src
 the tag "org_netbeans_modules_autoupdate_silentupdate_update_center", must point to the path of the updates.xml file in /ModuleBuilder/target/netbeans_site. Furthermore before running the application, the ModuleBuilder must be deployed. 
 
 # Known bugs
-Incoming spell collider only works on 1 point.
-No bounce if an entity casts a spell before being hit.
-The game does not work optimally with touchpad, so using a mouse is recommended.
-If the player dies outside the map, he will be invincible for the rest of the game.
+- Incoming spell collider only works on 1 point.
+- No bounce if an entity casts a spell before being hit.
+- The game does not work optimally with touchpad, so using a mouse is recommended.
+- If the player dies outside the map, he will be invincible for the rest of the game.
