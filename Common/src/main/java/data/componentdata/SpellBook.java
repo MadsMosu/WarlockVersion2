@@ -28,7 +28,7 @@ public class SpellBook {
         this.owner = owner;
         spells = new ArrayList<>();
         spellCooldowns = new ConcurrentHashMap();
-        globalCooldownTime = 0.5f;
+        globalCooldownTime = 1f;
         
     }
 

@@ -17,6 +17,7 @@ public class Position implements Serializable {
     private float y;
     private Position startPosition;
     private boolean inLava = false;
+    private float lavaTimer;
 
 
     public boolean isInLava() {
@@ -30,11 +31,13 @@ public class Position implements Serializable {
     public Position(Position pos) {
         x = pos.getX();
         y = pos.getY();
+        lavaTimer = 0;
     }
 
     public Position(float x, float y) {
         this.x = x;
         this.y = y;
+        lavaTimer = 0;
     }
 
     public void setPosition(float x, float y) {
@@ -64,6 +67,20 @@ public class Position implements Serializable {
 
     public void setStartPosition(Position startPosition) {
         this.startPosition = startPosition;
+    }
+
+    public float getLavaTimer()
+    {
+        return lavaTimer;
+    }
+
+    public void setLavaTimer(float lavaTimer)
+    {
+        this.lavaTimer = lavaTimer;
+    }
+    
+        public void increaseLavaTimer(float delta) {
+        this.lavaTimer += delta;
     }
     
     @Override

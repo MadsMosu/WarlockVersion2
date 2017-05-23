@@ -16,9 +16,6 @@ import data.componentdata.DamageTaken;
 import data.componentdata.Health;
 import data.componentdata.Owner;
 import data.componentdata.Position;
-import data.componentdata.Score;
-import data.componentdata.SpellBook;
-import data.componentdata.SpellInfos;
 import data.componentdata.Velocity;
 import java.util.Collection;
 import org.openide.util.lookup.ServiceProvider;
@@ -39,8 +36,6 @@ public class CollisionPlugin implements IEntityProcessingService {
 
             for (Entity collideWith : collideWithEntities) {
                 handleCollision(handled, collideWith, world, gameData);
-//                isCollision(handled, collideWith);
-
             }
 
         }
@@ -56,7 +51,7 @@ public class CollisionPlugin implements IEntityProcessingService {
                     Owner owner = (handled.get(Owner.class));
                     DamageTaken dmgTaken = new DamageTaken(dmg, owner);
                     collideWith.get(Health.class).addDamageTaken(dmgTaken);
-                    //System.out.println(collideWith.get(Health.class).getHp());
+                    
                     Velocity v = collideWith.get(Velocity.class);
 
                     v.setVector(handled.get(Velocity.class).getVector());
@@ -72,6 +67,8 @@ public class CollisionPlugin implements IEntityProcessingService {
                 if (!handled.get(Owner.class).getID().equals(collideWith.getID())) {
                     collideWith.get(Health.class).addDamageTaken(new DamageTaken(handled.get(Damage.class), handled.get(Owner.class)));
 
+                    Position p = collideWith.get(Position.class);
+                    p.setStartPosition(new Position(p));
                     Velocity v = collideWith.get(Velocity.class);
                     v.setVector(handled.get(Velocity.class).getVector());
                     v.getVector().setMagnitude(200);

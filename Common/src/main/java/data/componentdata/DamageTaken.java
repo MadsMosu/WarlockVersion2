@@ -15,7 +15,6 @@ public class DamageTaken
 {
     private Damage damage;
     private Owner owner;
-    private int bouncePoints;
 
     public DamageTaken(Damage damage, Owner owner)
     {

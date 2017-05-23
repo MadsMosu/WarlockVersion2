@@ -1,12 +1,14 @@
 package data.util;
 
 import data.componentdata.Position;
+import java.util.Random;
 
 public class Vector2 {
 
     private float x;
     private float y;
     static public final float FLOAT_ROUNDING_ERROR = 0.000001f;
+    Random random = new RandomXS128();
 
     /**
      * Constructs vector from pos1 to pos2
@@ -69,6 +71,12 @@ public class Vector2 {
         return this;
     }
 
+    public Vector2 setToRandomDirection()
+    {
+        float theta = random(0f, (float) (Math.PI*2));
+        return this.set((float) Math.cos(theta), (float) Math.sin(theta));
+    }
+
     /**
      * Sets the offset y.
      *
@@ -77,6 +85,11 @@ public class Vector2 {
     public void setY(float y)
     {
         this.y = y;
+    }
+
+    private float random(float start, float end)
+    {
+        return start + random.nextFloat() * (end - start);
     }
 
     /**
@@ -143,6 +156,13 @@ public class Vector2 {
     {
         this.x *= multiplier;
         this.y *= multiplier;
+        return this;
+    }
+
+    private Vector2 set(float x, float y)
+    {
+        this.x = x;
+        this.y = y;
         return this;
     }
 
@@ -263,7 +283,6 @@ public class Vector2 {
     {
         return isZero(x * other.y - y * other.x);
     }
-
 
     @Override
     public boolean equals(Object obj)
